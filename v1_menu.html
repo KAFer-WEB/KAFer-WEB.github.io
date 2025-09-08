@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>KAFer v1.0 - Menu</title>
+    <link rel="icon" href="icon.png" type="image/png">
+    <!-- v1.0用のシンプルなスタイル -->
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .update-banner { background: #ffcdd2; padding: 20px; margin: 20px 0; border-radius: 8px; border: 1px solid #e91e63; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc; margin: 5px; }
+        .primary { background-color: #e91e63; color: white; border: none; }
+        .secondary { background-color: #eee; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all .3s; z-index: 100; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background: white; padding: 30px; border-radius: 10px; text-align: center; max-width: 400px; }
+        .modal-buttons { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        input[type="password"] { padding: 10px; font-size: 1.2em; text-align: center; width: 150px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>KAFer v1.0 Menu</h1>
+        <p>ようこそ、<strong id="userName"></strong>さん！</p>
+        <div class="update-banner">
+            <h2>新しいv2.0が利用可能です！</h2>
+            <p>よりモダンなデザインと便利な機能を体験しませんか？</p>
+            <button id="updateButton" class="primary">v2.0にアップデートする</button>
+        </div>
+        <button id="changePasscodeButton" class="secondary">パスコード変更</button>
+        <button id="logoutButton" class="secondary">ログアウト</button>
+    </div>
+    <div id="customModal" class="modal-overlay"></div>
+
+    <script src="global.js"></script>
+    <script>
+        const userName = getLoggedInUserName();
+        const userId = getLoggedInKAFerID();
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if(!userId || getUserVersion() !== 'v1.0') { window.location.href = 'index.html'; return; }
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('logoutButton').addEventListener('click', () => { logout(); window.location.href = 'index.html'; });
+            document.getElementById('updateButton').addEventListener('click', promptPasscodeForUpdate);
+            document.getElementById('changePasscodeButton').addEventListener('click', promptChangePasscode);
+        });
+
+        function promptPasscodeForUpdate() {
+            const modalBody = `
+                <p>v2.0へのアップデートに伴い、セキュリティ強化のため新しいパスコード(4桁の数字)を設定してください。</p>
+                <input type="password" id="newPasscode" maxlength="4">
+            `;
+            showModal('v2.0用パスコード設定', modalBody, [
+                { text: '設定してアップデート', class: 'primary', action: handleUpdate },
+                { text: 'キャンセル', class: 'secondary', action: hideModal }
+            ]);
+        }
+
+        async function handleUpdate() {
+            const newPasscode = document.getElementById('newPasscode').value;
+            if (!/^\d{4}$/.test(newPasscode)) { alert('パスコードは4桁の数字で入力してください。'); return; }
+            hideModal();
+
+            try {
+                const passFormData = new FormData();
+                passFormData.append(ENTRY_MAP.id, userId); passFormData.append(ENTRY_MAP.name, userName);
+                passFormData.append(ENTRY_MAP.type, 'pass_update'); passFormData.append(ENTRY_MAP.data, JSON.stringify({ pass: newPasscode }));
+                await postToGoogleForm(passFormData);
+                await pollForData(data => data.some(r => r.F === userId && r.e === 'pass_update' && r.r.includes(newPasscode)));
+
+                const versionFormData = new FormData();
+                versionFormData.append(ENTRY_MAP.id, userId); versionFormData.append(ENTRY_MAP.name, userName);
+                versionFormData.append(ENTRY_MAP.type, 'version_select'); versionFormData.append(ENTRY_MAP.data, JSON.stringify({ version: 'v2.0' }));
+                await postToGoogleForm(versionFormData);
+                await pollForData(data => data.some(r => r.F === userId && r.e === 'version_select' && r.r.includes('v2.0')));
+                
+                setLoggedInInfo(userId, userName, 'v2.0');
+                showModal('アップデート完了！', '新しいKAFerへようこそ。次回からは新しいパスコードでログインしてください。', [
+                    { text: 'OK', action: () => window.location.href = 'menu.html' }
+                ]);
+            } catch(e) { showModal('エラー', e.message); }
+        }
+        
+        function promptChangePasscode() {
+            const modalBody = `
+                <p>現在のパスコードと新しいパスコードを入力してください。</p>
+                <input type="password" id="currentPasscode" maxlength="4" placeholder="現在のパスコード"><br>
+                <input type="password" id="newPasscode" maxlength="4" placeholder="新しいパスコード"><br>
+                <input type="password" id="confirmNewPasscode" maxlength="4" placeholder="新しいパスコード(確認)">
+            `;
+            showModal('パスコード変更', modalBody, [
+                { text: '変更する', class: 'primary', action: handleChangePasscode },
+                { text: 'キャンセル', class: 'secondary', action: hideModal }
+            ]);
+        }
+
+        async function handleChangePasscode() {
+            const currentPass = document.getElementById('currentPasscode').value;
+            const newPass = document.getElementById('newPasscode').value;
+            const confirmPass = document.getElementById('confirmNewPasscode').value;
+
+            if (!/^\d{4}$/.test(currentPass) || !/^\d{4}$/.test(newPass)) { alert('パスコードは4桁の数字です。'); return; }
+            if (newPass !== confirmPass) { alert('新しいパスコードが一致しません。'); return; }
+
+            const allData = await fetchKAFerData();
+            const passcodeRecords = allData.filter(row => row.F === userId && (row.e === 'register' || row.e === 'pass_update'));
+            const latestPasscodeRecord = passcodeRecords.pop();
+            if (!latestPasscodeRecord || JSON.parse(latestPasscodeRecord.r).pass !== currentPass) {
+                alert('現在のパスコードが違います。'); return;
+            }
+
+            hideModal();
+            const formData = new FormData();
+            formData.append(ENTRY_MAP.id, userId); formData.append(ENTRY_MAP.name, userName);
+            formData.append(ENTRY_MAP.type, 'pass_update'); formData.append(ENTRY_MAP.data, JSON.stringify({ pass: newPass }));
+            await postToGoogleForm(formData);
+
+            try {
+                await pollForData(data => data.filter(r => r.F === userId && r.e === 'pass_update').pop()?.r.includes(newPass));
+                showModal('成功', 'パスコードが正常に変更されました。');
+            } catch (e) {
+                showModal('エラー', e.message);
+            }
+        }
+    </script>
+</body>
+</html>
