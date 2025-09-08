@@ -1,0 +1,153 @@
+/* style.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+    --bg-color-1: #fde_b_f2; /* Light Pink */
+    --bg-color-2: #e_a_bbf2; /* Lilac */
+    --bg-color-3: #f_a_dee_d9; /* Pale Pink */
+    --bg-color-4: #d_d_bff2; /* Light Purple */
+    --main-pink: #e91e63;
+    --dark-pink: #c2185b;
+    --light-pink: #ffcdd2;
+    --text-dark: #333;
+    --text-light: #555;
+    --white: #ffffff;
+    --success: #2e7d32;
+    --error: #c62828;
+    --warning: #EF6C00;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 20px 0;
+    color: var(--text-dark);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    /* ★★★ 光のようなアニメーショングラデーション背景 ★★★ */
+    background: linear-gradient(315deg, var(--bg-color-1), var(--bg-color-2), var(--bg-color-3), var(--bg-color-4));
+    background-size: 400% 400%;
+    animation: gradient-animation 15s ease infinite;
+}
+@keyframes gradient-animation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ★★★ ノイズテクスチャを上に重ねる ★★★ */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgODAwIj48ZyBmaWxsLW9wYWNpdHk9IjAuMTIiPjxjaXJjbGUgZmlsbD0iI2U5MWU2MyIgY3g9IjQwMCIgY3k9IjQwMCIgcj0iNjAwIi8+PGNpcmNsZSBmaWxsPSIjZmNlZmVlIiBjeD0iNDAwIiBjeT0iNDAwIiByPSI1MDAiLz48Y2lyY2xlIGZpbGw9IiNmZmNkZDIiIGN4PSI0MDAiIGN5PSI0MDAiIHI9IjMwMCIvPjxjaXJjbGUgZmlsbD0iI2MyMTg1YiIgY3g9IjQwMCIgY3k9IjQwMCIgcj0iMjAwIi8+PGNpcmNsZSBmaWxsPSIjZmZmZmZmIiBjeD0iNDAwIiBjeT0iNDAwIiByPSIxMDAiLz48L2c+PC9zdmc+');
+    opacity: 0.05;
+    z-index: -1;
+    animation: noise 2s steps(2) infinite;
+}
+@keyframes noise { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(5px, 5px); } }
+
+.container {
+    /* ★★★ ガラスのような質感（グラスモーフィズム）を強化 ★★★ */
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1), 0 0 25px rgba(233, 30, 99, 0.1); /* ★ グローエフェクト追加 */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    max-width: 500px;
+    width: 90%;
+    margin: 50px auto;
+    text-align: center;
+    animation: fadeIn 0.5s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+h1, h2 {
+    color: var(--main-pink);
+    margin-bottom: 25px;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(233, 30, 99, 0.2); /* ★ テキストにグロー効果 */
+}
+h1 { font-size: 2.2em; }
+
+input[type="text"], input[type="password"], input[type="number"] {
+    width: calc(100% - 24px);
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid var(--light-pink);
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.5);
+}
+input:focus {
+    border-color: var(--main-pink);
+    box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.2);
+    outline: none;
+}
+button, .button {
+    background: linear-gradient(45deg, var(--main-pink), var(--dark-pink));
+    color: var(--white);
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 2px 10px rgba(233, 30, 99, 0.2); /* ★ ボタンの影を調整 */
+}
+button:hover, .button:hover {
+    transform: translateY(-3px) scale(1.02); /* ★ ホバー時の動きを強化 */
+    box-shadow: 0 5px 20px rgba(233, 30, 99, 0.4); /* ★ グローエフェクト強化 */
+}
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 他のスタイルは前回から変更なし */
+.link-button { background: transparent; border: 1px solid var(--main-pink); color: var(--main-pink); }
+.link-button:hover { background: var(--main-pink); color: var(--white); }
+.message { margin-top: 20px; padding: 15px; border-radius: 8px; font-weight: 500; border-left: 5px solid; text-align: left; }
+.success { border-color: var(--success); background-color: #E8F5E9; color: var(--success); }
+.error { border-color: var(--error); background-color: #FFEBEE; color: var(--error); }
+.warning { border-color: var(--warning); background-color: #FFF3E0; color: var(--warning); }
+.hidden { display: none; }
+.menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 30px; }
+.menu-grid .button { padding: 20px; background: var(--white); color: var(--main-pink); border: 1px solid var(--light-pink); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.menu-grid .button:hover { background: var(--light-pink); }
+.content-box { text-align: left; padding: 20px; border: 1px solid var(--light-pink); border-radius: 8px; margin-top: 20px; background: #fff; }
+.info-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
+.info-item:last-child { border-bottom: none; }
+.info-label { font-weight: 600; color: var(--text-light); }
+.info-value { font-weight: 600; font-size: 1.1em; }
+.locked-account { filter: blur(5px); pointer-events: none; opacity: 0.7; }
+.unpaid { color: var(--error); font-weight: bold; }
+.paid { color: var(--success); font-weight: bold; }
+.admin-container { max-width: 900px; }
+.tab-buttons { display: flex; border-bottom: 2px solid var(--light-pink); margin-bottom: 20px; }
+.tab-button { padding: 10px 20px; cursor: pointer; border: none; background: transparent; font-size: 16px; font-weight: 600; color: var(--text-light); position: relative; transition: color 0.3s; }
+.tab-button.active { color: var(--main-pink); }
+.tab-button.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background: var(--main-pink); animation: grow 0.3s; }
+@keyframes grow { from { width: 0; } to { width: 100%; } }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s; }
+.data-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
+.data-table th, .data-table td { border: 1px solid var(--light-pink); padding: 10px; text-align: left; }
+.data-table th { background-color: var(--main-pink); color: white; }
+.data-table td .button { width: auto; padding: 5px 10px; font-size: 0.8em; margin: 0; }
+.data-table td.used { color: #999; text-decoration: line-through; }
+.loading-spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--main-pink); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAFer - Menu</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="icon.png" type="image/png">
+</head>
+<body>
+    <div class="container">
+        <h1>メニュー</h1>
+        <p>ようこそ、<strong id="userName"></strong> さん！</p>
+        <div id="contentArea"><div class="loading-spinner"></div></div>
+        <div class="menu-grid">
+            <button class="button" data-content="paymentInfo">支払い情報</button>
+            <button class="button" data-content="paymentStatus">全会員の支払状況</button>
+            <button class="button" data-content="submitCode">コード入力</button>
+            <button class="button" data-content="accountConfirm">アカウント確認</button>
+            <button class="button" data-content="withdrawal">退会</button>
+        </div>
+        <button id="logoutButton" class="link-button" style="margin-top: 30px;">ログアウト</button>
+    </div>
+
+    <script src="global.js"></script>
+    <script>
+        const userName = getLoggedInUserName();
+        const userId = getLoggedInKAFerID();
+        const contentArea = document.getElementById('contentArea');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!userId) { window.location.href = 'index.html'; return; }
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('logoutButton').addEventListener('click', () => { logout(); window.location.href = 'index.html'; });
+            loadContent('paymentInfo');
+            document.querySelectorAll('.menu-grid .button').forEach(btn => btn.addEventListener('click', () => loadContent(btn.dataset.content)));
+        });
+
+        async function loadContent(contentType) {
+            contentArea.innerHTML = `<div class="loading-spinner"></div>`;
+            try {
+                const allData = await fetchKAFerData();
+                
+                const registerInfo = allData.find(r => r.F === userId && r.e === 'register');
+                if (!registerInfo) { contentArea.innerHTML = `<p class="message error">あなたの登録情報が見つかりません。管理者にお問い合わせください。</p>`; return; }
+                const myRegisterDate = new Date(registerInfo.K);
+                const myPayments = allData.filter(row => row.F === userId && row.e === 'payment').map(p => ({...p, date: new Date(p.K)}));
+
+                let unpaidAmount = 0, consecutiveDelinquent = 0;
+                let checkDate = new Date(myRegisterDate.getFullYear(), myRegisterDate.getMonth(), 1);
+                const today = new Date(); today.setMonth(today.getMonth() -1); today.setDate(1);
+
+                while (checkDate <= today) {
+                    const monthStr = getMonthYear(checkDate);
+                    if (!myPayments.some(p => getMonthYear(p.date) === monthStr)) {
+                        unpaidAmount += calculateBilling(getActiveUsers(allData, checkDate).length);
+                        consecutiveDelinquent++;
+                    } else {
+                        consecutiveDelinquent = 0;
+                    }
+                    checkDate.setMonth(checkDate.getMonth() + 1);
+                }
+
+                let content = '';
+                switch(contentType) {
+                    case 'paymentInfo':
+                        const activeNow = getActiveUsers(allData).length;
+                        const currentBilling = calculateBilling(activeNow);
+                        const totalBilling = currentBilling + unpaidAmount;
+                        content = `<h2>支払い情報</h2><div class="content-box">
+                            <div class="info-item"><span class="info-label">今月の請求額</span><span class="info-value">¥${currentBilling.toLocaleString()}</span></div>
+                            <div class="info-item"><span class="info-label">未払い合計額</span><span class="info-value">¥${unpaidAmount.toLocaleString()}</span></div>
+                            <div class="info-item" style="background: #fcefee;"><span class="info-label"><strong>合計請求額</strong></span><span class="info-value"><strong>¥${totalBilling.toLocaleString()}</strong></span></div>
+                            <div class="info-item"><span class="info-label">集金期間</span><span class="info-value">毎月1日～末日</span></div>
+                        </div>`;
+                        break;
+                    case 'paymentStatus':
+                        const users = allData.filter(r => r.e === 'register' && !allData.some(rem => rem.F === r.F && rem.e === 'remove'));
+                        const payments = allData.filter(r => r.e === 'payment');
+                        const currentMonth = getMonthYear(new Date());
+                        let tableRows = users.map(user => {
+                            const isPaid = payments.some(p => p.F === user.F && getMonthYear(new Date(p.K)) === currentMonth);
+                            return `<tr><td>${user.A}</td><td class="${isPaid ? 'paid' : 'unpaid'}">${isPaid ? '支払い済み' : '未払い'}</td></tr>`;
+                        }).join('');
+                        content = `<h2>全会員の支払状況 (${currentMonth})</h2><table class="data-table"><thead><tr><th>名前</th><th>状況</th></tr></thead><tbody>${tableRows}</tbody></table>`;
+                        break;
+                    case 'submitCode':
+                        content = `<h2>支払いコード入力</h2><div class="content-box">
+                            <input type="number" id="paymentCodeInput" placeholder="6桁の支払いコード">
+                            <button id="submitPaymentCode">支払いを確定する</button>
+                            <div id="paymentMsg" class="message hidden"></div>
+                        </div>`;
+                        break;
+                    case 'accountConfirm':
+                        const config = allData.filter(r => r.e === 'config' && r.r).pop();
+                        const accInfo = config ? JSON.parse(config.r) : { email: '未設定', pass: '未設定' };
+                        const isLocked = consecutiveDelinquent >= 3;
+                        if(isLocked) alert('3ヶ月以上の料金延滞があるため、アカウント情報を確認できません。');
+                        content = `<h2>アカウント確認</h2><div class="content-box ${isLocked ? 'locked-account' : ''}">
+                            <div class="info-item"><span class="info-label">メール</span><span class="info-value">${accInfo.email}</span></div>
+                            <div class="info-item"><span class="info-label">パスワード</span><span class="info-value">${accInfo.pass}</span></div>
+                        </div>`;
+                        break;
+                    case 'withdrawal':
+                        let totalOverpayment = 0;
+                        for (const payment of myPayments) {
+                            const activeCount = getActiveUsers(allData, payment.date).length;
+                            const billing = calculateBilling(activeCount);
+                            const totalCollected = billing * activeCount;
+                            if (totalCollected > 990) totalOverpayment += Math.floor((totalCollected - 990) / activeCount);
+                        }
+                        content = `<h2>退会手続き</h2><div class="content-box">
+                            <p class="message warning">本当に退会しますか？この操作は取り消せません。</p>
+                            <div class="info-item"><span class="info-label">過払い金合計 (返金額目安)</span><span class="info-value">¥${totalOverpayment.toLocaleString()}</span></div>
+                            <button id="confirmWithdrawal" class="button">退会を確定する</button>
+                        </div>`;
+                        break;
+                }
+                contentArea.innerHTML = content;
+                attachEventListeners(contentType, allData);
+            } catch(e) {
+                contentArea.innerHTML = `<p class="message error">データの表示中にエラーが発生しました。時間をおいて再読み込みしてください。</p>`;
+                console.error(e);
+            }
+        }
+
+        function attachEventListeners(contentType, allData) {
+            if (contentType === 'submitCode') {
+                const button = document.getElementById('submitPaymentCode');
+                button.addEventListener('click', async () => {
+                    button.disabled = true; button.textContent = '確認中...';
+                    const code = document.getElementById('paymentCodeInput').value;
+                    const msgEl = document.getElementById('paymentMsg');
+                    hideMessage(msgEl);
+                    if (!/^\d{6}$/.test(code)) { showMessage(msgEl, '6桁のコードを入力してください。', 'error'); button.disabled = false; button.textContent = '支払いを確定する'; return; }
+                    
+                    const isValid = allData.some(r => r.e === 'code_issue' && r.r === code);
+                    const isUsed = allData.some(r => (r.e === 'payment' || r.e === 'code_void') && r.r === code);
+                    
+                    if(isValid && !isUsed) {
+                        const formData = new FormData();
+                        formData.append(ENTRY_MAP.name, userName); formData.append(ENTRY_MAP.id, userId); formData.append(ENTRY_MAP.type, 'payment'); formData.append(ENTRY_MAP.data, code);
+                        await postToGoogleForm(formData);
+                        showMessage(msgEl, 'システムに反映中です...', 'warning');
+                        try {
+                            await pollForData(data => data.some(row => row.F === userId && row.e === 'payment' && row.r === code));
+                            showMessage(msgEl, '支払いが完了しました！', 'success');
+                            setTimeout(() => loadContent('paymentInfo'), 2000);
+                        } catch(e) { showMessage(msgEl, e.message, 'error'); }
+                    } else {
+                        showMessage(msgEl, '無効または使用済みのコードです。', 'error');
+                    }
+                    button.disabled = false; button.textContent = '支払いを確定する';
+                });
+            } else if (contentType === 'withdrawal') {
+                document.getElementById('confirmWithdrawal').addEventListener('click', async (event) => {
+                     if(confirm('最終確認：本当に退会しますか？')) {
+                        event.target.disabled = true; event.target.textContent = "処理中...";
+                        const formData = new FormData();
+                        formData.append(ENTRY_MAP.name, userName); formData.append(ENTRY_MAP.id, userId); formData.append(ENTRY_MAP.type, 'remove');
+                        await postToGoogleForm(formData);
+                        try {
+                            await pollForData(data => data.some(row => row.F === userId && row.e === 'remove'));
+                            alert('退会処理が完了しました。ご利用ありがとうございました。');
+                            logout(); window.location.href = 'index.html';
+                        } catch(e) { alert(e.message); event.target.disabled = false; event.target.textContent = "退会を確定する"; }
+                     }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

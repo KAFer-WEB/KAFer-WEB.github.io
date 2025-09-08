@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAFer - Welcome</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="icon.png" type="image/png">
+</head>
+<body>
+    <div class="container">
+        <h1 id="pageTitle">KAFer</h1>
+        <div id="loginSection">
+            <h2>ログイン</h2>
+            <input type="text" id="loginKAFerID" maxlength="4" placeholder="KAFerID (4桁)" required>
+            <div id="passwordWrapper" class="hidden"><input type="password" id="loginPassword" placeholder="管理者パスワード" required></div>
+            <button id="loginButton">ログイン</button>
+            <div id="loginMessage" class="message hidden"></div>
+            <button id="showRegisterButton" class="link-button">新規登録はこちら</button>
+        </div>
+        <div id="registerSection" class="hidden">
+            <h2>新規登録</h2>
+            <input type="text" id="registerName" maxlength="5" placeholder="名前 (例: TARO)" required>
+            <input type="text" id="registerKAFerID" maxlength="4" placeholder="希望のKAFerID (4桁)" required>
+            <button id="submitRegisterButton">登録する</button>
+            <div id="registerMessage" class="message hidden"></div>
+            <button id="backToLogin" class="link-button">ログイン画面に戻る</button>
+        </div>
+    </div>
+    <script src="global.js"></script>
+    <script>
+        const loginSection = document.getElementById('loginSection');
+        const registerSection = document.getElementById('registerSection');
+        const loginKAFerIDInput = document.getElementById('loginKAFerID');
+        const passwordWrapper = document.getElementById('passwordWrapper');
+        const loginButton = document.getElementById('loginButton');
+        const loginMessage = document.getElementById('loginMessage');
+
+        document.addEventListener('DOMContentLoaded', () => { if (getLoggedInKAFerID()) window.location.href = 'menu.html'; });
+        loginKAFerIDInput.addEventListener('input', () => passwordWrapper.classList.toggle('hidden', loginKAFerIDInput.value !== '2025'));
+
+        loginButton.addEventListener('click', async () => {
+            hideMessage(loginMessage);
+            const id = loginKAFerIDInput.value.trim();
+            if (id === '2025') {
+                if (document.getElementById('loginPassword').value === 'iKeda0108') {
+                    setLoggedInInfo('2025', 'Admin'); setAdminSession(); window.location.href = 'admin.html';
+                } else { showMessage(loginMessage, 'パスワードが違います。', 'error'); }
+            } else {
+                if (!/^\d{4}$/.test(id)) { showMessage(loginMessage, 'KAFerIDは4桁の数字です。', 'error'); return; }
+                const allData = await fetchKAFerData();
+                const userInfo = allData.find(row => row.F === id && row.e === 'register');
+                if (userInfo && !allData.some(r => r.F === id && r.e === 'remove')) {
+                    setLoggedInInfo(id, userInfo.A); window.location.href = 'menu.html';
+                } else { showMessage(loginMessage, 'KAFerIDが見つからないか、退会済みです。', 'error'); }
+            }
+        });
+
+        document.getElementById('showRegisterButton').addEventListener('click', () => { loginSection.classList.add('hidden'); registerSection.classList.remove('hidden'); });
+        document.getElementById('backToLogin').addEventListener('click', () => { registerSection.classList.add('hidden'); loginSection.classList.remove('hidden'); });
+        
+        const registerButton = document.getElementById('submitRegisterButton');
+        registerButton.addEventListener('click', async () => {
+            registerButton.disabled = true; registerButton.textContent = '処理中...';
+            const name = document.getElementById('registerName').value.trim().toUpperCase();
+            const id = document.getElementById('registerKAFerID').value.trim();
+            const msgEl = document.getElementById('registerMessage');
+            hideMessage(msgEl);
+            
+            if (!/^[A-Z]{1,5}$/.test(name) || !/^\d{4}$/.test(id)) { showMessage(msgEl, '入力形式が正しくありません。', 'error'); registerButton.disabled = false; registerButton.textContent = '登録する'; return; }
+            const allData = await fetchKAFerData();
+            if (allData.some(row => row.F === id)) { showMessage(msgEl, 'このKAFerIDは使用されています。', 'error'); registerButton.disabled = false; registerButton.textContent = '登録する'; return; }
+
+            const formData = new FormData();
+            formData.append(ENTRY_MAP.name, name); formData.append(ENTRY_MAP.id, id); formData.append(ENTRY_MAP.type, 'register');
+            await postToGoogleForm(formData);
+            
+            showMessage(msgEl, '登録内容をシステムに反映中です...', 'warning');
+            try {
+                await pollForData(data => data.some(row => row.F === id && row.e === 'register'));
+                showMessage(msgEl, '登録完了！ログインしてください。', 'success');
+                setTimeout(() => document.getElementById('backToLogin').click(), 2000);
+            } catch (error) {
+                showMessage(msgEl, error.message, 'error');
+            } finally {
+                registerButton.disabled = false; registerButton.textContent = '登録する';
+            }
+        });
+    </script>
+</body>
+</html>

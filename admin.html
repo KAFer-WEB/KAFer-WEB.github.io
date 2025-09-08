@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAFer - Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="icon.png" type="image/png">
+</head>
+<body>
+    <div class="container admin-container">
+        <h1>管理者パネル</h1>
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="dashboard">ダッシュボード</button>
+            <button class="tab-button" data-tab="codes">コード管理</button>
+            <button class="tab-button" data-tab="config">設定変更</button>
+        </div>
+        <div id="dashboard" class="tab-content active"><div class="loading-spinner"></div></div>
+        <div id="codes" class="tab-content"><div class="loading-spinner"></div></div>
+        <div id="config" class="tab-content">
+            <h2>アカウント情報設定</h2>
+            <div class="content-box">
+                <p>ここで設定したメールアドレスとパスワードが、全ユーザーの「アカウント確認」ページに表示されます。</p>
+                <input type="text" id="configEmail" placeholder="新しいメールアドレス">
+                <input type="text" id="configPass" placeholder="新しいパスワード">
+                <button id="updateConfigButton">設定を更新</button>
+                <div id="configMsg" class="message hidden"></div>
+            </div>
+        </div>
+        <button id="adminLogout" class="link-button" style="margin-top: 30px;">ログアウト</button>
+    </div>
+    
+    <script src="global.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!isAdmin()) { window.location.href = 'index.html'; return; }
+            document.getElementById('adminLogout').addEventListener('click', () => { logout(); window.location.href = 'index.html'; });
+            
+            document.querySelectorAll('.tab-button').forEach(btn => btn.addEventListener('click', e => {
+                document.querySelector('.tab-button.active').classList.remove('active');
+                document.querySelector('.tab-content.active').classList.remove('active');
+                e.target.classList.add('active');
+                document.getElementById(e.target.dataset.tab).classList.add('active');
+            }));
+
+            loadDashboard(); loadCodes();
+            
+            const updateBtn = document.getElementById('updateConfigButton');
+            updateBtn.addEventListener('click', async () => {
+                updateBtn.disabled = true; updateBtn.textContent = '更新中...';
+                const msgEl = document.getElementById('configMsg');
+                hideMessage(msgEl);
+                const email = document.getElementById('configEmail').value.trim();
+                const pass = document.getElementById('configPass').value.trim();
+                if (!email || !pass) { alert('両方のフィールドを入力してください。'); updateBtn.disabled = false; updateBtn.textContent = '設定を更新'; return; }
+
+                const configData = JSON.stringify({ email, pass });
+                const formData = new FormData();
+                formData.append(ENTRY_MAP.type, 'config'); formData.append(ENTRY_MAP.data, configData);
+                await postToGoogleForm(formData);
+                showMessage(msgEl, 'システムに反映中です...', 'warning');
+                try {
+                    await pollForData(data => data.filter(r => r.e === 'config').pop()?.r === configData);
+                    showMessage(msgEl, '設定を更新しました。', 'success');
+                } catch(e) { showMessage(msgEl, e.message, 'error'); }
+                finally { updateBtn.disabled = false; updateBtn.textContent = '設定を更新'; }
+            });
+        });
+
+        async function loadDashboard() {
+            const content = document.getElementById('dashboard');
+            content.innerHTML = `<div class="loading-spinner"></div>`;
+            const allData = await fetchKAFerData();
+            const users = allData.filter(r => r.e === 'register');
+            const payments = allData.filter(r => r.e === 'payment');
+            const removals = allData.filter(r => r.e === 'remove').map(r => r.F);
+            const currentMonth = getMonthYear(new Date());
+            
+            let rows = users.map(user => {
+                const isPaid = payments.some(p => p.F === user.F && getMonthYear(new Date(p.K)) === currentMonth);
+                const isRemoved = removals.includes(user.F);
+                return `<tr style="${isRemoved ? 'opacity:0.4; text-decoration: line-through;' : ''}"><td>${user.A}</td><td>${user.F}</td><td class="${isPaid ? 'paid' : 'unpaid'}">${isPaid ? '支払い済み' : '未払い'}${isRemoved ? ' (退会)' : ''}</td></tr>`;
+            }).join('');
+            content.innerHTML = `<h2>会員と支払い状況</h2><table class="data-table"><thead><tr><th>名前</th><th>KAFerID</th><th>今月の支払い</th></tr></thead><tbody>${rows}</tbody></table>`;
+        }
+
+        async function loadCodes() {
+            const content = document.getElementById('codes');
+            content.innerHTML = `<div class="loading-spinner"></div>`;
+            const allData = await fetchKAFerData();
+            const issuedCodes = allData.filter(r => r.e === 'code_issue');
+            const payments = allData.filter(r => r.e === 'payment');
+            const voidedCodes = allData.filter(r => r.e === 'code_void').map(r => r.r);
+            
+            let rows = issuedCodes.reverse().map(code => {
+                const payment = payments.find(p => p.r === code.r);
+                const isVoided = voidedCodes.includes(code.r);
+                let status = isVoided ? `<span class="unpaid">無効化済み</span>` : (payment ? `<span class="paid">使用済み (${payment.A})</span>` : '未使用');
+                let button = (payment || isVoided) ? '-' : `<button class="button" onclick="voidCode('${code.r}', this)">無効化</button>`;
+                return `<tr><td>${code.r}</td><td>${status}</td><td>${button}</td></tr>`;
+            }).join('');
+            content.innerHTML = `<h2>支払い完了コード管理</h2>
+                <div class="content-box">
+                    <input type="number" id="newCodeInput" placeholder="新しい6桁コード (空で自動生成)">
+                    <button id="issueCodeButton">新規コード発行</button>
+                    <div id="codeMsg" class="message hidden"></div>
+                </div>
+                <table class="data-table"><thead><tr><th>コード</th><th>状態</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table>`;
+            
+            const issueBtn = document.getElementById('issueCodeButton');
+            issueBtn.addEventListener('click', async () => {
+                issueBtn.disabled = true; issueBtn.textContent = '発行中...';
+                const msgEl = document.getElementById('codeMsg');
+                hideMessage(msgEl);
+                let code = document.getElementById('newCodeInput').value.trim();
+                if (code && !/^\d{6}$/.test(code)) { alert('6桁の数字を入力してください。'); issueBtn.disabled = false; issueBtn.textContent = '新規コード発行'; return; }
+                if (!code) code = Math.floor(100000 + Math.random() * 900000).toString();
+                
+                const currentData = await fetchKAFerData();
+                if(currentData.some(r => r.r === code)) { alert('エラー：このコードは既に存在します。'); issueBtn.disabled = false; issueBtn.textContent = '新規コード発行'; return; }
+
+                const formData = new FormData();
+                formData.append(ENTRY_MAP.type, 'code_issue'); formData.append(ENTRY_MAP.data, code);
+                await postToGoogleForm(formData);
+                showMessage(msgEl, `コード「${code}」をシステムに反映中です...`, 'warning');
+                try {
+                    await pollForData(data => data.some(row => row.e === 'code_issue' && row.r === code));
+                    showMessage(msgEl, `コード「${code}」を発行しました。`, 'success');
+                    loadCodes();
+                } catch(e) { showMessage(msgEl, e.message, 'error'); }
+                finally { issueBtn.disabled = false; issueBtn.textContent = '新規コード発行'; }
+            });
+        }
+
+        async function voidCode(code, button) {
+            if(confirm(`コード「${code}」を本当に無効化しますか？`)) {
+                button.disabled = true; button.textContent = '...';
+                const formData = new FormData();
+                formData.append(ENTRY_MAP.type, 'code_void'); formData.append(ENTRY_MAP.data, code);
+                await postToGoogleForm(formData);
+                try {
+                    await pollForData(data => data.some(row => row.e === 'code_void' && row.r === code));
+                    alert(`コード「${code}」を無効化しました。`);
+                    loadCodes();
+                } catch(e) { alert(e.message); button.disabled = false; button.textContent = '無効化'; }
+            }
+        }
+    </script>
+</body>
+</html>
