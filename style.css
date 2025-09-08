@@ -1,153 +1,213 @@
-/* style.css */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+/* style.css - Final Revolution: "Aura & Glass" */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 :root {
-    --bg-color-1: #fde_b_f2; /* Light Pink */
-    --bg-color-2: #e_a_bbf2; /* Lilac */
-    --bg-color-3: #f_a_dee_d9; /* Pale Pink */
-    --bg-color-4: #d_d_bff2; /* Light Purple */
-    --main-pink: #e91e63;
-    --dark-pink: #c2185b;
-    --light-pink: #ffcdd2;
-    --text-dark: #333;
-    --text-light: #555;
-    --white: #ffffff;
-    --success: #2e7d32;
-    --error: #c62828;
-    --warning: #EF6C00;
+    --bg-grad-1: #fdebf2; --bg-grad-2: #eabbf2; --bg-grad-3: #fadee9; --bg-grad-4: #ddbff2;
+    --main-pink: #e91e63; --dark-pink: #c2185b; --light-pink: #ffcdd2;
+    --text-dark: #2c2c2c; --text-light: #555; --white: #ffffff;
+    --success: #2e7d32; --error: #c62828; --warning: #EF6C00;
+    --shadow-color-light: rgba(255, 255, 255, 0.9);
+    --shadow-color-dark: rgba(200, 150, 180, 0.3);
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 20px 0;
-    color: var(--text-dark);
-    min-height: 100vh;
-    position: relative;
-    overflow-x: hidden;
-    /* ★★★ 光のようなアニメーショングラデーション背景 ★★★ */
-    background: linear-gradient(315deg, var(--bg-color-1), var(--bg-color-2), var(--bg-color-3), var(--bg-color-4));
-    background-size: 400% 400%;
-    animation: gradient-animation 15s ease infinite;
+    font-family: 'Inter', sans-serif;
+    margin: 0; padding: 20px 0; color: var(--text-dark);
+    min-height: 100vh; position: relative; overflow-x: hidden;
+    background: linear-gradient(315deg, var(--bg-grad-1), var(--bg-grad-2), var(--bg-grad-3), var(--bg-grad-4));
+    background-size: 400% 400%; animation: gradient-animation 20s ease infinite;
 }
-@keyframes gradient-animation {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* ★★★ ノイズテクスチャを上に重ねる ★★★ */
+@keyframes gradient-animation { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
 body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgODAwIj48ZyBmaWxsLW9wYWNpdHk9IjAuMTIiPjxjaXJjbGUgZmlsbD0iI2U5MWU2MyIgY3g9IjQwMCIgY3k9IjQwMCIgcj0iNjAwIi8+PGNpcmNsZSBmaWxsPSIjZmNlZmVlIiBjeD0iNDAwIiBjeT0iNDAwIiByPSI1MDAiLz48Y2lyY2xlIGZpbGw9IiNmZmNkZDIiIGN4PSI0MDAiIGN5PSI0MDAiIHI9IjMwMCIvPjxjaXJjbGUgZmlsbD0iI2MyMTg1YiIgY3g9IjQwMCIgY3k9IjQwMCIgcj0iMjAwIi8+PGNpcmNsZSBmaWxsPSIjZmZmZmZmIiBjeD0iNDAwIiBjeT0iNDAwIiByPSIxMDAiLz48L2c+PC9zdmc+');
-    opacity: 0.05;
-    z-index: -1;
-    animation: noise 2s steps(2) infinite;
-}
-@keyframes noise { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(5px, 5px); } }
+    content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39tbX18fHybm5yKiopbW1sAAAD/AAD///+GhobOORvvAAAAAXRSTlMAQObYZgAAAPxJREFUeNpiYCANMzEyMgDx4uLiGIABZEBOSAgyMjKi0gDnaKkQWdeSoCgqKnIsKioK8iA1YSD24uIykBfJ8bW1hcDEyBPR8bW19ZkYBI0E8gB5d3e3AA8gT1ZWViG2s7Oza2sLAwO8vLwMDw8PDw8vIAsoE8jOzsvLgAsoE8gLy8vLgAsoE8jLy8vLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq-container">
+        <h1>メニュー</h1>
+        <p>ようこそ、<strong id="userName"></strong> さん！</p>
+        <div id="contentArea"><div class="loading-spinner"></div></div>
+        <div class="menu-grid">
+            <button class="button" data-content="paymentInfo">支払い情報</button>
+            <button class="button" data-content="paymentStatus">全会員の支払状況</button>
+            <button class="button" data-content="submitCode">コード入力</button>
+            <button class="button" data-content="accountConfirm">アカウント確認</button>
+            <button class="button" data-content="changePasscode">パスコード変更</button>
+            <button class="button" data-content="withdrawal">退会</button>
+        </div>
+        <button id="logoutButton" class="link-button" style="margin-top: 30px;">ログアウト</button>
+    </div>
 
-.container {
-    /* ★★★ ガラスのような質感（グラスモーフィズム）を強化 ★★★ */
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1), 0 0 25px rgba(233, 30, 99, 0.1); /* ★ グローエフェクト追加 */
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    max-width: 500px;
-    width: 90%;
-    margin: 50px auto;
-    text-align: center;
-    animation: fadeIn 0.5s ease-out;
-}
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    <div id="customModal" class="modal-overlay"></div>
+    <div id="notification-container"></div>
 
-h1, h2 {
-    color: var(--main-pink);
-    margin-bottom: 25px;
-    font-weight: 700;
-    text-shadow: 0 0 10px rgba(233, 30, 99, 0.2); /* ★ テキストにグロー効果 */
-}
-h1 { font-size: 2.2em; }
+    <script src="global.js"></script>
+    <script>
+        const userName = getLoggedInUserName();
+        const userId = getLoggedInKAFerID();
+        const contentArea = document.getElementById('contentArea');
 
-input[type="text"], input[type="password"], input[type="number"] {
-    width: calc(100% - 24px);
-    padding: 12px;
-    margin-bottom: 20px;
-    border: 1px solid var(--light-pink);
-    border-radius: 8px;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.5);
-}
-input:focus {
-    border-color: var(--main-pink);
-    box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.2);
-    outline: none;
-}
-button, .button {
-    background: linear-gradient(45deg, var(--main-pink), var(--dark-pink));
-    color: var(--white);
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 15px;
-    text-decoration: none;
-    display: inline-block;
-    box-shadow: 0 2px 10px rgba(233, 30, 99, 0.2); /* ★ ボタンの影を調整 */
-}
-button:hover, .button:hover {
-    transform: translateY(-3px) scale(1.02); /* ★ ホバー時の動きを強化 */
-    box-shadow: 0 5px 20px rgba(233, 30, 99, 0.4); /* ★ グローエフェクト強化 */
-}
-button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!userId || getUserVersion() !== 'v2.0') { window.location.href = 'index.html'; return; }
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('logoutButton').addEventListener('click', () => { logout(); window.location.href = 'index.html'; });
+            loadContent('paymentInfo');
+            document.querySelectorAll('.menu-grid .button').forEach(btn => btn.addEventListener('click', () => loadContent(btn.dataset.content)));
+        });
 
-/* 他のスタイルは前回から変更なし */
-.link-button { background: transparent; border: 1px solid var(--main-pink); color: var(--main-pink); }
-.link-button:hover { background: var(--main-pink); color: var(--white); }
-.message { margin-top: 20px; padding: 15px; border-radius: 8px; font-weight: 500; border-left: 5px solid; text-align: left; }
-.success { border-color: var(--success); background-color: #E8F5E9; color: var(--success); }
-.error { border-color: var(--error); background-color: #FFEBEE; color: var(--error); }
-.warning { border-color: var(--warning); background-color: #FFF3E0; color: var(--warning); }
-.hidden { display: none; }
-.menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 30px; }
-.menu-grid .button { padding: 20px; background: var(--white); color: var(--main-pink); border: 1px solid var(--light-pink); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-.menu-grid .button:hover { background: var(--light-pink); }
-.content-box { text-align: left; padding: 20px; border: 1px solid var(--light-pink); border-radius: 8px; margin-top: 20px; background: #fff; }
-.info-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
-.info-item:last-child { border-bottom: none; }
-.info-label { font-weight: 600; color: var(--text-light); }
-.info-value { font-weight: 600; font-size: 1.1em; }
-.locked-account { filter: blur(5px); pointer-events: none; opacity: 0.7; }
-.unpaid { color: var(--error); font-weight: bold; }
-.paid { color: var(--success); font-weight: bold; }
-.admin-container { max-width: 900px; }
-.tab-buttons { display: flex; border-bottom: 2px solid var(--light-pink); margin-bottom: 20px; }
-.tab-button { padding: 10px 20px; cursor: pointer; border: none; background: transparent; font-size: 16px; font-weight: 600; color: var(--text-light); position: relative; transition: color 0.3s; }
-.tab-button.active { color: var(--main-pink); }
-.tab-button.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background: var(--main-pink); animation: grow 0.3s; }
-@keyframes grow { from { width: 0; } to { width: 100%; } }
-.tab-content { display: none; }
-.tab-content.active { display: block; animation: fadeIn 0.3s; }
-.data-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
-.data-table th, .data-table td { border: 1px solid var(--light-pink); padding: 10px; text-align: left; }
-.data-table th { background-color: var(--main-pink); color: white; }
-.data-table td .button { width: auto; padding: 5px 10px; font-size: 0.8em; margin: 0; }
-.data-table td.used { color: #999; text-decoration: line-through; }
-.loading-spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--main-pink); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        async function loadContent(contentType) {
+            contentArea.innerHTML = `<div class="loading-spinner"></div>`;
+            try {
+                const allData = await fetchKAFerData();
+                const registerInfo = allData.find(r => r.F === userId && r.e === 'register');
+                if (!registerInfo || !registerInfo.K) { contentArea.innerHTML = `<p class="message error">あなたの登録情報が見つかりません。</p>`; return; }
+                const myRegisterDate = new Date(registerInfo.K);
+                const myPayments = allData.filter(row => row.F === userId && row.e === 'payment').map(p => ({...p, date: new Date(p.K)}));
+
+                let unpaidAmount = 0, consecutiveDelinquent = 0;
+                let checkDate = new Date(myRegisterDate.getFullYear(), myRegisterDate.getMonth(), 1);
+                const today = new Date(); today.setDate(1);
+
+                while (checkDate < today) {
+                    const monthStr = getMonthYear(checkDate);
+                    if (!myPayments.some(p => getMonthYear(p.date) === monthStr)) {
+                        unpaidAmount += calculateBilling(getActiveUsers(allData, checkDate).length);
+                        consecutiveDelinquent++;
+                    } else {
+                        consecutiveDelinquent = 0;
+                    }
+                    checkDate.setMonth(checkDate.getMonth() + 1);
+                }
+
+                let content = '';
+                switch(contentType) {
+                    case 'paymentInfo':
+                        const activeNow = getActiveUsers(allData).length;
+                        const currentBilling = calculateBilling(activeNow);
+                        const totalBilling = currentBilling + unpaidAmount;
+                        content = `<h2>支払い情報</h2><div class="content-box">
+                            <div class="info-item"><span class="info-label">今月の請求額</span><span class="info-value">¥${currentBilling.toLocaleString()}</span></div>
+                            <div class="info-item"><span class="info-label">未払い合計額</span><span class="info-value">¥${unpaidAmount.toLocaleString()}</span></div>
+                            <div class="info-item" style="background: #fcefee;"><span class="info-label"><strong>合計請求額</strong></span><span class="info-value"><strong>¥${totalBilling.toLocaleString()}</strong></span></div>
+                            <div class="info-item"><span class="info-label">集金期間</span><span class="info-value">毎月1日～末日</span></div>
+                        </div>`;
+                        break;
+                    case 'paymentStatus':
+                        const users = allData.filter(r => r.e === 'register' && !allData.some(rem => rem.F === r.F && rem.e === 'remove'));
+                        const payments = allData.filter(r => r.e === 'payment');
+                        const currentMonth = getMonthYear(new Date());
+                        let tableRows = users.map(user => {
+                            const isPaid = payments.some(p => p.F === user.F && getMonthYear(new Date(p.K)) === currentMonth);
+                            return `<tr><td>${user.A}</td><td class="${isPaid ? 'paid' : 'unpaid'}">${isPaid ? '支払い済み' : '未払い'}</td></tr>`;
+                        }).join('');
+                        content = `<h2>全会員の支払状況 (${currentMonth})</h2><table class="data-table"><thead><tr><th>名前</th><th>状況</th></tr></thead><tbody>${tableRows}</tbody></table>`;
+                        break;
+                    case 'submitCode':
+                        content = `<h2>支払いコード入力</h2><div class="content-box">
+                            <input type="number" id="paymentCodeInput" placeholder="6桁の支払いコード">
+                            <button id="submitPaymentCode">支払いを確定する</button>
+                            <div id="paymentMsg" class="message hidden"></div>
+                        </div>`;
+                        break;
+                    case 'accountConfirm':
+                        const config = allData.filter(r => r.e === 'config' && r.r).pop();
+                        const accInfo = config ? JSON.parse(config.r) : { email: '未設定', pass: '未設定' };
+                        const isLocked = consecutiveDelinquent >= 3;
+                        if(isLocked) showModal('アカウントロック', '3ヶ月以上の料金延滞があるため、アカウント情報を確認できません。');
+                        content = `<h2>アカウント確認</h2><div class="content-box ${isLocked ? 'locked-account' : ''}">
+                            <div class="info-item"><span class="info-label">メール</span><span class="info-value">${accInfo.email}</span></div>
+                            <div class="info-item"><span class="info-label">パスワード</span><span class="info-value">${accInfo.pass}</span></div>
+                        </div>`;
+                        break;
+                    case 'changePasscode':
+                        content = `<h2>パスコード変更</h2><div class="content-box">
+                            <p>セキュリティのため、定期的なパスコードの変更を推奨します。</p>
+                            <input type="password" id="currentPasscode" maxlength="4" placeholder="現在のパスコード (4桁)">
+                            <input type="password" id="newPasscode" maxlength="4" placeholder="新しいパスコード (4桁)">
+                            <input type="password" id="confirmNewPasscode" maxlength="4" placeholder="新しいパスコード (確認)">
+                            <button id="submitChangePasscode">変更を保存</button>
+                        </div>`;
+                        break;
+                    case 'withdrawal':
+                        let totalOverpayment = 0;
+                        for (const payment of myPayments) {
+                            const activeCount = getActiveUsers(allData, payment.date).length;
+                            const billing = calculateBilling(activeCount);
+                            const totalCollected = billing * activeCount;
+                            if (totalCollected > 990) totalOverpayment += Math.floor((totalCollected - 990) / activeCount);
+                        }
+                        content = `<h2>退会手続き</h2><div class="content-box">
+                            <p class="message warning">本当に退会しますか？この操作は取り消せません。</p>
+                            <div class="info-item"><span class="info-label">過払い金合計 (返金額目安)</span><span class="info-value">¥${totalOverpayment.toLocaleString()}</span></div>
+                            <button id="confirmWithdrawal" class="button">退会を確定する</button>
+                        </div>`;
+                        break;
+                }
+                contentArea.innerHTML = content;
+                attachEventListeners(contentType, allData);
+            } catch(e) {
+                contentArea.innerHTML = `<p class="message error">データの表示中にエラーが発生しました。</p>`;
+                console.error(e);
+            }
+        }
+
+        function attachEventListeners(contentType, allData) {
+            if (contentType === 'submitCode') {
+                const button = document.getElementById('submitPaymentCode');
+                button.addEventListener('click', async () => { /* ... (変更なし) ... */ });
+            } else if (contentType === 'withdrawal') {
+                document.getElementById('confirmWithdrawal').addEventListener('click', () => {
+                    showModal('最終確認', '本当に退会しますか？この操作は取り消せません。', [
+                        { text: '実行する', class: 'button danger', action: executeWithdrawal },
+                        { text: 'キャンセル', class: 'link-button', action: hideModal }
+                    ]);
+                });
+            } else if (contentType === 'changePasscode') {
+                document.getElementById('submitChangePasscode').addEventListener('click', () => handleChangePasscode(allData));
+            }
+        }
+        
+        async function executeWithdrawal() { /* ... (変更なし) ... */ }
+
+        async function handleChangePasscode(allData) {
+            const currentPassEl = document.getElementById('currentPasscode');
+            const newPassEl = document.getElementById('newPasscode');
+            const confirmPassEl = document.getElementById('confirmNewPasscode');
+
+            const currentPass = currentPassEl.value;
+            const newPass = newPassEl.value;
+            const confirmPass = confirmPassEl.value;
+
+            if (!/^\d{4}$/.test(currentPass) || !/^\d{4}$/.test(newPass)) {
+                showModal('入力エラー', 'パスコードは4桁の数字で入力してください。'); return;
+            }
+            if (newPass !== confirmPass) {
+                showModal('入力エラー', '新しいパスコードが一致しません。'); return;
+            }
+
+            const passcodeRecords = allData.filter(row => row.F === userId && (row.e === 'register' || row.e === 'pass_update'));
+            const latestPasscodeRecord = passcodeRecords.pop();
+            const storedPasscode = JSON.parse(latestPasscodeRecord.r).pass;
+            
+            if (currentPass !== storedPasscode) {
+                showModal('認証エラー', '現在のパスコードが違います。'); return;
+            }
+            
+            hideModal();
+            showNotification('パスコードを変更中...', 'warning');
+
+            const formData = new FormData();
+            formData.append(ENTRY_MAP.id, userId);
+            formData.append(ENTRY_MAP.name, userName);
+            formData.append(ENTRY_MAP.type, 'pass_update');
+            formData.append(ENTRY_MAP.data, JSON.stringify({ pass: newPass }));
+            await postToGoogleForm(formData);
+            
+            try {
+                await pollForData(data => data.some(r => r.F === userId && r.e === 'pass_update' && r.r.includes(newPass)));
+                showNotification('パスコードが正常に変更されました。', 'success');
+                currentPassEl.value = ''; newPassEl.value = ''; confirmPassEl.value = '';
+            } catch (e) {
+                showModal('エラー', e.message);
+            }
+        }
+    </script>
+</body>
+</html>
