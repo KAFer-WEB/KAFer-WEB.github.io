@@ -10,81 +10,143 @@
 <body>
     <div class="container">
         <h1 id="pageTitle">KAFer</h1>
+        
         <div id="loginSection">
             <h2>ログイン</h2>
             <input type="text" id="loginKAFerID" maxlength="4" placeholder="KAFerID (4桁)" required>
-            <div id="passwordWrapper" class="hidden"><input type="password" id="loginPassword" placeholder="管理者パスワード" required></div>
+            <input type="password" id="loginPasscode" maxlength="4" placeholder="パスコード (4桁)" required>
             <button id="loginButton">ログイン</button>
             <div id="loginMessage" class="message hidden"></div>
             <button id="showRegisterButton" class="link-button">新規登録はこちら</button>
         </div>
+
         <div id="registerSection" class="hidden">
             <h2>新規登録</h2>
             <input type="text" id="registerName" maxlength="5" placeholder="名前 (例: TARO)" required>
             <input type="text" id="registerKAFerID" maxlength="4" placeholder="希望のKAFerID (4桁)" required>
+            <input type="password" id="registerPasscode" maxlength="4" placeholder="パスコード (4桁の数字)" required>
             <button id="submitRegisterButton">登録する</button>
             <div id="registerMessage" class="message hidden"></div>
             <button id="backToLogin" class="link-button">ログイン画面に戻る</button>
         </div>
     </div>
+
+    <div id="customModal" class="modal-overlay"></div>
+    <div id="notification-container"></div>
+    
     <script src="global.js"></script>
     <script>
         const loginSection = document.getElementById('loginSection');
         const registerSection = document.getElementById('registerSection');
-        const loginKAFerIDInput = document.getElementById('loginKAFerID');
-        const passwordWrapper = document.getElementById('passwordWrapper');
         const loginButton = document.getElementById('loginButton');
         const loginMessage = document.getElementById('loginMessage');
+        const registerButton = document.getElementById('submitRegisterButton');
 
-        document.addEventListener('DOMContentLoaded', () => { if (getLoggedInKAFerID()) window.location.href = 'menu.html'; });
-        loginKAFerIDInput.addEventListener('input', () => passwordWrapper.classList.toggle('hidden', loginKAFerIDInput.value !== '2025'));
-
-        loginButton.addEventListener('click', async () => {
-            hideMessage(loginMessage);
-            const id = loginKAFerIDInput.value.trim();
-            if (id === '2025') {
-                if (document.getElementById('loginPassword').value === 'iKeda0108') {
-                    setLoggedInInfo('2025', 'Admin'); setAdminSession(); window.location.href = 'admin.html';
-                } else { showMessage(loginMessage, 'パスワードが違います。', 'error'); }
-            } else {
-                if (!/^\d{4}$/.test(id)) { showMessage(loginMessage, 'KAFerIDは4桁の数字です。', 'error'); return; }
-                const allData = await fetchKAFerData();
-                const userInfo = allData.find(row => row.F === id && row.e === 'register');
-                if (userInfo && !allData.some(r => r.F === id && r.e === 'remove')) {
-                    setLoggedInInfo(id, userInfo.A); window.location.href = 'menu.html';
-                } else { showMessage(loginMessage, 'KAFerIDが見つからないか、退会済みです。', 'error'); }
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+             if (getLoggedInKAFerID()) {
+                const version = getUserVersion() || 'v1.0';
+                window.location.href = version === 'v2.0' ? 'menu.html' : 'v1_menu.html';
+             }
         });
 
-        document.getElementById('showRegisterButton').addEventListener('click', () => { loginSection.classList.add('hidden'); registerSection.classList.remove('hidden'); });
-        document.getElementById('backToLogin').addEventListener('click', () => { registerSection.classList.add('hidden'); loginSection.classList.remove('hidden'); });
+        loginButton.addEventListener('click', async () => {
+            loginButton.disabled = true; loginButton.textContent = "確認中...";
+            hideMessage(loginMessage);
+            const id = document.getElementById('loginKAFerID').value.trim();
+            const passcode = document.getElementById('loginPasscode').value.trim();
+
+            if (id === '2025' && passcode === '0108') { // 仮の管理者ログイン
+                setLoggedInInfo('2025', 'Admin', 'v2.0'); setAdminSession(); window.location.href = 'admin.html'; return;
+            }
+            if (!/^\d{4}$/.test(id) || !/^\d{4}$/.test(passcode)) {
+                showMessage(loginMessage, 'IDとパスコードは4桁の数字です。', 'error');
+                loginButton.disabled = false; loginButton.textContent = "ログイン"; return;
+            }
+
+            const allData = await fetchKAFerData();
+            const registerInfo = allData.find(row => row.F === id && row.e === 'register');
+
+            if (!registerInfo) {
+                showMessage(loginMessage, 'KAFerIDが見つかりません。', 'error');
+                loginButton.disabled = false; loginButton.textContent = "ログイン"; return;
+            }
+
+            const passcodeRecords = allData.filter(row => row.F === id && (row.e === 'register' || row.e === 'pass_update'));
+            const latestPasscodeRecord = passcodeRecords.pop();
+            
+            let storedPasscode = null;
+            if (latestPasscodeRecord && latestPasscodeRecord.r) {
+                try { storedPasscode = JSON.parse(latestPasscodeRecord.r).pass; } catch (e) { console.error('パスコードの解析に失敗:', e); }
+            }
+
+            if (storedPasscode !== passcode) {
+                showMessage(loginMessage, 'パスコードが違います。', 'error');
+                loginButton.disabled = false; loginButton.textContent = "ログイン"; return;
+            }
+            
+            const versionInfo = allData.find(row => row.F === id && row.e === 'version_select');
+            const version = (versionInfo && JSON.parse(versionInfo.r).version) ? JSON.parse(versionInfo.r).version : 'v1.0';
+
+            setLoggedInInfo(id, registerInfo.A, version);
+            window.location.href = version === 'v2.0' ? 'menu.html' : 'v1_menu.html';
+        });
         
-        const registerButton = document.getElementById('submitRegisterButton');
         registerButton.addEventListener('click', async () => {
             registerButton.disabled = true; registerButton.textContent = '処理中...';
             const name = document.getElementById('registerName').value.trim().toUpperCase();
             const id = document.getElementById('registerKAFerID').value.trim();
+            const passcode = document.getElementById('registerPasscode').value.trim();
             const msgEl = document.getElementById('registerMessage');
             hideMessage(msgEl);
             
-            if (!/^[A-Z]{1,5}$/.test(name) || !/^\d{4}$/.test(id)) { showMessage(msgEl, '入力形式が正しくありません。', 'error'); registerButton.disabled = false; registerButton.textContent = '登録する'; return; }
+            if (!/^[A-Z]{1,5}$/.test(name) || !/^\d{4}$/.test(id) || !/^\d{4}$/.test(passcode)) {
+                 showMessage(msgEl, '入力形式が正しくありません。', 'error');
+                 registerButton.disabled = false; registerButton.textContent = '登録する'; return;
+            }
             const allData = await fetchKAFerData();
-            if (allData.some(row => row.F === id)) { showMessage(msgEl, 'このKAFerIDは使用されています。', 'error'); registerButton.disabled = false; registerButton.textContent = '登録する'; return; }
+            if (allData.some(row => row.F === id)) {
+                showMessage(msgEl, 'このKAFerIDは既に使用されています。', 'error');
+                registerButton.disabled = false; registerButton.textContent = '登録する'; return;
+            }
 
-            const formData = new FormData();
-            formData.append(ENTRY_MAP.name, name); formData.append(ENTRY_MAP.id, id); formData.append(ENTRY_MAP.type, 'register');
-            await postToGoogleForm(formData);
+            const passFormData = new FormData();
+            passFormData.append(ENTRY_MAP.name, name);
+            passFormData.append(ENTRY_MAP.id, id);
+            passFormData.append(ENTRY_MAP.type, 'register');
+            passFormData.append(ENTRY_MAP.data, JSON.stringify({ pass: passcode }));
+            await postToGoogleForm(passFormData);
             
-            showMessage(msgEl, '登録内容をシステムに反映中です...', 'warning');
+            showMessage(msgEl, 'ユーザー情報を登録中...', 'warning');
             try {
                 await pollForData(data => data.some(row => row.F === id && row.e === 'register'));
+                
+                const versionFormData = new FormData();
+                versionFormData.append(ENTRY_MAP.id, id);
+                versionFormData.append(ENTRY_MAP.name, name);
+                versionFormData.append(ENTRY_MAP.type, 'version_select');
+                versionFormData.append(ENTRY_MAP.data, JSON.stringify({ version: 'v1.0' }));
+                await postToGoogleForm(versionFormData);
+
+                showMessage(msgEl, 'バージョン情報を設定中...', 'warning');
+                await pollForData(data => data.some(r => r.F === id && r.e === 'version_select'));
+
                 showMessage(msgEl, '登録完了！ログインしてください。', 'success');
                 setTimeout(() => document.getElementById('backToLogin').click(), 2000);
+
             } catch (error) {
                 showMessage(msgEl, error.message, 'error');
             } finally {
                 registerButton.disabled = false; registerButton.textContent = '登録する';
             }
+        });
+        
+        document.getElementById('showRegisterButton').addEventListener('click', () => {
+            loginSection.classList.add('hidden');
+            registerSection.classList.remove('hidden');
+        });
+        document.getElementById('backToLogin').addEventListener('click', () => {
+            registerSection.classList.add('hidden');
+            loginSection.classList.remove('hidden');
         });
     </script>
 </body>
