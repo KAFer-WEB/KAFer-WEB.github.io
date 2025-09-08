@@ -25,7 +25,7 @@
         <p>ようこそ、<strong id="userName"></strong>さん！</p>
         <div class="update-banner">
             <h2>新しいv2.0が利用可能です！</h2>
-            <p>よりモダンなデザインと便利な機能を体験しませんか？</p>
+            <p>よりモダンなデザインと、安全のためのパスコード設定で、新しいKAFerを体験しませんか？</p>
             <button id="updateButton" class="primary">v2.0にアップデートする</button>
         </div>
         <button id="changePasscodeButton" class="secondary">パスコード変更</button>
@@ -113,7 +113,8 @@
             hideModal();
             const formData = new FormData();
             formData.append(ENTRY_MAP.id, userId); formData.append(ENTRY_MAP.name, userName);
-            formData.append(ENTRY_MAP.type, 'pass_update'); formData.append(ENTRY_MAP.data, JSON.stringify({ pass: newPass }));
+            formData.append(ENTRY_MAP.type, 'pass_update');
+            formData.append(ENTRY_MAP.data, JSON.stringify({ pass: newPass }));
             await postToGoogleForm(formData);
 
             try {
