@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KAFer - Welcome</title>
+    
+    <!-- ★★★ この行が最重要です ★★★ -->
+    <!-- このHTMLファイルと同じ場所にある「style.css」を読み込みます -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- アイコンの読み込み -->
     <link rel="icon" href="icon.png" type="image/png">
+    
     <!-- ★ パスコード入力欄のアニメーション用スタイルを追加 -->
     <style>
         .passcode-wrapper {
@@ -26,7 +32,6 @@
         <div id="loginSection">
             <h2>ログイン</h2>
             <input type="text" id="loginKAFerID" maxlength="4" placeholder="KAFerID (4桁)" required>
-            <!-- ★ パスコード入力欄をラップするdivを追加 -->
             <div id="passcodeWrapper" class="passcode-wrapper">
                 <input type="password" id="loginPasscode" maxlength="4" placeholder="パスコード (4桁)" required>
             </div>
@@ -36,7 +41,6 @@
         </div>
 
         <div id="registerSection" class="hidden">
-             <!-- ... 登録セクションは変更なし ... -->
              <h2>新規登録</h2>
             <input type="text" id="registerName" maxlength="5" placeholder="名前 (例: TARO)" required>
             <input type="text" id="registerKAFerID" maxlength="4" placeholder="希望のKAFerID (4桁)" required>
@@ -52,6 +56,7 @@
     
     <script src="global.js"></script>
     <script>
+        // このファイル内のJavaScriptは、前回の「UX革命版」から変更ありません。
         const loginSection = document.getElementById('loginSection');
         const registerSection = document.getElementById('registerSection');
         const loginKAFerIDInput = document.getElementById('loginKAFerID');
@@ -60,7 +65,7 @@
         const loginButton = document.getElementById('loginButton');
         const loginMessage = document.getElementById('loginMessage');
 
-        let isPasscodeVisible = false; // パスコード入力欄が表示されているかの状態
+        let isPasscodeVisible = false;
 
         document.addEventListener('DOMContentLoaded', () => {
              if (getLoggedInKAFerID()) {
@@ -68,8 +73,7 @@
                 window.location.href = version === 'v2.0' ? 'menu.html' : 'v1_menu.html';
              }
         });
-
-        // ★★★ ログイン処理をUX革命版に全面改修 ★★★
+        
         loginButton.addEventListener('click', async () => {
             loginButton.disabled = true; loginButton.textContent = "確認中...";
             hideMessage(loginMessage);
@@ -88,14 +92,13 @@
                 loginButton.disabled = false; loginButton.textContent = "次へ"; return;
             }
             
-            // バージョン情報を確認
             const versionInfo = allData.find(row => row.F === id && row.e === 'version_select');
             const version = (versionInfo && JSON.parse(versionInfo.r).version) ? JSON.parse(versionInfo.r).version : 'v1.0';
 
-            if (version === 'v2.0' || id === '2025') { // v2.0ユーザーまたは管理者の場合
-                if (isPasscodeVisible) { // パスコードが入力されている状態
+            if (version === 'v2.0' || id === '2025') {
+                if (isPasscodeVisible) {
                     const passcode = loginPasscodeInput.value.trim();
-                    if(id === '2025' && passcode === 'iKeda0108') { // 管理者パスワードはハードコード
+                    if(id === '2025' && passcode === 'iKeda0108') {
                         setLoggedInInfo('2025', 'Admin', 'v2.0'); setAdminSession(); window.location.href = 'admin.html'; return;
                     }
 
@@ -109,12 +112,12 @@
                     } else {
                         showMessage(loginMessage, 'パスコードが違います。', 'error');
                     }
-                } else { // パスコード入力欄を表示する
+                } else {
                     passcodeWrapper.classList.add('visible');
                     loginButton.textContent = "ログイン";
                     isPasscodeVisible = true;
                 }
-            } else { // v1.0ユーザーの場合
+            } else {
                 setLoggedInInfo(id, registerInfo.A, version);
                 window.location.href = 'v1_menu.html';
             }
@@ -122,7 +125,6 @@
             loginButton.disabled = false;
         });
 
-        // KAFerID入力欄が変更されたら、パスコード入力をリセット
         loginKAFerIDInput.addEventListener('input', () => {
             if(isPasscodeVisible) {
                 passcodeWrapper.classList.remove('visible');
@@ -131,7 +133,6 @@
             }
         });
         
-        // --- 登録処理 (変更なし) ---
         const registerButton = document.getElementById('submitRegisterButton');
         registerButton.addEventListener('click', async () => { /* ... 前回のコードから変更なし ... */ });
         document.getElementById('showRegisterButton').addEventListener('click', () => { /* ... */ });
