@@ -1,213 +1,909 @@
-/* style.css - Final Revolution: "Aura & Glass" */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+/*
+ * style.css
+ * KAFerプロジェクト引き継ぎ資料 (最終版)に基づき生成 (UI超強化版 - ピンク10色テーマ & ダークモード対応)
+ *
+ * ピンクを基調としたカラーパレットで、より魅力的で複雑なUIを目指します。
+ * ダークモード時にロゴ画像を色反転させる機能を追加。
+ */
 
+/* ============================================================
+   1. 基本設定 & グローバル変数
+   ============================================================ */
 :root {
-    --bg-grad-1: #fdebf2; --bg-grad-2: #eabbf2; --bg-grad-3: #fadee9; --bg-grad-4: #ddbff2;
-    --main-pink: #e91e63; --dark-pink: #c2185b; --light-pink: #ffcdd2;
-    --text-dark: #2c2c2c; --text-light: #555; --white: #ffffff;
-    --success: #2e7d32; --error: #c62828; --warning: #EF6C00;
-    --shadow-color-light: rgba(255, 255, 255, 0.9);
-    --shadow-color-dark: rgba(200, 150, 180, 0.3);
+    /* ピンクカラーパレット (10色) */
+    --pink-shade-1: #FFEBEE; /* Lightest Pink (Almost white) */
+    --pink-shade-2: #FFCDD2;
+    --pink-shade-3: #EF9A9A;
+    --pink-shade-4: #E57373;
+    --pink-shade-5: #FF4081; /* Accent Pink */
+    --pink-shade-6: #F8BBD0; /* Muted Pink */
+    --pink-shade-7: #F06292; /* Mid Pink */
+    --pink-shade-8: #EC407A; /* Darker Mid Pink */
+    --pink-shade-9: #D81B60; /* Deep Pink */
+    --pink-shade-10: #880E4F; /* Darkest Pink (Almost maroon) */
+
+
+    --primary-color: var(--pink-shade-8); /* 主要アクションに使うメインピンク */
+    --primary-dark: var(--pink-shade-9);
+    --primary-light: var(--pink-shade-7);
+    --secondary-color: var(--pink-shade-5); /* サブアクションや強調に使うアクセントピンク */
+    --secondary-dark: var(--pink-shade-9);
+    --accent-color: #FFC107; /* 警告や強調に使うアンバー (ピンクと相性の良い補色) */
+    --success-color: #4CAF50; /* 成功メッセージ用 (緑はそのまま) */
+    --error-color: #F44336; /* エラーメッセージ用 (赤はそのまま) */
+    --info-color: #2196F3; /* 情報メッセージ用 (青はそのまま) */
+
+    /* グレーシェード (ピンクと合うように少し調整) */
+    --text-color: #4A4A4A;
+    --light-text-color: #ffffff;
+    --dark-grey: #616161;
+    --medium-grey: #9E9E9E;
+    --light-grey: #E0E0E0;
+    --border-color: #e0e0e0;
+    --bg-color: var(--pink-shade-1); /* 明るい背景をライトピンクに */
+    --card-bg-color: #ffffff;
+    --hover-bg-color: var(--pink-shade-2); /* ホバー時の背景色 */
+
+    /* タイポグラフィ */
+    --font-family-sans: 'Roboto', 'Noto Sans JP', sans-serif;
+    --heading-font-weight: 700;
+    --body-font-weight: 400;
+
+    /* スペーシング */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
+
+    /* シャドウ */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    --shadow-lg: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+
+    /* ボーダーラディウス */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+}
+
+/* Google Fonts (Roboto, Noto Sans JP) */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Roboto:wght@400;700&display=swap');
+
+/* リセット */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
-    margin: 0; padding: 20px 0; color: var(--text-dark);
-    min-height: 100vh; position: relative; overflow-x: hidden;
-    background: linear-gradient(315deg, var(--bg-grad-1), var(--bg-grad-2), var(--bg-grad-3), var(--bg-grad-4));
-    background-size: 400% 400%; animation: gradient-animation 20s ease infinite;
+    font-family: var(--font-family-sans);
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease; /* スムーズな切り替え */
 }
-@keyframes gradient-animation { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-body::before {
-    content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39tbX18fHybm5yKiopbW1sAAAD/AAD///+GhobOORvvAAAAAXRSTlMAQObYZgAAAPxJREFUeNpiYCANMzEyMgDx4uLiGIABZEBOSAgyMjKi0gDnaKkQWdeSoCgqKnIsKioK8iA1YSD24uIykBfJ8bW1hcDEyBPR8bW19ZkYBI0E8gB5d3e3AA8gT1ZWViG2s7Oza2sLAwO8vLwMDw8PDw8vIAsoE8jOzsvLgAsoE8gLy8vLgAsoE8jLy8vLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq6urq6uLgAsoE8jLq6urq-container">
-        <h1>メニュー</h1>
-        <p>ようこそ、<strong id="userName"></strong> さん！</p>
-        <div id="contentArea"><div class="loading-spinner"></div></div>
-        <div class="menu-grid">
-            <button class="button" data-content="paymentInfo">支払い情報</button>
-            <button class="button" data-content="paymentStatus">全会員の支払状況</button>
-            <button class="button" data-content="submitCode">コード入力</button>
-            <button class="button" data-content="accountConfirm">アカウント確認</button>
-            <button class="button" data-content="changePasscode">パスコード変更</button>
-            <button class="button" data-content="withdrawal">退会</button>
-        </div>
-        <button id="logoutButton" class="link-button" style="margin-top: 30px;">ログアウト</button>
-    </div>
 
-    <div id="customModal" class="modal-overlay"></div>
-    <div id="notification-container"></div>
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+a:hover {
+    color: var(--primary-dark);
+}
 
-    <script src="global.js"></script>
-    <script>
-        const userName = getLoggedInUserName();
-        const userId = getLoggedInKAFerID();
-        const contentArea = document.getElementById('contentArea');
+/* ============================================================
+   2. レイアウト & グリッド
+   ============================================================ */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!userId || getUserVersion() !== 'v2.0') { window.location.href = 'index.html'; return; }
-            document.getElementById('userName').textContent = userName;
-            document.getElementById('logoutButton').addEventListener('click', () => { logout(); window.location.href = 'index.html'; });
-            loadContent('paymentInfo');
-            document.querySelectorAll('.menu-grid .button').forEach(btn => btn.addEventListener('click', () => loadContent(btn.dataset.content)));
-        });
+.main-content-wrapper {
+    display: flex;
+    flex-grow: 1;
+    padding-top: var(--header-height); /* ヘッダーの高さ分、コンテンツを下にずらす */
+}
 
-        async function loadContent(contentType) {
-            contentArea.innerHTML = `<div class="loading-spinner"></div>`;
-            try {
-                const allData = await fetchKAFerData();
-                const registerInfo = allData.find(r => r.F === userId && r.e === 'register');
-                if (!registerInfo || !registerInfo.K) { contentArea.innerHTML = `<p class="message error">あなたの登録情報が見つかりません。</p>`; return; }
-                const myRegisterDate = new Date(registerInfo.K);
-                const myPayments = allData.filter(row => row.F === userId && row.e === 'payment').map(p => ({...p, date: new Date(p.K)}));
+.container {
+    flex-grow: 1;
+    padding: var(--spacing-lg);
+    max-width: 1200px;
+    margin: 0 auto; /* 中央揃え */
+    width: 100%;
+}
 
-                let unpaidAmount = 0, consecutiveDelinquent = 0;
-                let checkDate = new Date(myRegisterDate.getFullYear(), myRegisterDate.getMonth(), 1);
-                const today = new Date(); today.setDate(1);
+.content-section {
+    background-color: var(--card-bg-color);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-xl);
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* スムーズな切り替え */
+}
 
-                while (checkDate < today) {
-                    const monthStr = getMonthYear(checkDate);
-                    if (!myPayments.some(p => getMonthYear(p.date) === monthStr)) {
-                        unpaidAmount += calculateBilling(getActiveUsers(allData, checkDate).length);
-                        consecutiveDelinquent++;
-                    } else {
-                        consecutiveDelinquent = 0;
-                    }
-                    checkDate.setMonth(checkDate.getMonth() + 1);
-                }
+.grid {
+    display: grid;
+    gap: var(--spacing-md);
+}
 
-                let content = '';
-                switch(contentType) {
-                    case 'paymentInfo':
-                        const activeNow = getActiveUsers(allData).length;
-                        const currentBilling = calculateBilling(activeNow);
-                        const totalBilling = currentBilling + unpaidAmount;
-                        content = `<h2>支払い情報</h2><div class="content-box">
-                            <div class="info-item"><span class="info-label">今月の請求額</span><span class="info-value">¥${currentBilling.toLocaleString()}</span></div>
-                            <div class="info-item"><span class="info-label">未払い合計額</span><span class="info-value">¥${unpaidAmount.toLocaleString()}</span></div>
-                            <div class="info-item" style="background: #fcefee;"><span class="info-label"><strong>合計請求額</strong></span><span class="info-value"><strong>¥${totalBilling.toLocaleString()}</strong></span></div>
-                            <div class="info-item"><span class="info-label">集金期間</span><span class="info-value">毎月1日～末日</span></div>
-                        </div>`;
-                        break;
-                    case 'paymentStatus':
-                        const users = allData.filter(r => r.e === 'register' && !allData.some(rem => rem.F === r.F && rem.e === 'remove'));
-                        const payments = allData.filter(r => r.e === 'payment');
-                        const currentMonth = getMonthYear(new Date());
-                        let tableRows = users.map(user => {
-                            const isPaid = payments.some(p => p.F === user.F && getMonthYear(new Date(p.K)) === currentMonth);
-                            return `<tr><td>${user.A}</td><td class="${isPaid ? 'paid' : 'unpaid'}">${isPaid ? '支払い済み' : '未払い'}</td></tr>`;
-                        }).join('');
-                        content = `<h2>全会員の支払状況 (${currentMonth})</h2><table class="data-table"><thead><tr><th>名前</th><th>状況</th></tr></thead><tbody>${tableRows}</tbody></table>`;
-                        break;
-                    case 'submitCode':
-                        content = `<h2>支払いコード入力</h2><div class="content-box">
-                            <input type="number" id="paymentCodeInput" placeholder="6桁の支払いコード">
-                            <button id="submitPaymentCode">支払いを確定する</button>
-                            <div id="paymentMsg" class="message hidden"></div>
-                        </div>`;
-                        break;
-                    case 'accountConfirm':
-                        const config = allData.filter(r => r.e === 'config' && r.r).pop();
-                        const accInfo = config ? JSON.parse(config.r) : { email: '未設定', pass: '未設定' };
-                        const isLocked = consecutiveDelinquent >= 3;
-                        if(isLocked) showModal('アカウントロック', '3ヶ月以上の料金延滞があるため、アカウント情報を確認できません。');
-                        content = `<h2>アカウント確認</h2><div class="content-box ${isLocked ? 'locked-account' : ''}">
-                            <div class="info-item"><span class="info-label">メール</span><span class="info-value">${accInfo.email}</span></div>
-                            <div class="info-item"><span class="info-label">パスワード</span><span class="info-value">${accInfo.pass}</span></div>
-                        </div>`;
-                        break;
-                    case 'changePasscode':
-                        content = `<h2>パスコード変更</h2><div class="content-box">
-                            <p>セキュリティのため、定期的なパスコードの変更を推奨します。</p>
-                            <input type="password" id="currentPasscode" maxlength="4" placeholder="現在のパスコード (4桁)">
-                            <input type="password" id="newPasscode" maxlength="4" placeholder="新しいパスコード (4桁)">
-                            <input type="password" id="confirmNewPasscode" maxlength="4" placeholder="新しいパスコード (確認)">
-                            <button id="submitChangePasscode">変更を保存</button>
-                        </div>`;
-                        break;
-                    case 'withdrawal':
-                        let totalOverpayment = 0;
-                        for (const payment of myPayments) {
-                            const activeCount = getActiveUsers(allData, payment.date).length;
-                            const billing = calculateBilling(activeCount);
-                            const totalCollected = billing * activeCount;
-                            if (totalCollected > 990) totalOverpayment += Math.floor((totalCollected - 990) / activeCount);
-                        }
-                        content = `<h2>退会手続き</h2><div class="content-box">
-                            <p class="message warning">本当に退会しますか？この操作は取り消せません。</p>
-                            <div class="info-item"><span class="info-label">過払い金合計 (返金額目安)</span><span class="info-value">¥${totalOverpayment.toLocaleString()}</span></div>
-                            <button id="confirmWithdrawal" class="button">退会を確定する</button>
-                        </div>`;
-                        break;
-                }
-                contentArea.innerHTML = content;
-                attachEventListeners(contentType, allData);
-            } catch(e) {
-                contentArea.innerHTML = `<p class="message error">データの表示中にエラーが発生しました。</p>`;
-                console.error(e);
-            }
-        }
+.grid-2-cols {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
 
-        function attachEventListeners(contentType, allData) {
-            if (contentType === 'submitCode') {
-                const button = document.getElementById('submitPaymentCode');
-                button.addEventListener('click', async () => { /* ... (変更なし) ... */ });
-            } else if (contentType === 'withdrawal') {
-                document.getElementById('confirmWithdrawal').addEventListener('click', () => {
-                    showModal('最終確認', '本当に退会しますか？この操作は取り消せません。', [
-                        { text: '実行する', class: 'button danger', action: executeWithdrawal },
-                        { text: 'キャンセル', class: 'link-button', action: hideModal }
-                    ]);
-                });
-            } else if (contentType === 'changePasscode') {
-                document.getElementById('submitChangePasscode').addEventListener('click', () => handleChangePasscode(allData));
-            }
-        }
-        
-        async function executeWithdrawal() { /* ... (変更なし) ... */ }
+/* ============================================================
+   3. ヘッダー
+   ============================================================ */
+header.app-header {
+    /* ヘッダーはピンクのグラデーションに */
+    background: linear-gradient(135deg, var(--pink-shade-8) 0%, var(--pink-shade-5) 100%);
+    color: var(--light-text-color);
+    padding: var(--spacing-md) var(--spacing-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-md);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    height: 70px; /* ヘッダーの高さを固定 */
+    transition: background 0.3s ease, box-shadow 0.3s ease; /* スムーズな切り替え */
+}
+header.app-header .logo {
+    font-size: 2.2rem;
+    font-weight: var(--heading-font-weight);
+    margin: 0;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+}
+header.app-header .logo img {
+    height: 40px;
+    margin-right: var(--spacing-sm);
+    filter: drop-shadow(0 0 5px rgba(0,0,0,0.2));
+    transition: filter 0.3s ease; /* スムーズな反転 */
+}
 
-        async function handleChangePasscode(allData) {
-            const currentPassEl = document.getElementById('currentPasscode');
-            const newPassEl = document.getElementById('newPasscode');
-            const confirmPassEl = document.getElementById('confirmNewPasscode');
+.user-controls {
+    display: flex;
+    align-items: center;
+}
+.user-info-header {
+    margin-right: var(--spacing-md);
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.3s ease; /* スムーズな切り替え */
+}
+.user-info-header span {
+    font-weight: var(--heading-font-weight);
+    color: var(--light-text-color);
+}
+.logout-btn {
+    background-color: var(--secondary-color);
+    color: var(--light-text-color);
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.logout-btn:hover {
+    background-color: var(--secondary-dark);
+    transform: translateY(-2px);
+}
 
-            const currentPass = currentPassEl.value;
-            const newPass = newPassEl.value;
-            const confirmPass = confirmPassEl.value;
+/* ============================================================
+   4. サイドナビゲーション (多階層対応)
+   ============================================================ */
+.sidebar {
+    width: 250px;
+    background-color: var(--card-bg-color);
+    box-shadow: var(--shadow-sm);
+    padding-top: calc(var(--header-height) + var(--spacing-lg)); /* ヘッダーと間隔を空ける */
+    border-right: 1px solid var(--border-color);
+    flex-shrink: 0; /* 縮小させない */
+    overflow-y: auto; /* サイドバーが長くなった場合にスクロール */
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* スムーズな切り替え */
+}
 
-            if (!/^\d{4}$/.test(currentPass) || !/^\d{4}$/.test(newPass)) {
-                showModal('入力エラー', 'パスコードは4桁の数字で入力してください。'); return;
-            }
-            if (newPass !== confirmPass) {
-                showModal('入力エラー', '新しいパスコードが一致しません。'); return;
-            }
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+}
 
-            const passcodeRecords = allData.filter(row => row.F === userId && (row.e === 'register' || row.e === 'pass_update'));
-            const latestPasscodeRecord = passcodeRecords.pop();
-            const storedPasscode = JSON.parse(latestPasscodeRecord.r).pass;
-            
-            if (currentPass !== storedPasscode) {
-                showModal('認証エラー', '現在のパスコードが違います。'); return;
-            }
-            
-            hideModal();
-            showNotification('パスコードを変更中...', 'warning');
+.sidebar nav ul li {
+    position: relative;
+}
 
-            const formData = new FormData();
-            formData.append(ENTRY_MAP.id, userId);
-            formData.append(ENTRY_MAP.name, userName);
-            formData.append(ENTRY_MAP.type, 'pass_update');
-            formData.append(ENTRY_MAP.data, JSON.stringify({ pass: newPass }));
-            await postToGoogleForm(formData);
-            
-            try {
-                await pollForData(data => data.some(r => r.F === userId && r.e === 'pass_update' && r.r.includes(newPass)));
-                showNotification('パスコードが正常に変更されました。', 'success');
-                currentPassEl.value = ''; newPassEl.value = ''; confirmPassEl.value = '';
-            } catch (e) {
-                showModal('エラー', e.message);
-            }
-        }
-    </script>
-</body>
-</html>
+.sidebar nav ul li a {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    color: var(--dark-grey);
+    font-weight: var(--body-font-weight);
+    transition: background-color 0.3s ease, color 0.3s ease, border-left-color 0.3s ease; /* スムーズな切り替え */
+    border-left: 4px solid transparent;
+}
+
+.sidebar nav ul li a i { /* アイコン用 */
+    margin-right: var(--spacing-sm);
+    font-size: 1.1rem;
+    color: var(--medium-grey);
+    transition: color 0.3s ease; /* スムーズな切り替え */
+}
+
+.sidebar nav ul li a:hover {
+    background-color: var(--hover-bg-color);
+    color: var(--primary-color);
+    border-left-color: var(--primary-color);
+}
+.sidebar nav ul li a:hover i {
+    color: var(--primary-color);
+}
+
+.sidebar nav ul li a.active {
+    background-color: var(--primary-color);
+    color: var(--light-text-color);
+    border-left-color: var(--secondary-color);
+}
+.sidebar nav ul li a.active i {
+    color: var(--light-text-color);
+}
+
+/* サブメニューのスタイリング */
+.sidebar nav ul ul {
+    list-style: none;
+    padding-left: var(--spacing-xxl); /* 親メニューからインデント */
+    border-left: 1px dashed var(--light-grey); /* 階層を視覚化、少し薄いピンク系のグレーに */
+    margin-left: calc(var(--spacing-lg) + 2px); /* border-leftの位置調整 */
+    transition: border-left-color 0.3s ease; /* スムーズな切り替え */
+}
+
+.sidebar nav ul ul li a {
+    padding: var(--spacing-sm) var(--spacing-lg); /* サブメニューは少し小さく */
+    font-size: 0.95rem;
+    border-left: none; /* サブメニューの左ボーダーは不要 */
+}
+.sidebar nav ul ul li a:hover {
+    background-color: var(--hover-bg-color);
+    color: var(--primary-color);
+}
+.sidebar nav ul ul li a.active {
+    background-color: var(--pink-shade-4); /* サブメニューのアクティブは少し濃いピンクに */
+    color: var(--light-text-color);
+}
+
+
+/* ============================================================
+   5. メインコンテンツのスタイリング
+   ============================================================ */
+h2 {
+    font-size: 2rem;
+    font-weight: var(--heading-font-weight);
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--border-color);
+    text-align: center;
+    position: relative;
+    padding-top: var(--spacing-md);
+    transition: color 0.3s ease, border-bottom-color 0.3s ease; /* スムーズな切り替え */
+}
+h2::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -2px;
+    width: 60px;
+    height: 4px;
+    background-color: var(--secondary-color);
+    border-radius: 2px;
+    transition: background-color 0.3s ease; /* スムーズな切り替え */
+}
+
+h3 {
+    font-size: 1.5rem;
+    font-weight: var(--heading-font-weight);
+    color: var(--dark-grey);
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--spacing-sm);
+    transition: color 0.3s ease, border-bottom-color 0.3s ease; /* スムーズな切り替え */
+}
+
+/* ============================================================
+   6. フォームコンポーネント
+   ============================================================ */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    max-width: 500px;
+    margin: var(--spacing-lg) auto;
+}
+
+.form-group {
+    margin-bottom: var(--spacing-sm);
+}
+
+label {
+    font-weight: var(--heading-font-weight);
+    margin-bottom: var(--spacing-xs);
+    display: block;
+    color: var(--dark-grey);
+    font-size: 0.95rem;
+    transition: color 0.3s ease; /* スムーズな切り替え */
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: 1rem;
+    color: var(--text-color);
+    background-color: var(--card-bg-color); /* 背景は白で統一 */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease, background-color 0.3s ease; /* スムーズな切り替え */
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px var(--pink-shade-3); /* フォーカス時は少し明るいピンクのシャドウ */
+}
+
+.btn {
+    background-color: var(--primary-color); /* メインボタンは濃いピンク */
+    color: var(--light-text-color);
+    padding: var(--spacing-md) var(--spacing-xl);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: var(--heading-font-weight);
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+.btn i {
+    font-size: 1.2rem;
+}
+
+.btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color); /* セカンダリボタンはアクセントピンク */
+}
+.btn-secondary:hover {
+    background-color: var(--secondary-dark);
+}
+
+.btn-danger {
+    background-color: var(--error-color); /* 危険な操作は赤 */
+}
+.btn-danger:hover {
+    background-color: #d32f2f;
+}
+
+/* ============================================================
+   7. メッセージ & アラート
+   ============================================================ */
+.message {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--border-radius-sm);
+    font-weight: var(--heading-font-weight);
+    text-align: center;
+    display: none; /* JSで表示を制御 */
+    box-shadow: var(--shadow-sm);
+    border: 1px solid transparent; /* デフォルトで透明 */
+}
+
+.message.error {
+    background-color: #ffebee; /* エラー背景もピンク系 */
+    color: var(--error-color);
+    border-color: var(--error-color);
+}
+
+.message.success {
+    background-color: var(--pink-shade-2); /* 成功背景もピンク系 */
+    color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.message.info {
+    background-color: var(--pink-shade-1); /* 情報背景もピンク系 */
+    color: var(--info-color);
+    border-color: var(--info-color);
+}
+
+/* ============================================================
+   8. カード & リスト
+   ============================================================ */
+.card {
+    background-color: var(--card-bg-color);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-lg);
+    border: 1px solid var(--pink-shade-2); /* カードにライトピンクのボーダー */
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* スムーズな切り替え */
+}
+
+.card-header {
+    font-size: 1.2rem;
+    font-weight: var(--heading-font-weight);
+    color: var(--pink-shade-7); /* カードヘッダーはミッドピンク */
+    margin-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--pink-shade-3); /* ボーダーもピンク系 */
+    padding-bottom: var(--spacing-sm);
+    transition: color 0.3s ease, border-bottom-color 0.3s ease; /* スムーズな切り替え */
+}
+
+.list-group {
+    list-style: none;
+    padding: 0;
+}
+
+.list-group-item {
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--pink-shade-2); /* リストのボーダーもピンク系 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-bottom-color 0.3s ease; /* スムーズな切り替え */
+}
+.list-group-item:last-child {
+    border-bottom: none;
+}
+
+/* ============================================================
+   9. テーブル
+   ============================================================ */
+.data-table-container {
+    overflow-x: auto; /* テーブルがはみ出る場合にスクロール */
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--spacing-lg);
+    min-width: 600px; /* 小画面でテーブルが小さくなりすぎないように */
+}
+
+.data-table th, .data-table td {
+    border: 1px solid var(--border-color);
+    padding: var(--spacing-md);
+    text-align: left;
+    vertical-align: middle;
+    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease; /* スムーズな切り替え */
+}
+
+.data-table th {
+    background-color: var(--primary-color);
+    color: var(--light-text-color);
+    font-weight: var(--heading-font-weight);
+    position: sticky; /* スクロールしてもヘッダーを固定 */
+    top: 0;
+    z-index: 1;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: var(--pink-shade-1); /* テーブル偶数行もライトピンク */
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--pink-shade-2); /* テーブルホバーもライトピンク */
+}
+
+/* ============================================================
+   10. フッター
+   ============================================================ */
+footer.app-footer {
+    text-align: center;
+    padding: var(--spacing-lg);
+    margin-top: auto; /* コンテンツが少ない時に下部に固定 */
+    color: var(--medium-grey);
+    font-size: 0.9rem;
+    background-color: var(--card-bg-color);
+    border-top: 1px solid var(--pink-shade-3); /* フッターのボーダーもピンク系 */
+    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease, border-top-color 0.3s ease, color 0.3s ease; /* スムーズな切り替え */
+}
+
+/* ============================================================
+   11. 特殊コンポーネント
+   ============================================================ */
+.dashboard-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.metric-card {
+    background: linear-gradient(45deg, var(--pink-shade-7), var(--pink-shade-4)); /* メトリックカードもグラデーションピンク */
+    color: var(--light-text-color);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease; /* スムーズな切り替え */
+}
+.metric-card.secondary {
+    background: linear-gradient(45deg, var(--pink-shade-5), var(--pink-shade-3));
+}
+.metric-card.accent {
+    background: linear-gradient(45deg, var(--accent-color), #FFEB3B); /* アクセント色はそのまま */
+    color: var(--dark-grey);
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+}
+
+.metric-card .value {
+    font-size: 2.5rem;
+    font-weight: var(--heading-font-weight);
+    margin-bottom: var(--spacing-sm);
+}
+
+.metric-card .label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.action-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    justify-content: center;
+}
+
+/* ローディングスピナー */
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: var(--primary-color);
+    animation: spin 1s ease infinite;
+    margin: 20px auto;
+    display: none; /* JSで表示を制御 */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* タブコンポーネント */
+.tab-navigation {
+    display: flex;
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--pink-shade-4); /* タブナビのボーダーもピンク系 */
+    width: 100%;
+    transition: border-bottom-color 0.3s ease; /* スムーズな切り替え */
+}
+
+.tab-button {
+    flex-grow: 1; /* タブを均等に広げる */
+    padding: var(--spacing-md) var(--spacing-lg);
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--medium-grey);
+    font-size: 1rem;
+    font-weight: var(--heading-font-weight);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.tab-button:hover {
+    color: var(--primary-dark);
+    background-color: var(--pink-shade-2); /* ホバーもライトピンク */
+}
+
+.tab-button.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background-color: var(--card-bg-color); /* アクティブタブは背景色を変える */
+}
+
+.tab-content-wrapper {
+    margin-top: var(--spacing-lg);
+}
+
+.tab-content {
+    padding: var(--spacing-md) 0;
+    /* JSで display: none を切り替える */
+}
+
+
+/* ============================================================
+   12. ダークモード対応
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-color: #e0e0e0; /* 明るいテキストに */
+        --light-text-color: #333333; /* 暗い背景では逆に使う */
+        --dark-grey: #e0e0e0;
+        --medium-grey: #bdbdbd;
+        --light-grey: #616161;
+        --border-color: #424242;
+        --bg-color: #212121; /* 暗い背景色 */
+        --card-bg-color: #303030; /* カード背景色 */
+        --hover-bg-color: #424242; /* ホバー時の背景色 */
+
+        /* ピンクカラーをダークモードに合わせて調整 */
+        --primary-color: var(--pink-shade-5); /* 少し明るめに */
+        --primary-dark: var(--pink-shade-7);
+        --primary-light: var(--pink-shade-3);
+        --secondary-color: var(--pink-shade-4);
+        --secondary-dark: var(--pink-shade-7);
+        --accent-color: #FFD54F; /* 明るいアンバーに */
+
+        --error-color: #EF5350; /* 少し明るめに */
+        --success-color: #66BB6A;
+        --info-color: #64B5F6;
+
+        /* index.html の独自スタイル調整 */
+        --index-bg-gradient-start: var(--pink-shade-9);
+        --index-bg-gradient-end: var(--pink-shade-7);
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--dark-grey) 0%, var(--bg-color) 100%) !important; /* ダークモードの背景グラデーション */
+    }
+
+    header.app-header .logo img {
+        filter: invert(100%) hue-rotate(180deg) brightness(1.5) drop-shadow(0 0 5px rgba(255,255,255,0.3)); /* 画像を反転させて調整 */
+    }
+
+    /* index.html の独自スタイル調整 */
+    .login-card, .register-card {
+        background-color: var(--card-bg-color) !important;
+        border-color: var(--border-color) !important;
+    }
+    .login-card .card-header, .register-card .card-header {
+        color: var(--primary-color) !important;
+        background-color: var(--hover-bg-color) !important;
+        border-bottom-color: var(--border-color) !important;
+    }
+    .login-form-button {
+        background-color: var(--primary-dark) !important;
+        border-color: var(--primary-color) !important;
+    }
+    .login-form-button:hover {
+        background-color: var(--primary-color) !important;
+    }
+    .register-form-button {
+        background-color: var(--secondary-dark) !important;
+        border-color: var(--secondary-color) !important;
+    }
+    .register-form-button:hover {
+        background-color: var(--secondary-color) !important;
+    }
+    input[type="text"]:focus, input[type="password"]:focus {
+        box-shadow: 0 0 0 3px rgba(var(--primary-color), 0.5) !important;
+    }
+    .content-section {
+        background-color: var(--card-bg-color) !important;
+        border-color: var(--border-color) !important;
+    }
+    h2 {
+        color: var(--primary-color) !important;
+        border-bottom-color: var(--border-color) !important;
+    }
+    h2::after {
+        background-color: var(--secondary-color) !important;
+    }
+    input[type="text"], input[type="password"] {
+        border-color: var(--border-color) !important;
+        background-color: var(--bg-color) !important;
+        color: var(--text-color) !important;
+    }
+
+    .data-table tbody tr:nth-child(even) {
+        background-color: var(--bg-color) !important;
+    }
+    .data-table tbody tr:hover {
+        background-color: var(--hover-bg-color) !important;
+    }
+    footer.app-footer {
+        background-color: var(--card-bg-color) !important;
+        border-top-color: var(--border-color) !important;
+        color: var(--medium-grey) !important;
+    }
+    .message.error {
+        background-color: #5C1D1D !important; /* ダークモードに合わせたエラー背景 */
+    }
+    .message.success {
+        background-color: #2D5C2F !important; /* ダークモードに合わせた成功背景 */
+    }
+    .message.info {
+        background-color: #2D4C5C !important; /* ダークモードに合わせた情報背景 */
+    }
+}
+
+
+/* ============================================================
+   12. レスポンシブデザイン
+   ============================================================ */
+/* Small devices (phones, 600px and down) */
+@media (max-width: 768px) {
+    .app-header {
+        height: 60px;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    .app-header .logo {
+        font-size: 1.8rem;
+    }
+    .app-header .logo img {
+        height: 30px;
+    }
+    .user-info-header {
+        display: none; /* モバイルではユーザー情報を非表示 */
+    }
+
+    .main-content-wrapper {
+        flex-direction: column;
+        padding-bottom: 60px; /* 下部ナビゲーションバーの高さ分 */
+        padding-top: 60px; /* ヘッダーの高さ分 */
+    }
+
+    .sidebar {
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        height: 60px; /* 下部ナビゲーションバー */
+        padding-top: 0;
+        border-right: none;
+        border-top: 1px solid var(--border-color);
+        box-shadow: var(--shadow-lg);
+        background-color: var(--card-bg-color);
+        z-index: 999;
+    }
+    .sidebar nav ul {
+        display: flex;
+        justify-content: space-around;
+        height: 100%;
+    }
+    .sidebar nav ul ul { /* モバイルではサブメニューを非表示 */
+        display: none;
+    }
+    .sidebar nav ul li {
+        flex: 1;
+        text-align: center;
+    }
+    .sidebar nav ul li a {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: var(--spacing-xs) 0;
+        font-size: 0.8rem;
+        border-left: none; /* 不要 */
+        border-top: 4px solid transparent;
+        height: 100%;
+    }
+    .sidebar nav ul li a i {
+        margin-right: 0;
+        margin-bottom: var(--spacing-xs);
+        font-size: 1.2rem;
+    }
+    .sidebar nav ul li a:hover, .sidebar nav ul li a.active {
+        border-left-color: transparent; /* 不要 */
+        border-top-color: var(--primary-color);
+        background-color: var(--hover-bg-color);
+    }
+    .sidebar nav ul li a.active {
+        border-top-color: var(--secondary-color);
+        background-color: var(--hover-bg-color);
+        color: var(--secondary-color);
+    }
+    .sidebar nav ul li a.active i {
+        color: var(--secondary-color);
+    }
+
+
+    .container {
+        padding: var(--spacing-md);
+    }
+
+    .content-section {
+        padding: var(--spacing-lg);
+    }
+
+    h2 {
+        font-size: 1.8rem;
+    }
+
+    .dashboard-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .data-table-container {
+        /* overflow-x: auto; はそのまま */
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    .btn {
+        width: 100%;
+    }
+
+    .tab-navigation {
+        flex-direction: column;
+    }
+    .tab-button {
+        border-bottom: 1px solid var(--border-color);
+        border-right: none;
+    }
+    .tab-button.active {
+        border-right: none;
+        border-bottom-color: var(--primary-color);
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 769px) {
+    .main-content-wrapper {
+        padding-top: var(--header-height); /* ヘッダーの高さ分、コンテンツを下にずらす */
+    }
+    .sidebar {
+        padding-top: calc(var(--header-height) + var(--spacing-lg));
+        /* sidebarは左に固定 */
+        position: sticky;
+        top: 0;
+        height: 100vh; /* 画面いっぱいの高さ */
+    }
+}
+
+/* ヘッダーの高さ変数 */
+:root {
+    --header-height: 70px;
+}
+@media (max-width: 768px) {
+    :root {
+        --header-height: 60px;
+    }
+}

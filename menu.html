@@ -3,199 +3,640 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAFer v2.0 - Menu</title>
+    <title>KAFer - v2.0 メニュー</title>
+    <link id="favicon" rel="icon" href="icon.png" type="image/png">
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="icon.png" type="image/png">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body>
-    <div class="container">
-        <h1>メニュー</h1>
-        <p>ようこそ、<strong id="userName"></strong> さん！</p>
-        <div id="contentArea"><div class="loading-spinner"></div></div>
-        <div class="menu-grid">
-            <button class="button" data-content="paymentInfo">支払い情報</button>
-            <button class="button" data-content="paymentStatus">全会員の支払状況</button>
-            <button class="button" data-content="submitCode">コード入力</button>
-            <button class="button" data-content="accountConfirm">アカウント確認</button>
-            <button class="button" data-content="changePasscode">パスコード変更</button>
-            <button class="button" data-content="withdrawal">退会</button>
+<body class="app-container">
+    <header class="app-header">
+        <div class="logo">
+            <img id="app-logo" src="icon.png" alt="KAFer Logo">
+            <h1>KAFer</h1>
         </div>
-        <button id="logoutButton" class="link-button" style="margin-top: 30px;">ログアウト</button>
+        <div class="user-controls">
+            <span class="user-info-header" id="header-user-info"></span>
+            <button class="logout-btn" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> ログアウト</button>
+        </div>
+    </header>
+
+    <div class="main-content-wrapper">
+        <aside class="sidebar">
+            <nav>
+                <ul>
+                    <li><a href="menu.html" class="active"><i class="fas fa-home"></i> ダッシュボード</a></li>
+                    <li>
+                        <a href="#" onclick="showSection('payment-section'); return false;"><i class="fas fa-wallet"></i> 会費</a>
+                        <ul>
+                            <li><a href="#" onclick="showSection('payment-section'); return false;"><i class="fas fa-hand-holding-usd"></i> KAFerマネーコード入力</a></li>
+                            <li><a href="#" onclick="showSection('my-payments-section'); return false;"><i class="fas fa-file-invoice-dollar"></i> マイ支払い状況</a></li>
+                            <li><a href="#" onclick="showSection('refund-request-section'); return false;"><i class="fas fa-undo-alt"></i> KAFerマネー返金申請</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#" onclick="showSection('pass-update-section'); return false;"><i class="fas fa-user-lock"></i> パスコード変更</a></li>
+                    <li id="admin-link-sidebar" style="display: none;"><a href="admin.html"><i class="fas fa-user-cog"></i> 管理者ダッシュボード</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="container">
+            <div id="message-area" class="message"></div>
+
+            <!-- ダッシュボードセクション -->
+            <div id="dashboard-section" class="content-section">
+                <h2><i class="fas fa-tachometer-alt"></i> ダッシュボード</h2>
+                <div class="dashboard-metrics">
+                    <div class="metric-card">
+                        <div class="value" id="dashboard-name"></div>
+                        <div class="label">ユーザー名</div>
+                    </div>
+                    <div class="metric-card secondary">
+                        <div class="value" id="dashboard-kaferId"></div>
+                        <div class="label">KAFer ID</div>
+                    </div>
+                    <div class="metric-card accent">
+                        <div class="value" id="dashboard-kafer-money">0円</div>
+                        <div class="label">KAFerマネー残高</div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: var(--spacing-xl);">
+                    <div class="card-header"><i class="fas fa-money-bill-wave"></i> 今月の支払い状況</div>
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <span>今月の支払い必要額 (延滞含む):</span>
+                            <span id="current-monthly-due" style="font-weight: bold;">0円</span>
+                        </div>
+                        <div class="list-group-item">
+                            <span>支払いステータス:</span>
+                            <span id="payment-status-display" style="font-weight: bold; color: var(--error-color);">未確認</span>
+                        </div>
+                    </div>
+                </div>
+                <h3 style="margin-top: var(--spacing-xxl);"><i class="fas fa-bullhorn"></i> お知らせ</h3>
+                <div class="card">
+                    <div id="user-notifications">
+                        <!-- ユーザー向けのお知らせがここに表示される -->
+                        <div class="log-entry"><i class="fas fa-info-circle"></i> 最新の情報が表示されます。</div>
+                    </div>
+                </div>
+                <h3 style="margin-top: var(--spacing-xxl);"><i class="fas fa-info-circle"></i> 運営からのお知らせ</h3>
+                <div class="card">
+                    <div id="admin-announcements">
+                        <!-- 管理者からのお知らせがここに表示される -->
+                        <div class="log-entry"><i class="fas fa-info-circle"></i> 運営からのお知らせがここに表示されます。</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KAFerマネーコード入力セクション -->
+            <div id="payment-section" class="content-section" style="display: none;">
+                <h2><i class="fas fa-hand-holding-usd"></i> KAFerマネーコード入力</h2>
+                <form id="payment-form">
+                    <div class="form-group">
+                        <label for="payment-code"><i class="fas fa-barcode"></i> KAFerマネーコード (6桁の数字)</label>
+                        <input type="text" id="payment-code" required pattern="[0-9]{6}" title="6桁の数字を入力してください">
+                    </div>
+                    <button type="submit" class="btn"><i class="fas fa-money-check-alt"></i> コードを使用</button>
+                </form>
+            </div>
+
+            <!-- マイ支払い状況セクション (タブUI導入) -->
+            <div id="my-payments-section" class="content-section" style="display: none;">
+                <h2><i class="fas fa-file-invoice-dollar"></i> マイ支払い状況</h2>
+
+                <div class="tab-navigation" id="my-payments-tab-nav">
+                    <button class="tab-button active" data-target="recent-payments"><i class="fas fa-history"></i> 最近の記録</button>
+                    <button class="tab-button" data-target="all-records"><i class="fas fa-list-ul"></i> 全ての記録</button>
+                </div>
+
+                <div class="tab-content-wrapper">
+                    <div id="recent-payments" class="tab-content">
+                        <h3>最新5件の活動記録</h3>
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>日付</th>
+                                        <th>種別</th>
+                                        <th>詳細</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="my-payments-recent-list">
+                                    <!-- 最近の支払いデータがここに動的に追加される -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="all-records" class="tab-content" style="display: none;">
+                        <h3>全ての活動記録</h3>
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>日付</th>
+                                        <th>種別</th>
+                                        <th>詳細</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="my-payments-all-list">
+                                    <!-- 全ての支払いデータがここに動的に追加される -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KAFerマネー返金申請セクション -->
+            <div id="refund-request-section" class="content-section" style="display: none;">
+                <h2><i class="fas fa-undo-alt"></i> KAFerマネー返金申請</h2>
+                <p style="margin-bottom: var(--spacing-md);">
+                    現在のKAFerマネー残高: <span id="current-money-balance-refund" style="font-weight: bold;">0円</span>
+                </p>
+                <form id="refund-request-form">
+                    <div class="form-group">
+                        <label for="refund-amount-input"><i class="fas fa-yen-sign"></i> 返金を希望する金額 (KAFerマネー残高の範囲内)</label>
+                        <input type="number" id="refund-amount-input" required min="10" step="10" title="10円以上の10円単位で入力してください">
+                    </div>
+                    <p style="font-size: 0.9em; color: var(--medium-grey);">
+                        <i class="fas fa-info-circle"></i> 返金には手数料として<span id="refund-fee-display">100円</span>がかかります。実際に返金される金額は入力額から手数料を引いた額となります。
+                    </p>
+                    <p id="refund-code-display" style="font-weight: bold; color: var(--info-color); margin-top: var(--spacing-md); display: none;">
+                        <i class="fas fa-exclamation-circle"></i> 返還コード: <span id="generated-refund-code"></span> (このコードを管理者に提示してください)
+                    </p>
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-paper-plane"></i> 返金申請を提出</button>
+                </form>
+            </div>
+
+
+            <!-- パスコード変更セクション -->
+            <div id="pass-update-section" class="content-section" style="display: none;">
+                <h2><i class="fas fa-user-lock"></i> パスコード変更</h2>
+                <form id="pass-update-form">
+                    <div class="form-group">
+                        <label for="current-password"><i class="fas fa-key"></i> 現在のパスコード</label>
+                        <input type="password" id="current-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password"><i class="fas fa-unlock-alt"></i> 新しいパスコード (4桁以上の半角英数字記号)</label>
+                        <input type="password" id="new-password" required pattern="[a-zA-Z0-9!@#$%^&*()_+-=\[\]{}|;:'&quot;,.<>/?]{4,}" title="4文字以上の半角英数字記号を入力してください">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-new-password"><i class="fas fa-check-double"></i> 新しいパスコード (確認)</label>
+                        <input type="password" id="confirm-new-password" required pattern="[a-zA-Z0-9!@#$%^&*()_+-=\[\]{}|;:'&quot;,.<>/?]{4,}" title="4文字以上の半角英数字記号を入力してください">
+                    </div>
+                    <button type="submit" class="btn btn-secondary"><i class="fas fa-exchange-alt"></i> パスコードを変更</button>
+                </form>
+            </div>
+
+        </main>
     </div>
 
-    <div id="customModal" class="modal-overlay"></div>
-    <div id="notification-container"></div>
+    <footer class="app-footer">
+        <p>&copy; 2025 KAFer App. All rights reserved.</p>
+    </footer>
 
+    <script src="crypto.js"></script>
     <script src="global.js"></script>
     <script>
-        const userName = getLoggedInUserName();
-        const userId = getLoggedInKAFerID();
-        const contentArea = document.getElementById('contentArea');
+        let currentSection = 'dashboard-section'; // 現在表示中のセクション
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!userId || getUserVersion() !== 'v2.0') { window.location.href = 'index.html'; return; }
-            document.getElementById('userName').textContent = userName;
-            document.getElementById('logoutButton').addEventListener('click', () => { logout(); window.location.href = 'index.html'; });
-            loadContent('paymentInfo');
-            document.querySelectorAll('.menu-grid .button').forEach(btn => btn.addEventListener('click', () => loadContent(btn.dataset.content)));
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 管理者でないユーザーの/admin.htmlへの直接アクセスを防ぐ
+            if (window.location.pathname.endsWith('admin.html')) {
+                const user = getLoggedInUser();
+                if (!(user && user.isAdmin)) {
+                    window.location.href = 'index.html'; // 認証されていない管理者はログインページへ
+                    return;
+                }
+            }
+
+            // ログイン状態と緊急ロックダウンモードをチェック
+            await checkLoginStatus(true, false, 'menu.html');
+
+            const user = getLoggedInUser();
+            if (!user) return; // 未ログインの場合はcheckLoginStatusでリダイレクトされているはず
+
+            // ヘッダーにユーザー情報を表示
+            document.getElementById('header-user-info').textContent = `${user.name} (${user.kaferId})`;
+
+            // 管理者リンクの表示制御
+            if (user.isAdmin) {
+                document.getElementById('admin-link-sidebar').style.display = 'block';
+            }
+
+            // 初期ロード時に各種ステータスを更新
+            await updateDashboardAndPayments();
+            await loadUserNotifications(); // ユーザー向け通知をロード
+            await loadAdminAnnouncements(); // 運営からのお知らせをロード
+            document.getElementById('refund-fee-display').textContent = `${PROJECT_CONFIG.REFUND_FEE}円`;
+
+
+            // KAFerマネーコード入力フォームのイベントリスナー
+            document.getElementById('payment-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                hideMessage('message-area');
+
+                const moneyCode = document.getElementById('payment-code').value;
+                if (!moneyCode || !/^[0-9]{6}$/.test(moneyCode)) {
+                    showMessage('message-area', '6桁のKAFerマネーコードを入力してください。', 'error');
+                    return;
+                }
+
+                // KAFerマネーコードの有効性チェック
+                const records = await fetchSheetData();
+                const validMoneyCodeRecord = records.find(r => r.type === 'money_code_issue' && r.moneyCode === moneyCode);
+                if (!validMoneyCodeRecord) {
+                    showMessage('message-area', '無効なKAFerマネーコードです。', 'error');
+                    return;
+                }
+                
+                // コードが無効化されているかチェック
+                const isVoided = records.some(r => r.type === 'money_code_void' && r.moneyCode === moneyCode);
+                if (isVoided) {
+                     showMessage('message-area', 'このKAFerマネーコードは無効化されています。', 'error');
+                     return;
+                }
+
+                // 既にこのコードが使用済みかチェック (他のユーザーも含む)
+                const alreadyUsed = records.some(r => r.type === 'payment' && r.paymentCode === moneyCode);
+                if (alreadyUsed) {
+                    showMessage('message-area', 'このKAFerマネーコードは既に使用済みです。', 'info');
+                    return;
+                }
+
+                const success = await writeToSheet(user.name, user.kaferId, 'payment', { paymentCode: moneyCode, amount: validMoneyCodeRecord.amount });
+
+                if (success) {
+                    showMessage('message-area', `KAFerマネーコード ${moneyCode} (${validMoneyCodeRecord.amount}円) を使用しました。残高に反映されます。`, 'success');
+                    document.getElementById('payment-form').reset();
+                    await updateDashboardAndPayments(); // 全体のステータスを更新
+                    await loadUserNotifications(); // 通知を更新
+                } else {
+                    showMessage('message-area', 'KAFerマネーコードの使用に失敗しました。', 'error');
+                }
+            });
+
+            // 返金申請フォームのイベントリスナー
+            document.getElementById('refund-request-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                hideMessage('message-area');
+                document.getElementById('refund-code-display').style.display = 'none'; // 以前のコードを非表示
+
+                const requestAmount = parseInt(document.getElementById('refund-amount-input').value, 10);
+                const records = await fetchSheetData();
+                const currentBalance = calculateKAFerMoneyBalance(user.kaferId, records);
+
+                if (isNaN(requestAmount) || requestAmount < 10 || requestAmount % 10 !== 0) {
+                    showMessage('message-area', '返金希望額は10円以上の10円単位で入力してください。', 'error');
+                    return;
+                }
+                if (requestAmount > currentBalance) {
+                    showMessage('message-area', `KAFerマネー残高が不足しています。現在の残高は${currentBalance}円です。`, 'error');
+                    return;
+                }
+                if (requestAmount <= PROJECT_CONFIG.REFUND_FEE) {
+                     showMessage('message-area', `返金手数料 ${PROJECT_CONFIG.REFUND_FEE}円を考慮すると、入力された金額では返金できません。`, 'error');
+                     return;
+                }
+
+                const refundAmountAfterFee = requestAmount - PROJECT_CONFIG.REFUND_FEE;
+                const refundCode = generateRandomString(12); // 返還コードを生成
+
+                if (confirm(`KAFerマネー ${requestAmount}円の返金申請を提出しますか？\n手数料 ${PROJECT_CONFIG.REFUND_FEE}円を差し引き、${refundAmountAfterFee}円が返金されます。`)) {
+                    const success = await writeToSheet(user.name, user.kaferId, 'refund_request', {
+                        requestAmount: requestAmount,
+                        refundAmountAfterFee: refundAmountAfterFee,
+                        refundCode: refundCode, // 生成したコードを保存
+                        status: 'pending'
+                    });
+
+                    if (success) {
+                        showMessage('message-area', `KAFerマネー ${requestAmount}円の返金申請を提出しました。`, 'success');
+                        document.getElementById('refund-request-form').reset();
+                        document.getElementById('generated-refund-code').textContent = refundCode;
+                        document.getElementById('refund-code-display').style.display = 'block'; // コードを表示
+                        await updateDashboardAndPayments(); // ダッシュボードを更新
+                        await loadUserNotifications(); // 通知を更新
+                    } else {
+                        showMessage('message-area', '返金申請の提出に失敗しました。', 'error');
+                    }
+                }
+            });
+
+
+            // パスコード変更フォームのイベントリスナー
+            document.getElementById('pass-update-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                hideMessage('message-area');
+
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmNewPassword = document.getElementById('confirm-new-password').value;
+
+                if (!currentPassword || !newPassword || !confirmNewPassword) {
+                    showMessage('message-area', 'すべてのフィールドを入力してください。', 'error');
+                    return;
+                }
+                if (!/^[a-zA-Z0-9!@#$%^&*()_+-=\[\]{}|;:'&quot;,.<>/?]{4,}$/.test(newPassword)) {
+                    showMessage('message-area', '新しいパスコードは4文字以上の半角英数字記号で入力してください。', 'error');
+                    return;
+                }
+                if (newPassword !== confirmNewPassword) {
+                    showMessage('message-area', '新しいパスコードが一致しません。', 'error');
+                    return;
+                }
+
+                // 現在のパスコードで認証
+                const authenticatedUser = await authenticateUser(user.kaferId, currentPassword);
+                if (!authenticatedUser) {
+                    showMessage('message-area', '現在のパスコードが間違っています。', 'error');
+                    return;
+                }
+
+                const success = await writeToSheet(user.name, user.kaferId, 'pass_update', { pass: newPassword });
+
+                if (success) {
+                    showMessage('message-area', 'パスコードが正常に変更されました。次回から新しいパスコードでログインしてください。', 'success');
+                    document.getElementById('pass-update-form').reset();
+                    logoutUser(); // パスコード変更後はセキュリティのため再ログイン
+                } else {
+                    showMessage('message-area', 'パスコードの変更に失敗しました。', 'error');
+                }
+            });
+
+            // タブボタンのイベントリスナー設定
+            document.querySelectorAll('#my-payments-tab-nav .tab-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    showTabContent('my-payments-tab-nav', e.target.dataset.target);
+                });
+            });
+
+            // 初期表示タブの設定
+            showTabContent('my-payments-tab-nav', 'recent-payments');
         });
 
-        async function loadContent(contentType) {
-            contentArea.innerHTML = `<div class="loading-spinner"></div>`;
-            try {
-                const allData = await fetchKAFerData();
-                const registerInfo = allData.find(r => r.F === userId && r.e === 'register');
-                if (!registerInfo || !registerInfo.K) { contentArea.innerHTML = `<p class="message error">あなたの登録情報が見つかりません。</p>`; return; }
-                const myRegisterDate = new Date(registerInfo.K);
-                const myPayments = allData.filter(row => row.F === userId && row.e === 'payment').map(p => ({...p, date: new Date(p.K)}));
+        /**
+         * ユーザー向け通知をロードする
+         */
+        async function loadUserNotifications() {
+            const user = getLoggedInUser();
+            if (!user) return;
 
-                let unpaidAmount = 0, consecutiveDelinquent = 0;
-                let checkDate = new Date(myRegisterDate.getFullYear(), myRegisterDate.getMonth(), 1);
-                const today = new Date(); today.setDate(1);
+            const records = await fetchSheetData();
+            const userNotificationsDiv = document.getElementById('user-notifications');
+            userNotificationsDiv.innerHTML = ''; // クリア
 
-                while (checkDate < today) {
-                    const monthStr = getMonthYear(checkDate);
-                    if (!myPayments.some(p => getMonthYear(p.date) === monthStr)) {
-                        unpaidAmount += calculateBilling(getActiveUsers(allData, checkDate).length);
-                        consecutiveDelinquent++;
-                    } else {
-                        consecutiveDelinquent = 0;
-                    }
-                    checkDate.setMonth(checkDate.getMonth() + 1);
-                }
+            const notifications = [];
 
-                let content = '';
-                switch(contentType) {
-                    case 'paymentInfo':
-                        const activeNow = getActiveUsers(allData).length;
-                        const currentBilling = calculateBilling(activeNow);
-                        const totalBilling = currentBilling + unpaidAmount;
-                        content = `<h2>支払い情報</h2><div class="content-box">
-                            <div class="info-item"><span class="info-label">今月の請求額</span><span class="info-value">¥${currentBilling.toLocaleString()}</span></div>
-                            <div class="info-item"><span class="info-label">未払い合計額</span><span class="info-value">¥${unpaidAmount.toLocaleString()}</span></div>
-                            <div class="info-item" style="background: #fcefee;"><span class="info-label"><strong>合計請求額</strong></span><span class="info-value"><strong>¥${totalBilling.toLocaleString()}</strong></span></div>
-                            <div class="info-item"><span class="info-label">集金期間</span><span class="info-value">毎月1日～末日</span></div>
-                        </div>`;
-                        break;
-                    case 'paymentStatus':
-                        const users = allData.filter(r => r.e === 'register' && !allData.some(rem => rem.F === r.F && rem.e === 'remove'));
-                        const payments = allData.filter(r => r.e === 'payment');
-                        const currentMonth = getMonthYear(new Date());
-                        let tableRows = users.map(user => {
-                            const isPaid = payments.some(p => p.F === user.F && getMonthYear(new Date(p.K)) === currentMonth);
-                            return `<tr><td>${user.A}</td><td class="${isPaid ? 'paid' : 'unpaid'}">${isPaid ? '支払い済み' : '未払い'}</td></tr>`;
-                        }).join('');
-                        content = `<h2>全会員の支払状況 (${currentMonth})</h2><table class="data-table"><thead><tr><th>名前</th><th>状況</th></tr></thead><tbody>${tableRows}</tbody></table>`;
-                        break;
-                    case 'submitCode':
-                        content = `<h2>支払いコード入力</h2><div class="content-box">
-                            <input type="number" id="paymentCodeInput" placeholder="6桁の支払いコード">
-                            <button id="submitPaymentCode">支払いを確定する</button>
-                            <div id="paymentMsg" class="message hidden"></div>
-                        </div>`;
-                        break;
-                    case 'accountConfirm':
-                        const config = allData.filter(r => r.e === 'config' && r.r).pop();
-                        const accInfo = config ? JSON.parse(config.r) : { email: '未設定', pass: '未設定' };
-                        const isLocked = consecutiveDelinquent >= 3;
-                        if(isLocked) showModal('アカウントロック', '3ヶ月以上の料金延滞があるため、アカウント情報を確認できません。');
-                        content = `<h2>アカウント確認</h2><div class="content-box ${isLocked ? 'locked-account' : ''}">
-                            <div class="info-item"><span class="info-label">メール</span><span class="info-value">${accInfo.email}</span></div>
-                            <div class="info-item"><span class="info-label">パスワード</span><span class="info-value">${accInfo.pass}</span></div>
-                        </div>`;
-                        break;
-                    case 'changePasscode':
-                        content = `<h2>パスコード変更</h2><div class="content-box">
-                            <p>セキュリティのため、定期的なパスコードの変更を推奨します。</p>
-                            <input type="password" id="currentPasscode" maxlength="4" placeholder="現在のパスコード (4桁)">
-                            <input type="password" id="newPasscode" maxlength="4" placeholder="新しいパスコード (4桁)">
-                            <input type="password" id="confirmNewPasscode" maxlength="4" placeholder="新しいパスコード (確認)">
-                            <button id="submitChangePasscode">変更を保存</button>
-                        </div>`;
-                        break;
-                    case 'withdrawal':
-                        let totalOverpayment = 0;
-                        for (const payment of myPayments) {
-                            const activeCount = getActiveUsers(allData, payment.date).length;
-                            const billing = calculateBilling(activeCount);
-                            const totalCollected = billing * activeCount;
-                            if (totalCollected > 990) totalOverpayment += Math.floor((totalCollected - 990) / activeCount);
-                        }
-                        content = `<h2>退会手続き</h2><div class="content-box">
-                            <p class="message warning">本当に退会しますか？この操作は取り消せません。</p>
-                            <div class="info-item"><span class="info-label">過払い金合計 (返金額目安)</span><span class="info-value">¥${totalOverpayment.toLocaleString()}</span></div>
-                            <button id="confirmWithdrawal" class="button">退会を確定する</button>
-                        </div>`;
-                        break;
-                }
-                contentArea.innerHTML = content;
-                attachEventListeners(contentType, allData);
-            } catch(e) {
-                contentArea.innerHTML = `<p class="message error">データの表示中にエラーが発生しました。</p>`;
-                console.error(e);
-            }
-        }
-
-        function attachEventListeners(contentType, allData) {
-            if (contentType === 'submitCode') {
-                const button = document.getElementById('submitPaymentCode');
-                button.addEventListener('click', async () => { /* ... (変更なし) ... */ });
-            } else if (contentType === 'withdrawal') {
-                document.getElementById('confirmWithdrawal').addEventListener('click', () => {
-                    showModal('最終確認', '本当に退会しますか？この操作は取り消せません。', [
-                        { text: '実行する', class: 'button danger', action: executeWithdrawal },
-                        { text: 'キャンセル', class: 'link-button', action: hideModal }
-                    ]);
+            // 支払い完了通知
+            const userPayments = records.filter(r => r.kaferId === user.kaferId && r.type === 'payment');
+            userPayments.forEach(p => {
+                notifications.push({
+                    type: 'success',
+                    message: `KAFerマネー ${p.amount}円 (${p.paymentCode}) が使用され、支払いに充当されました。`,
+                    timestamp: p.timestamp
                 });
-            } else if (contentType === 'changePasscode') {
-                document.getElementById('submitChangePasscode').addEventListener('click', () => handleChangePasscode(allData));
+            });
+
+            // 返金申請提出通知
+            const refundRequests = records.filter(r => r.kaferId === user.kaferId && r.type === 'refund_request' && r.status === 'pending');
+            refundRequests.forEach(r => {
+                notifications.push({
+                    type: 'info',
+                    message: `KAFerマネー ${r.requestAmount}円の返金申請を提出しました。管理者の承認をお待ちください。返還コード: ${r.refundCode}`,
+                    timestamp: r.timestamp
+                });
+            });
+
+            // 返金承認通知
+            const refundApproved = records.filter(r => r.kaferId === user.kaferId && r.type === 'refund_approved');
+            refundApproved.forEach(r => {
+                notifications.push({
+                    type: 'success',
+                    message: `KAFerマネー ${r.refundAmountAfterFee}円の返金が承認されました！詳細は管理者にお問い合わせください。`,
+                    timestamp: r.timestamp
+                });
+            });
+
+
+            // 不足金・延滞金のお知らせ、チャージ推奨通知
+            const paymentStatus = await calculateUserPaymentStatus(user.kaferId, records);
+            if (paymentStatus.outstanding > 0) {
+                notifications.push({
+                    type: 'error',
+                    message: `今月の会費が${paymentStatus.outstanding}円不足しています。KAFerマネーをチャージしてください。この不足分は翌月に上乗せされます。`,
+                    timestamp: new Date().toISOString() // 現在の時刻で通知
+                });
+            } else if (paymentStatus.excess > 0) {
+                // 過払い金がある場合は、特に追加で通知は不要（残高表示でわかるため）
+            } else {
+                 notifications.push({
+                    type: 'info',
+                    message: `KAFerマネー残高が十分にあります。現在の残高は${paymentStatus.kaferMoneyBalance}円です。`,
+                    timestamp: new Date().toISOString()
+                });
             }
+
+
+            // 管理者からのお知らせもここに表示
+            const adminAnnouncements = records.filter(r => r.type === 'announcement');
+            adminAnnouncements.forEach(a => {
+                notifications.push({
+                    type: 'info',
+                    message: `運営からのお知らせ: ${a.message}`,
+                    timestamp: a.timestamp
+                });
+            });
+
+
+            notifications.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // 新しい順にソート
+
+            if (notifications.length === 0) {
+                userNotificationsDiv.innerHTML = '<div class="log-entry"><i class="fas fa-info-circle"></i> 最新の情報が表示されます。</div>';
+                return;
+            }
+
+            notifications.slice(0, 10).forEach(notification => { // 最新10件を表示
+                const notificationEntry = document.createElement('div');
+                notificationEntry.className = `log-entry message ${notification.type}`;
+                notificationEntry.innerHTML = `<i class="fas fa-bell"></i> [${new Date(notification.timestamp).toLocaleString('ja-JP')}] ${notification.message}`;
+                userNotificationsDiv.appendChild(notificationEntry);
+            });
         }
-        
-        async function executeWithdrawal() { /* ... (変更なし) ... */ }
 
-        async function handleChangePasscode(allData) {
-            const currentPassEl = document.getElementById('currentPasscode');
-            const newPassEl = document.getElementById('newPasscode');
-            const confirmPassEl = document.getElementById('confirmNewPasscode');
+        /**
+         * 運営からのお知らせをロードする (dashboardセクション用)
+         */
+        async function loadAdminAnnouncements() {
+            const records = await fetchSheetData();
+            const adminAnnouncementsDiv = document.getElementById('admin-announcements');
+            adminAnnouncementsDiv.innerHTML = '';
 
-            const currentPass = currentPassEl.value;
-            const newPass = newPassEl.value;
-            const confirmPass = confirmPassEl.value;
+            const announcements = records.filter(r => r.type === 'announcement');
+            announcements.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-            if (!/^\d{4}$/.test(currentPass) || !/^\d{4}$/.test(newPass)) {
-                showModal('入力エラー', 'パスコードは4桁の数字で入力してください。'); return;
-            }
-            if (newPass !== confirmPass) {
-                showModal('入力エラー', '新しいパスコードが一致しません。'); return;
+            if (announcements.length === 0) {
+                adminAnnouncementsDiv.innerHTML = '<div class="log-entry"><i class="fas fa-info-circle"></i> 運営からのお知らせはまだありません。</div>';
+                return;
             }
 
-            const passcodeRecords = allData.filter(row => row.F === userId && (row.e === 'register' || row.e === 'pass_update'));
-            const latestPasscodeRecord = passcodeRecords.pop();
-            const storedPasscode = JSON.parse(latestPasscodeRecord.r).pass;
-            
-            if (currentPass !== storedPasscode) {
-                showModal('認証エラー', '現在のパスコードが違います。'); return;
-            }
-            
-            hideModal();
-            showNotification('パスコードを変更中...', 'warning');
-
-            const formData = new FormData();
-            formData.append(ENTRY_MAP.id, userId);
-            formData.append(ENTRY_MAP.name, userName);
-            formData.append(ENTRY_MAP.type, 'pass_update');
-            formData.append(ENTRY_MAP.data, JSON.stringify({ pass: newPass }));
-            await postToGoogleForm(formData);
-            
-            try {
-                await pollForData(data => data.some(r => r.F === userId && r.e === 'pass_update' && r.r.includes(newPass)));
-                showNotification('パスコードが正常に変更されました。', 'success');
-                currentPassEl.value = ''; newPassEl.value = ''; confirmPassEl.value = '';
-            } catch (e) {
-                showModal('エラー', e.message);
-            }
+            announcements.slice(0, 5).forEach(announcement => { // 最新5件を表示
+                const announcementEntry = document.createElement('div');
+                announcementEntry.className = 'log-entry';
+                announcementEntry.innerHTML = `<i class="fas fa-bullhorn"></i> [${new Date(announcement.timestamp).toLocaleDateString('ja-JP')}] ${announcement.message}`;
+                adminAnnouncementsDiv.appendChild(announcementEntry);
+            });
         }
+
+
+        /**
+         * ダッシュボードと支払い状況をまとめて更新する
+         */
+        async function updateDashboardAndPayments() {
+            const user = getLoggedInUser();
+            if (!user) return;
+
+            const records = await fetchSheetData(); // 全レコードを復号済みで取得
+            const systemConfig = await getSystemConfig(records);
+
+            // KAFerマネー残高
+            const kaferMoneyBalance = calculateKAFerMoneyBalance(user.kaferId, records);
+            document.getElementById('dashboard-kafer-money').textContent = `${kaferMoneyBalance}円`;
+            document.getElementById('current-money-balance-refund').textContent = `${kaferMoneyBalance}円`; // 返金申請フォームにも表示
+
+            // 今月の支払い状況を計算・表示
+            const userPaymentStatus = await calculateUserPaymentStatus(user.kaferId, records);
+            document.getElementById('current-monthly-due').textContent = `${userPaymentStatus.monthlyDue}円`;
+
+            const paymentStatusDisplayElement = document.getElementById('payment-status-display');
+            if (userPaymentStatus.outstanding <= 0) { // 未払いがない場合
+                paymentStatusDisplayElement.textContent = `支払い済み (KAFerマネー残高 ${kaferMoneyBalance}円)`;
+                paymentStatusDisplayElement.style.color = 'var(--success-color)';
+            } else { // 未払いがある場合
+                paymentStatusDisplayElement.textContent = `未払い (${userPaymentStatus.outstanding}円不足, 延滞中)`;
+                paymentStatusDisplayElement.style.color = 'var(--error-color)';
+            }
+
+            // マイ支払い状況リストを更新
+            await loadMyPayments();
+        }
+
+
+        /**
+         * マイ支払い状況リストを更新する (最近の記録と全ての記録)
+         */
+        async function loadMyPayments() {
+            const user = getLoggedInUser();
+            if (!user) return;
+
+            const records = await fetchSheetData(); // クライアントサイドで復号済みデータ取得
+            const myPaymentsRecentList = document.getElementById('my-payments-recent-list');
+            const myPaymentsAllList = document.getElementById('my-payments-all-list');
+            myPaymentsRecentList.innerHTML = ''; // 既存のリストをクリア
+            myPaymentsAllList.innerHTML = ''; // 既存のリストをクリア
+
+            // ユーザー関連レコード全般 (登録、パスコード更新、KAFerマネー使用、返金申請、返金承認)
+            const userActivityRecords = records.filter(r =>
+                r.kaferId === user.kaferId &&
+                (r.type === 'payment' || r.type === 'pass_update' || r.type === 'register' || r.type === 'refund_request' || r.type === 'refund_approved')
+            );
+            userActivityRecords.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // 新しい順にソート
+
+            if (userActivityRecords.length === 0) {
+                const noRecordsRow = '<tr><td colspan="3">まだ記録がありません。</td></tr>';
+                myPaymentsRecentList.innerHTML = noRecordsRow;
+                myPaymentsAllList.innerHTML = noRecordsRow;
+                return;
+            }
+
+            // 全ての記録
+            userActivityRecords.forEach(record => {
+                appendPaymentRecordToTable(myPaymentsAllList, record);
+            });
+
+            // 最近の5件の記録
+            userActivityRecords.slice(0, 5).forEach(record => {
+                appendPaymentRecordToTable(myPaymentsRecentList, record);
+            });
+        }
+
+        function appendPaymentRecordToTable(tbodyElement, record) {
+            const row = tbodyElement.insertRow();
+            const dateCell = row.insertCell();
+            const typeCell = row.insertCell();
+            const detailCell = row.insertCell();
+
+            dateCell.textContent = new Date(record.timestamp).toLocaleString('ja-JP');
+            typeCell.textContent = {
+                'payment': 'KAFerマネー使用',
+                'pass_update': 'パスコード更新',
+                'register': '新規登録',
+                'refund_request': '返金申請',
+                'refund_approved': '返金承認',
+            }[record.type] || record.type;
+
+            let detail = '';
+            if (record.type === 'payment') {
+                detail = `コード: ${record.paymentCode} (${record.amount || 0}円)`;
+            } else if (record.type === 'pass_update') {
+                detail = 'パスコードが変更されました';
+            } else if (record.type === 'register') {
+                detail = 'アカウントが作成されました';
+            } else if (record.type === 'refund_request') {
+                detail = `申請額: ${record.requestAmount}円 (手数料${PROJECT_CONFIG.REFUND_FEE}円, コード: ${record.refundCode})`;
+            } else if (record.type === 'refund_approved') {
+                detail = `返金承認額: ${record.refundAmountAfterFee}円 (コード: ${record.refundCode})`;
+            }
+            detailCell.textContent = detail;
+        }
+
+        /**
+         * ランダムな文字列を生成する
+         * @param {number} length 生成する文字列の長さ
+         * @returns {string} ランダムな文字列
+         */
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        /**
+         * セクション表示を切り替える
+         * @param {string} sectionId 表示するセクションのID
+         */
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+
+            // サイドバーの active クラスを切り替える
+            document.querySelectorAll('.sidebar nav ul li a').forEach(link => {
+                link.classList.remove('active');
+            });
+            // sectionId に対応するリンクに active クラスを追加 (ダッシュボードはmenu.html自体なので別途対応)
+            if (sectionId === 'dashboard-section') {
+                document.querySelector('a[href="menu.html"]').classList.add('active');
+            } else {
+                // サブメニュー内のリンクにも対応
+                const targetLink = document.querySelector(`a[onclick*="showSection('${sectionId}')"]`);
+                if (targetLink) {
+                    targetLink.classList.add('active');
+                }
+            }
+
+            currentSection = sectionId;
+        }
+
+        // 初期表示セクションの設定
+        showSection('dashboard-section');
     </script>
 </body>
 </html>
