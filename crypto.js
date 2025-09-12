@@ -213,38 +213,8 @@ var CryptoJS = CryptoJS || (function (Math) {
         },
         _map: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
     };
-    var Hasher = util.Hasher = Base.extend({
-        cfg: Base.extend(),
-        init: function (cfg) {
-            this.cfg = this.cfg.extend(cfg);
-            this.reset();
-        },
-        reset: function () {
-            // 修正箇所: Base.reset.call(this); の呼び出しを削除
-            this._doReset();
-        },
-        update: function (messageUpdate) {
-            this._append(messageUpdate);
-            this._process();
-            return this;
-        },
-        finalize: function (messageUpdate) {
-            messageUpdate && this._append(messageUpdate);
-            this._doFinalize();
-            return this._hash;
-        },
-        blockSize: 16,
-        _createHelper: function (hasher) {
-            return function (message, cfg) {
-                return new hasher.init(cfg).finalize(message);
-            };
-        },
-        _createHmacHelper: function (hasher) {
-            return function (message, key) {
-                return new HMAC.init(hasher, key).finalize(message);
-            };
-        }
-    });
+
+    // BufferedBlockAlgorithm の定義
     var BufferedBlockAlgorithm = util.BufferedBlockAlgorithm = Base.extend({
         reset: function () {
             this._data = new WordArray.init();
@@ -280,6 +250,41 @@ var CryptoJS = CryptoJS || (function (Math) {
         },
         _minBufferSize: 0
     });
+
+    // Hasher の定義 (BufferedBlockAlgorithm を継承するように変更)
+    var Hasher = util.Hasher = BufferedBlockAlgorithm.extend({ // <-- 修正点1: Base を BufferedBlockAlgorithm に変更
+        cfg: Base.extend(),
+        init: function (cfg) {
+            this.cfg = this.cfg.extend(cfg);
+            this.reset();
+        },
+        reset: function () {
+            BufferedBlockAlgorithm.reset.call(this); // <-- 修正点2: 親クラスの reset を呼び出す
+            this._doReset();
+        },
+        update: function (messageUpdate) {
+            this._append(messageUpdate);
+            this._process();
+            return this;
+        },
+        finalize: function (messageUpdate) {
+            messageUpdate && this._append(messageUpdate);
+            this._doFinalize();
+            return this._hash;
+        },
+        blockSize: 16,
+        _createHelper: function (hasher) {
+            return function (message, cfg) {
+                return new hasher.init(cfg).finalize(message);
+            };
+        },
+        _createHmacHelper: function (hasher) {
+            return function (message, key) {
+                return new HMAC.init(hasher, key).finalize(message);
+            };
+        }
+    });
+    
     var C_algo = C.algo = {};
     var G = C_algo.SHA256 = Hasher.extend({
         _doReset: function () {
