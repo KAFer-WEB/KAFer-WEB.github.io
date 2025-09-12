@@ -1,4 +1,4 @@
-const PROJECT_CONFIG={SHEET_ID:'1lfDRRlo6aYsjW5rEj3ZoL-bpO0ZG2PiLzZVu4A0Ypdg',SHEET_NAME:'v1.0',ADMIN_ID:'2025',ADMIN_PASSCODE_SPECIAL:'@ichijik',MASTER_PASSWORD:'iKeMaster.atMark.lll3.wout.win#2025',OPENSHEET_BASE_URL:'https://opensheet.elk.sh/',FORM_BASE_URL:'https://docs.google.com/forms/d/e/1FAIpQLScPv4SVheBCYy1yu8iDPQs5MlJjRkhltnDN6KN2df5NJJ42NA/formResponse',SITE_URL:'https://kafer.wout.win',DEFAULT_SYSTEM_CONFIG:{emergency_lockdown:!1,base_monthly_fee_yen:1e3},KAF_MONEY_PER_YEN:100,REFUND_FEE_YEN:100,REFUND_FEE_KAF:100*100,REFUND_UNIT_KAF:100*100};
+const PROJECT_CONFIG={SHEET_ID:'1lfDRRlo6aYsjW5rEj3ZoL-bpO0ZG2PiLzZVu4A0Ypdg',SHEET_NAME:'v1.0',ADMIN_ID:'2025',ADMIN_PASSCODE_SPECIAL:'@ichijik',MASTER_PASSWORD:'iKeMaster.atMark.lll3.wout.win#2025',OPENSHEET_BASE_URL:'https://opensheet.elk.sh/',FORM_BASE_URL:'https://docs.google.com/forms/d/e/1FAIpQLScPv4SVheBCYy1yu8iDPQs5MlJjRkhltnDN6KN2df5NJJ42NA/formResponse',SITE_URL:'https://KAFer-WEB.github.io',DEFAULT_SYSTEM_CONFIG:{emergency_lockdown:!1,base_monthly_fee_yen:1e3},KAF_MONEY_PER_YEN:100,REFUND_FEE_YEN:100,REFUND_FEE_KAF:100*100,REFUND_UNIT_KAF:100*100};
 const ENTRY_MAP={name:'960395623',id:'58581214',type:'1943034586',data:'1922513785'};
 const AES_KEY=CryptoJS.SHA256(PROJECT_CONFIG.MASTER_PASSWORD);
 async function fetchSheetData(isAdminFetch=!1){
@@ -309,11 +309,21 @@ function showTabContent(tabContainerId,contentId){
     if(targetContent){targetContent.style.display='block'}
 }
 function initializePwaAndDarkMode(){
-    if('serviceWorker'in navigator&&window.location.protocol==='https:'){
-        window.addEventListener('load',()=>{
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(registration=>{console.log('Service Worker registered with scope:',registration.scope)})
-                .catch(error=>{console.error('Service Worker registration failed:',error)})
-        })
+    // Service WorkerはPWA機能に必要なので再有効化し、`service-worker.js`ファイルも必要
+    if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js', { scope: '/' }) // scopeを追加
+                .then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(error => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        });
     }
+    // ダークモード関連のファビコン切り替えは、ライトモード固定のため引き続きコメントアウト
+    // const faviconElement = document.getElementById('favicon');
+    // if (faviconElement) {
+    //     faviconElement.href = 'icon.png';
+    // }
 }

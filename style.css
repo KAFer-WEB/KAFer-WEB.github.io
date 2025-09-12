@@ -24,7 +24,6 @@ header.app-header .logo img#app-logo{display:none;height:40px;margin-right:var(-
 .sidebar nav ul li a{display:flex;align-items:center;padding:var(--spacing-md) var(--spacing-lg);color:var(--dark-grey);font-weight:var(--body-font-weight);transition:background-color .3s ease,color .3s ease,border-left-color .3s ease;border-left:4px solid transparent}
 .sidebar nav ul li a i{margin-right:var(--spacing-sm);font-size:1.1rem;color:var(--medium-grey);transition:color .3s ease}
 .sidebar nav ul li a:hover{background-color:var(--hover-bg-color);color:var(--primary-color);border-left-color:var(--primary-color)}
-.sidebar nav ul li a:hover i{color:var(--primary-color)}
 .sidebar nav ul li a.active{background-color:var(--primary-color);color:var(--light-text-color);border-left-color:var(--secondary-color)}
 .sidebar nav ul li a.active i{color:var(--light-text-color)}
 .sidebar nav ul ul{list-style:none;padding-left:var(--spacing-xxl);border-left:1px dashed var(--light-grey);margin-left:calc(var(--spacing-lg) + 2px);transition:border-left-color .3s ease}
