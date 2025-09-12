@@ -1,0 +1,23 @@
+{
+  "name": "KAFer App",
+  "short_name": "KAFer",
+  "description": "友人間のコミュニティにおける会員管理、KAFerマネーによる会費支払い、情報共有を行うWebアプリケーション。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFCDD2",
+  "theme_color": "#D81B60",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

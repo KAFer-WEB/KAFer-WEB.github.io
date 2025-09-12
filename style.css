@@ -1,9 +1,9 @@
 /*
  * style.css
- * KAFerプロジェクト引き継ぎ資料 (最終版)に基づき生成 (UI超強化版 - ピンク10色テーマ & ダークモード対応)
+ * KAFerプロジェクト引き継ぎ資料 (最終版)に基づき生成 (UI超強化版 - ピンク10色テーマ & ライトモード固定)
  *
  * ピンクを基調としたカラーパレットで、より魅力的で複雑なUIを目指します。
- * ダークモード時にロゴ画像を色反転させる機能を追加。
+ * ダークモード対応は削除し、ライトモードのピンクテーマに固定します。
  */
 
 /* ============================================================
@@ -169,11 +169,13 @@ header.app-header .logo {
     display: flex;
     align-items: center;
 }
-header.app-header .logo img {
+/* ヘッダーのロゴは表示しないため、反転フィルターは不要 */
+header.app-header .logo img#app-logo {
+    display: none; /* ロゴ画像を非表示 */
     height: 40px;
     margin-right: var(--spacing-sm);
-    filter: drop-shadow(0 0 5px rgba(0,0,0,0.2));
-    transition: filter 0.3s ease; /* スムーズな反転 */
+    /* filter: drop-shadow(0 0 5px rgba(0,0,0,0.2)); */ /* 不要なフィルターを削除 */
+    transition: none; /* 不要なトランジションを削除 */
 }
 
 .user-controls {
@@ -472,7 +474,7 @@ select:focus {
     margin-bottom: var(--spacing-md);
     border-bottom: 1px solid var(--pink-shade-3); /* ボーダーもピンク系 */
     padding-bottom: var(--spacing-sm);
-    transition: color 0.3s ease, border-bottom-color 0.3s ease; /* スムーズな切り替え */
+    transition: color 0.3s ease, background-color 0.3s ease, border-bottom-color 0.3s ease; /* スムーズな切り替え */
 }
 
 .list-group {
@@ -655,111 +657,53 @@ footer.app-footer {
     /* JSで display: none を切り替える */
 }
 
+/* QRコード表示エリア */
+#qrcode-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background-color: var(--pink-shade-1);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--pink-shade-3);
+    box-shadow: var(--shadow-sm);
+}
+#qrcode-container canvas {
+    background-color: white; /* QRコードの背景は白で固定 */
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+}
+#qrcode-container p {
+    font-size: 1.1em;
+    font-weight: var(--heading-font-weight);
+    color: var(--dark-grey);
+    margin-top: var(--spacing-md);
+}
 
-/* ============================================================
-   12. ダークモード対応
-   ============================================================ */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --text-color: #e0e0e0; /* 明るいテキストに */
-        --light-text-color: #333333; /* 暗い背景では逆に使う */
-        --dark-grey: #e0e0e0;
-        --medium-grey: #bdbdbd;
-        --light-grey: #616161;
-        --border-color: #424242;
-        --bg-color: #212121; /* 暗い背景色 */
-        --card-bg-color: #303030; /* カード背景色 */
-        --hover-bg-color: #424242; /* ホバー時の背景色 */
-
-        /* ピンクカラーをダークモードに合わせて調整 */
-        --primary-color: var(--pink-shade-5); /* 少し明るめに */
-        --primary-dark: var(--pink-shade-7);
-        --primary-light: var(--pink-shade-3);
-        --secondary-color: var(--pink-shade-4);
-        --secondary-dark: var(--pink-shade-7);
-        --accent-color: #FFD54F; /* 明るいアンバーに */
-
-        --error-color: #EF5350; /* 少し明るめに */
-        --success-color: #66BB6A;
-        --info-color: #64B5F6;
-
-        /* index.html の独自スタイル調整 */
-        --index-bg-gradient-start: var(--pink-shade-9);
-        --index-bg-gradient-end: var(--pink-shade-7);
-    }
-
-    body {
-        background: linear-gradient(135deg, var(--dark-grey) 0%, var(--bg-color) 100%) !important; /* ダークモードの背景グラデーション */
-    }
-
-    header.app-header .logo img {
-        filter: invert(100%) hue-rotate(180deg) brightness(1.5) drop-shadow(0 0 5px rgba(255,255,255,0.3)); /* 画像を反転させて調整 */
-    }
-
-    /* index.html の独自スタイル調整 */
-    .login-card, .register-card {
-        background-color: var(--card-bg-color) !important;
-        border-color: var(--border-color) !important;
-    }
-    .login-card .card-header, .register-card .card-header {
-        color: var(--primary-color) !important;
-        background-color: var(--hover-bg-color) !important;
-        border-bottom-color: var(--border-color) !important;
-    }
-    .login-form-button {
-        background-color: var(--primary-dark) !important;
-        border-color: var(--primary-color) !important;
-    }
-    .login-form-button:hover {
-        background-color: var(--primary-color) !important;
-    }
-    .register-form-button {
-        background-color: var(--secondary-dark) !important;
-        border-color: var(--secondary-color) !important;
-    }
-    .register-form-button:hover {
-        background-color: var(--secondary-color) !important;
-    }
-    input[type="text"]:focus, input[type="password"]:focus {
-        box-shadow: 0 0 0 3px rgba(var(--primary-color), 0.5) !important;
-    }
-    .content-section {
-        background-color: var(--card-bg-color) !important;
-        border-color: var(--border-color) !important;
-    }
-    h2 {
-        color: var(--primary-color) !important;
-        border-bottom-color: var(--border-color) !important;
-    }
-    h2::after {
-        background-color: var(--secondary-color) !important;
-    }
-    input[type="text"], input[type="password"] {
-        border-color: var(--border-color) !important;
-        background-color: var(--bg-color) !important;
-        color: var(--text-color) !important;
-    }
-
-    .data-table tbody tr:nth-child(even) {
-        background-color: var(--bg-color) !important;
-    }
-    .data-table tbody tr:hover {
-        background-color: var(--hover-bg-color) !important;
-    }
-    footer.app-footer {
-        background-color: var(--card-bg-color) !important;
-        border-top-color: var(--border-color) !important;
-        color: var(--medium-grey) !important;
-    }
-    .message.error {
-        background-color: #5C1D1D !important; /* ダークモードに合わせたエラー背景 */
-    }
-    .message.success {
-        background-color: #2D5C2F !important; /* ダークモードに合わせた成功背景 */
-    }
-    .message.info {
-        background-color: #2D4C5C !important; /* ダークモードに合わせた情報背景 */
-    }
+/* QRコードスキャナー */
+#reader {
+    width: 100%;
+    max-width: 400px;
+    margin: var(--spacing-xl) auto;
+    border: 1px dashed var(--primary-color);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+}
+#reader video {
+    width: 100% !important;
+    height: auto !important;
+}
+#reader div {
+    /* html5-qrcodeの内部要素のスタイル調整 */
+    text-align: center;
+    color: var(--text-color);
+}
+.qr-scanner-controls {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    margin-top: var(--spacing-md);
 }
 
 
@@ -775,7 +719,8 @@ footer.app-footer {
     .app-header .logo {
         font-size: 1.8rem;
     }
-    .app-header .logo img {
+    /* モバイル時もロゴ反転は維持 */
+    header.app-header .logo img#app-logo {
         height: 30px;
     }
     .user-info-header {
@@ -822,11 +767,6 @@ footer.app-footer {
         border-left: none; /* 不要 */
         border-top: 4px solid transparent;
         height: 100%;
-    }
-    .sidebar nav ul li a i {
-        margin-right: 0;
-        margin-bottom: var(--spacing-xs);
-        font-size: 1.2rem;
     }
     .sidebar nav ul li a:hover, .sidebar nav ul li a.active {
         border-left-color: transparent; /* 不要 */

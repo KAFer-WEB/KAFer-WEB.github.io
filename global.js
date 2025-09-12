@@ -1,29 +1,39 @@
 /*
  * global.js
  * 共通のJavaScript関数、設定値、UIヘルパーなど
- * KAFerプロジェクト引き継ぎ資料 (最終版)に基づき生成 (GitHubオンリー版 - admin.html新機能対応・フルコード)
+ * KAFerプロジェクト引き継ぎ資料 (最終版)に基づき生成 (KAFerマネー/自動支払い/延滞対応版 - 最終調整)
  *
  * セキュリティ上の限界点 (MASTER_PASSWORDがクライアントサイドに存在すること) を許容し、
  * GitHub Pagesなどの純粋な静的サイトで動作するように調整されています。
+ * KAFerマネーの自動支払い・延滞処理・返金申請などの新機能に対応。
+ * PWA対応のためのサイトURL設定、KAFerマネーコード16桁ランダム生成、ユーザー名/パスコードルール強化。
+ * KAFerマネー: 1円 = 100KAFer、過払い金システム廃止、返金手数料10000KAFer (100円)
  */
 
 // ============================================================
 // 1. プロジェクト設定
 // ============================================================
 const PROJECT_CONFIG = {
-    SHEET_ID: '1lfDRRlo6aYsjW5rEj3ZoL-bpO0ZG2PiLzZVu4A0Ypdg', // あなたのスプレッドシートIDに設定済み
+    SHEET_ID: '1lfDRRlo6aYsjW5rEj3ZoL-bpO0ZG2PiLzZVu4A0Ypdg', // あなたのスプレッドシートIDに設定してください
     SHEET_NAME: 'v1.0', // 資料に記載の通り、シート名は 'v1.0'
     ADMIN_ID: '2025', // 管理者KAFerID
+    ADMIN_PASSCODE_SPECIAL: '@ichijik', // 管理者ログイン専用の特殊パスワード
     // ★★★ ここをあなたが作成した37文字の秘密鍵で置き換えてください！
     // このパスワードはSHA256でハッシュ化されてAESキーとして使用されます。
     // GitHubに公開されるため、この鍵が漏洩すると全データが解読されます。
-    MASTER_PASSWORD: 'iKeMaster.atMark.lll3.wout.win#2025', // ← ここにあなたの強力な秘密鍵を設定しました
+    MASTER_PASSWORD: 'iKeMaster.atMark.lll3.wout.win#2025', // ← ここにあなたの強力な秘密鍵を設定
     OPENSHEET_BASE_URL: 'https://opensheet.elk.sh/', // Opensheet APIのベースURL
     FORM_BASE_URL: 'https://docs.google.com/forms/d/e/1FAIpQLScPv4SVheBCYy1yu8iDPQs5MlJjRkhltnDN6KN2df5NJJ42NA/formResponse', // GoogleフォームのformResponse URL
+    SITE_URL: 'https://kafer.wout.win', // あなたのサイトのURL (PWAやQRコードに利用)
     // システム設定のデフォルト値
     DEFAULT_SYSTEM_CONFIG: {
         emergency_lockdown: false, // 緊急情報保護モード (true: 有効, false: 無効)
-    }
+        base_monthly_fee_yen: 1000, // 基本の月額会費 (円)
+    },
+    KAF_MONEY_PER_YEN: 100, // 1円あたりのKAFerマネー
+    REFUND_FEE_YEN: 100, // 返金手数料 (円)
+    REFUND_FEE_KAF: 100 * 100, // 返金手数料 (KAFerマネー) = 10000 KAFer
+    REFUND_UNIT_KAF: 100 * 100, // 返金可能単位 (KAFerマネー) = 10000 KAFer
 };
 
 // Googleフォームの質問項目に対応するentry ID
@@ -55,6 +65,7 @@ async function fetchSheetData(isAdminFetch = false) {
     // 生データからシステム設定を復号して取得
     const systemConfigRecordsRaw = recordsForConfig.filter(r => {
         try {
+            if (!r.r) return false; // rデータがない場合はスキップ
             const encryptedPayload = JSON.parse(r.r);
             const decryptedJsonString = decryptData(encryptedPayload);
             const decryptedContent = JSON.parse(decryptedJsonString);
@@ -67,13 +78,13 @@ async function fetchSheetData(isAdminFetch = false) {
     let currentSystemConfig = { ...PROJECT_CONFIG.DEFAULT_SYSTEM_CONFIG };
     if (systemConfigRecordsRaw.length > 0) {
         const latestConfigRaw = systemConfigRecordsRaw.reduce((prev, current) => {
+            // 日付文字列をISO形式のDateオブジェクトに変換して比較
             const prevContent = JSON.parse(decryptData(JSON.parse(prev.r)));
             const currentContent = JSON.parse(decryptData(JSON.parse(current.r)));
             return (new Date(prevContent.timestamp) > new Date(currentContent.timestamp)) ? prev : current;
-        });
+        }, systemConfigRecordsRaw[0]); // 初期値を追加
         Object.assign(currentSystemConfig, JSON.parse(decryptData(JSON.parse(latestConfigRaw.r))));
     }
-
 
     // 緊急情報保護モードが有効で、かつ現在のユーザーが管理者ではない場合、データ取得をブロック
     if (currentSystemConfig.emergency_lockdown && !(user && user.isAdmin) && !isAdminFetch) {
@@ -134,7 +145,6 @@ async function fetchRawSheetData() {
         return data;
     } catch (error) {
         console.error('Error fetching raw sheet data:', error);
-        //alert('生データ取得中にエラーが発生しました。管理者にお問い合わせください。');
         return [];
     }
 }
@@ -270,7 +280,7 @@ async function authenticateUser(kaferId, password) {
         const prevTime = new Date(prev.timestamp); // データのtimestampを使用
         const currentTime = new Date(current.timestamp);
         return (prevTime > currentTime) ? prev : current;
-    });
+    }, userRecords[0]); // 初期値を追加
 
     if (!latestRegister || !latestRegister.pass) {
         return null; // パスコード情報なし
@@ -370,7 +380,7 @@ async function checkLoginStatus(requireLogin = true, requireAdmin = false, curre
 
 
 // ============================================================
-// 5. システム設定管理関数
+// 5. システム設定・会費計算関数
 // ============================================================
 
 /**
@@ -388,12 +398,204 @@ async function getSystemConfig(allRecords) {
             const prevTime = new Date(prev.timestamp);
             const currentTime = new Date(current.timestamp);
             return (prevTime > currentTime) ? prev : current;
-        });
+        }, configRecords[0]);
         Object.assign(currentConfig, latestConfig); // 復号済みレコードであれば直接マージ
     }
     return currentConfig;
 }
 
+/**
+ * 当月の必要な月額会費を計算する (各会員ごとの延滞額を考慮し、合計する)
+ * @param {Array} allRecords 全ての復号済みレコード
+ * @returns {Promise<number>} 当月の支払い必要額の合計 (KAFerマネー)
+ */
+async function calculateCurrentMonthlyFee(allRecords) {
+    const systemConfig = await getSystemConfig(allRecords);
+    const baseFeeYen = systemConfig.base_monthly_fee_yen;
+    const baseFeeKaf = baseFeeYenToKaf(baseFeeYen); // 基本会費をKAFerマネーに変換
+
+    // 現在有効な会員を抽出
+    const activeMembers = allRecords.filter(r => {
+        if (r.type === 'register') {
+            const isRemoved = allRecords.some(rem => rem.type === 'remove' && rem.targetKaferId === r.kaferId);
+            return !isRemoved;
+        }
+        return false;
+    });
+
+    let totalMonthlyFeeSumKaf = 0; // 全会員の当月支払い必要額の合計 (KAFerマネー)
+
+    for (const member of activeMembers) {
+        const userPaymentStatus = await calculateUserPaymentStatus(member.kaferId, allRecords);
+        totalMonthlyFeeSumKaf += userPaymentStatus.monthlyDue;
+    }
+
+    return totalMonthlyFeeSumKaf;
+}
+
+
+/**
+ * 特定ユーザーのKAFerマネー残高を計算する
+ * @param {string} kaferId 対象ユーザーのKAFerID
+ * @param {Array} allRecords 全ての復号済みレコード
+ * @returns {number} KAFerマネー残高
+ */
+function calculateKAFerMoneyBalance(kaferId, allRecords) {
+    let balance = 0;
+
+    // 発行されたKAFerマネー
+    const issuedMoney = allRecords.filter(r => r.kaferId === kaferId && r.type === 'money_code_issue');
+    issuedMoney.forEach(issue => {
+        if (issue.moneyCode && issue.amount) {
+            balance += issue.amount;
+        }
+    });
+
+    // 使用されたKAFerマネー（支払い）
+    const usedMoney = allRecords.filter(r => r.kaferId === kaferId && r.type === 'payment');
+    usedMoney.forEach(payment => {
+        if (payment.paymentCode && payment.amount) {
+            balance -= payment.amount;
+        }
+    });
+
+    // 返金が承認されたKAFerマネー（残高から減らす）
+    const approvedRefunds = allRecords.filter(r => r.kaferId === kaferId && r.type === 'refund_approved');
+    approvedRefunds.forEach(refund => {
+        if (refund.refundAmountAfterFeeKaf) { // 承認された返金額は残高から引かれる
+            balance -= refund.refundAmountAfterFeeKaf;
+        }
+    });
+
+    return balance;
+}
+
+/**
+ * 特定ユーザーの当月未払い額または過払いKAFerマネー額を計算する
+ * 当月の支払い必要額には、過去の延滞額が繰り越されて加算されるロジックを含む。
+ * @param {string} kaferId 対象ユーザーのKAFerID
+ * @param {Array} allRecords 全ての復号済みレコード
+ * @returns {{ monthlyDue: number, kaferMoneyBalance: number, outstanding: number, excess: number }} (すべてKAFerマネー単位)
+ */
+async function calculateUserPaymentStatus(kaferId, allRecords) {
+    const systemConfig = await getSystemConfig(allRecords);
+    const baseFeeYen = systemConfig.base_monthly_fee_yen;
+    const baseFeeKaf = baseFeeYenToKaf(baseFeeYen); // 基本会費をKAFerマネーに変換
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0-11
+
+    let cumulativeMonthlyDueKaf = 0; // 登録月からの累積支払い必要額 (KAFerマネー)
+    let cumulativePaidKaf = 0; // 登録月からの累積支払い額 (KAFerマネー)
+
+    // 会員の登録レコードを特定
+    const registerRecord = allRecords.find(r => r.kaferId === kaferId && r.type === 'register');
+    if (!registerRecord) {
+        return { monthlyDue: baseFeeKaf, kaferMoneyBalance: 0, outstanding: baseFeeKaf, excess: 0 };
+    }
+    const registerDate = new Date(registerRecord.timestamp);
+    const registerYear = registerDate.getFullYear();
+    const registerMonth = registerDate.getMonth();
+
+    // ユーザーの支払い記録を集計 (KAFerマネーでの支払い)
+    const userPayments = allRecords.filter(r => r.kaferId === kaferId && r.type === 'payment');
+    userPayments.forEach(p => {
+        cumulativePaidKaf += p.amount || 0;
+    });
+    
+    // 登録月からの各月で発生する会費を計算
+    for (let y = registerYear; y <= currentYear; y++) {
+        const startM = (y === registerYear) ? registerMonth : 0;
+        const endM = (y === currentYear) ? currentMonth : 11;
+
+        for (let m = startM; m <= endM; m++) {
+            cumulativeMonthlyDueKaf += baseFeeKaf;
+        }
+    }
+    
+    // KAFerマネー残高
+    const kaferMoneyBalance = calculateKAFerMoneyBalance(kaferId, allRecords);
+
+    // 累積未払い額
+    let totalOutstandingDueKaf = cumulativeMonthlyDueKaf - cumulativePaidKaf;
+    if (totalOutstandingDueKaf < 0) totalOutstandingDueKaf = 0; // 累積で過払いなら未払い額は0
+
+    // 今月の支払い必要額（累積の未払い分を含む）
+    const monthlyDueKaf = baseFeeKaf + totalOutstandingDueKaf; // 今回の請求額
+
+    // 支払い状況
+    let outstanding = 0; // 未払いKAFerマネー
+    let excess = 0; // KAFerマネー残高の過払い分
+
+    if (kaferMoneyBalance < monthlyDueKaf) {
+        outstanding = monthlyDueKaf - kaferMoneyBalance;
+    } else {
+        excess = kaferMoneyBalance - monthlyDueKaf;
+    }
+
+    return {
+        monthlyDue: monthlyDueKaf, // 今月の支払い必要額 (累積の延滞分を含むKAFerマネー)
+        kaferMoneyBalance: kaferMoneyBalance, // 現在のKAFerマネー残高
+        outstanding: outstanding, // 未払い額 (支払い済みと見なすKAFerマネーを除く)
+        excess: excess, // 過払いKAFerマネー額
+    };
+}
+
+/**
+ * 円をKAFerマネーに変換し、小数点以下を切り上げて整数KAFerマネーにする。
+ * @param {number} yenAmount 円単位の金額
+ * @returns {number} KAFerマネー単位の金額 (整数)
+ */
+function yenToKaf(yenAmount) {
+    return Math.ceil(yenAmount * PROJECT_CONFIG.KAF_MONEY_PER_YEN);
+}
+
+/**
+ * KAFerマネーを円に変換し、小数点以下2桁で切り上げる。
+ * @param {number} kafAmount KAFerマネー単位の金額
+ * @returns {number} 円単位の金額 (小数点以下2桁)
+ */
+function kafToYen(kafAmount) {
+    const yen = kafAmount / PROJECT_CONFIG.KAF_MONEY_PER_YEN;
+    return Math.ceil(yen * 100) / 100; // 小数点以下2桁で切り上げ
+}
+
+/**
+ * 基本月額会費 (円) をKAFerマネーに変換する
+ * @param {number} baseFeeYen 基本月額会費 (円)
+ * @returns {number} KAFerマネー単位の金額 (整数)
+ */
+function baseFeeYenToKaf(baseFeeYen) {
+    return baseFeeYen * PROJECT_CONFIG.KAF_MONEY_PER_YEN; // 月額会費は整数円なので、正確に変換
+}
+
+
+/**
+ * ランダムなKAFerマネーコード (16桁の数字) を生成する
+ * @returns {string} 16桁の数字文字列
+ */
+function generateRandomMoneyCode() {
+    let result = '';
+    for (let i = 0; i < 16; i++) {
+        result += Math.floor(Math.random() * 10).toString(); // 0-9のランダムな数字
+    }
+    return result;
+}
+
+/**
+ * ランダムな返還コードを生成する (8文字以上の英数字記号)
+ * @param {number} length 生成する文字列の長さ
+ * @returns {string} ランダムな文字列
+ */
+function generateRandomRefundCode(length = 12) { // デフォルト12文字
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
 
 // ============================================================
 // 6. UIヘルパー関数
@@ -456,5 +658,31 @@ function showTabContent(tabContainerId, contentId) {
 
 
 // ============================================================
-// 7. 初期化処理 (各HTMLファイルでDOMContentLoaded後に呼び出す)
+// 7. PWA/ダークモード初期化関数 (各HTMLで呼び出す)
 // ============================================================
+
+/**
+ * PWAとダークモードの初期設定を行う関数
+ * 各HTMLファイルのDOMContentLoadedイベント内で呼び出すことを想定。
+ */
+function initializePwaAndDarkMode() {
+    // PWA Service Worker の登録 (GitHub PagesはHTTPS対応必須)
+    if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(error => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        });
+    }
+
+    // ファビコンをダークモードに応じて切り替える (今回はダークバージョンなし、常にicon.png)
+    // const faviconElement = document.getElementById('favicon');
+    // if (faviconElement) {
+    //     faviconElement.href = 'icon.png'; // 常にライトモードアイコン
+    // }
+    // bodyの背景色もダークモードで切り替えないようCSS側で調整済み、またはJSで制御しない
+}
