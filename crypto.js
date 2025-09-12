@@ -80,6 +80,11 @@ var CryptoJS = CryptoJS || (function (Math) {
             clone.words = this.words.slice(0);
             return clone;
         },
+        // ADDED SPLICE METHOD HERE
+        splice: function (start, deleteCount) { // <- 修正点1: splice メソッドを追加
+            this.words.splice(start, deleteCount);
+            this.sigBytes = this.words.length * 4;
+        },
         random: function (nBytes) {
             var words = [];
             var r;
@@ -245,21 +250,21 @@ var CryptoJS = CryptoJS || (function (Math) {
                 this._doProcessBlock(dataWords, offset);
             }
             var nBytesProcessed = nWordsProcessed * 4;
-            data.splice(0, nWordsProcessed);
+            data.splice(0, nWordsProcessed); // <- ここで WordArray.splice が使われる
             this._nDataBytes -= nBytesProcessed;
         },
         _minBufferSize: 0
     });
 
     // Hasher の定義 (BufferedBlockAlgorithm を継承するように変更)
-    var Hasher = util.Hasher = BufferedBlockAlgorithm.extend({ // <-- 修正点1: Base を BufferedBlockAlgorithm に変更
+    var Hasher = util.Hasher = BufferedBlockAlgorithm.extend({ // <- 修正点2: Base を BufferedBlockAlgorithm に変更
         cfg: Base.extend(),
         init: function (cfg) {
             this.cfg = this.cfg.extend(cfg);
             this.reset();
         },
         reset: function () {
-            BufferedBlockAlgorithm.reset.call(this); // <-- 修正点2: 親クラスの reset を呼び出す
+            BufferedBlockAlgorithm.reset.call(this); // <- 修正点3: 親クラスの reset を呼び出す
             this._doReset();
         },
         update: function (messageUpdate) {
