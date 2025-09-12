@@ -220,7 +220,7 @@ var CryptoJS = CryptoJS || (function (Math) {
             this.reset();
         },
         reset: function () {
-            Base.reset.call(this);
+            // 修正箇所: Base.reset.call(this); の呼び出しを削除
             this._doReset();
         },
         update: function (messageUpdate) {
