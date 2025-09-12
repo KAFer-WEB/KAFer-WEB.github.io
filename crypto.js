@@ -82,34 +82,28 @@ var CryptoJS = CryptoJS || (function (Math) {
         },
         random: function (nBytes) {
             var words = [];
-            var r = (function (h) {
-                var i;
-                if (typeof window != 'undefined' && window.crypto && (i = window.crypto)) {
-                    if (typeof i.getRandomValues == 'function') {
-                        try {
-                            return i.getRandomValues(new Uint32Array(1))[0];
-                        } catch (e) {}
-                    }
-                }
-                if (typeof self != 'undefined' && self.crypto && (i = self.crypto)) {
-                    if (typeof i.getRandomValues == 'function') {
-                        try {
-                            return i.getRandomValues(new Uint32Array(1))[0];
-                        } catch (e) {}
-                    }
-                }
-                if (typeof globalThis != 'undefined' && globalThis.crypto && (i = globalThis.crypto)) {
-                    if (typeof i.getRandomValues == 'function') {
-                        try {
-                            return i.getRandomValues(new Uint32Array(1))[0];
-                        } catch (e) {}
-                    }
-                }
-                // Fallback to Math.random if native crypto is not available or throws error
-                // This is less secure but prevents script breakage in environments without strong crypto
+            var r;
+
+            // Try to use native crypto for secure random numbers
+            if (typeof window !== 'undefined' && window.crypto && typeof window.crypto.getRandomValues === 'function') {
+                r = function() {
+                    return window.crypto.getRandomValues(new Uint32Array(1))[0];
+                };
+            } else if (typeof self !== 'undefined' && self.crypto && typeof self.crypto.getRandomValues === 'function') {
+                r = function() {
+                    return self.crypto.getRandomValues(new Uint32Array(1))[0];
+                };
+            } else if (typeof globalThis !== 'undefined' && globalThis.crypto && typeof globalThis.crypto.getRandomValues === 'function') {
+                r = function() {
+                    return globalThis.crypto.getRandomValues(new Uint32Array(1))[0];
+                };
+            } else {
+                // Fallback to Math.random (less secure)
                 console.warn("Native crypto module could not be used to get secure random number. Falling back to Math.random (less secure).");
-                return function() { return Math.random() * 0x100000000 | 0; }; 
-            }(Math));
+                r = function() {
+                    return Math.random() * 0x100000000 | 0;
+                };
+            }
             
             for (var i = 0; i < nBytes; i += 4) {
                 words.push(r());
@@ -377,10 +371,10 @@ var CryptoJS = CryptoJS || (function (Math) {
             this.xformMode = xformMode;
             this._key = key;
             this.cfg = this.cfg.extend(cfg);
-            this.reset(); // Add reset here for Cipher to properly initialize BufferedBlockAlgorithm
+            this.reset();
         },
         reset: function () {
-            BufferedBlockAlgorithm.reset.call(this); // Call parent reset
+            BufferedBlockAlgorithm.reset.call(this);
             this._doReset();
         },
         process: function (dataUpdate) {
