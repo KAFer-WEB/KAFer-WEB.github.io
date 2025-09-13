@@ -4,7 +4,7 @@ const urlsToCache = [
   '/index.html',
   '/menu.html',
   '/admin.html',
-  '/style.css',
+  '/style.css', // style.css を参照
   '/global.js',
   '/crypto.js',
   '/icon.png',

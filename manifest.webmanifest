@@ -3,8 +3,8 @@
   "short_name": "KAFer App",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#FFEBEE",
-  "theme_color": "#EC407A",
+  "background_color": "#E0F2F1",
+  "theme_color": "#00796B",
   "description": "友人コミュニティにおける会員管理、KAFerマネーによる会費徴収、情報共有を行うためのWebアプリケーション。",
   "icons": [
     {
