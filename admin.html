@@ -70,7 +70,7 @@
                 <h3>クイックアクション</h3>
                 <div class="action-buttons">
                     <button class="btn btn-secondary" onclick="showAdminSection('member-management-section', 'admin-register-tab');"><i class="fas fa-user-plus"></i> 新規会員登録</button>
-                    <button class="btn btn-secondary" onclick="showAdminSection('code-management-section', 'issue-code-tab');"><i class="fas fa-plus-square"></i> KAFerマネーコード発行</button>
+                    <button class="btn btn-secondary" onclick="showAdminSection('code-management-section', 'issue-code-tab');"><i class="fas fa fa-plus-square"></i> KAFerマネーコード発行</button>
                     <button class="btn btn-danger" onclick="toggleEmergencyLockdown();"><i class="fas fa-shield-alt"></i> 緊急情報保護切り替え</button>
                 </div>
 
@@ -375,7 +375,7 @@
                     }
                 } else if (sectionId === 'admin-dashboard-section') {
                     // ダッシュボードの場合、サイドバーの「管理者ダッシュボード」を直接アクティブにする
-                    document.querySelector('.sidebar nav ul li a[href="admin.html"]').classList.add('active');
+                    document.querySelector('.sidebar nav ul li a[onclick*="showAdminSection(\'admin-dashboard-section\')"]').classList.add('active');
                 }
 
                 currentAdminSection = sectionId;
