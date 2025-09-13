@@ -5,16 +5,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>KAFer - 管理者ダッシュボード</title>
     <link id="favicon" rel="icon" href="icon.png" type="image/png">
-    <link rel="stylesheet" href="style.css"> <!-- style.css を参照 -->
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="manifest" href="manifest.webmanifest">
-    <script src="https://unpkg.com/qrious@4.0.2/dist/qrious.js"></script>
 </head>
-<body class="app-container">
+<body class="app-container admin-page">
     <header class="app-header">
-        <div class="logo">
-            <h1>KAFer Admin</h1>
-        </div>
+        <div class="logo"><h1>KAFer Admin</h1></div>
         <div class="user-controls">
             <span class="user-info-header" id="header-user-info"></span>
             <button class="logout-btn" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> ログアウト</button>
@@ -24,25 +21,10 @@
         <aside class="sidebar">
             <nav>
                 <ul>
-                    <li><a href="#" onclick="showAdminSection('admin-dashboard-section'); return false;" class="active"><i class="fas fa-tools"></i> 管理者ダッシュボード</a></li>
-                    <li><a href="#" onclick="showAdminSection('member-management-section', 'member-list-tab'); return false;"><i class="fas fa-users"></i> 会員管理</a>
-                        <ul>
-                            <li><a href="#" onclick="showAdminSection('member-management-section', 'member-list-tab'); return false;"><i class="fas fa-user-friends"></i> 会員リスト</a></li>
-                            <li><a href="#" onclick="showAdminSection('member-management-section', 'admin-register-tab'); return false;"><i class="fas fa-user-plus"></i> 新規登録</a></li>
-                            <li><a href="#" onclick="showAdminSection('member-management-section', 'user-modify-tab'); return false;"><i class="fas fa-user-edit"></i> ユーザー変更</a></li>
-                            <li><a href="#" onclick="showAdminSection('member-management-section', 'remove-member-tab'); return false;"><i class="fas fa-user-minus"></i> 会員削除</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#" onclick="showAdminSection('code-management-section', 'issued-codes-tab'); return false;"><i class="fas fa-money-check-alt"></i> KAFerマネー</a>
-                        <ul>
-                            <li><a href="#" onclick="showAdminSection('code-management-section', 'issued-codes-tab'); return false;"><i class="fas fa-clipboard-list"></i> 発行済みコード</a></li>
-                            <li><a href="#" onclick="showAdminSection('code-management-section', 'issue-code-tab'); return false;"><i class="fas fa-hand-holding-usd"></i> コード発行</a></li>
-                            <li><a href="#" onclick="showAdminSection('code-management-section', 'void-code-tab'); return false;"><i class="fas fa-ban"></i> コード無効化</a></li>
-                            <li><a href="#" onclick="showAdminSection('code-management-section', 'refund-approval-tab'); return false;"><i class="fas fa-cash-register"></i> 返金承認</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#" onclick="showAdminSection('site-settings-section'); return false;"><i class="fas fa-cogs"></i> サイト設定</a></li>
-                    <li><a href="#" onclick="showAdminSection('activity-log-section'); return false;"><i class="fas fa-history"></i> アクティビティログ</a></li>
+                    <li><a href="admin.html" class="active"><i class="fas fa-tools"></i> 管理者ダッシュボード</a></li>
+                    <li><a href="admin-members.html"><i class="fas fa-users"></i> 会員管理</a></li>
+                    <li><a href="admin-money.html"><i class="fas fa-money-check-alt"></i> KAFerマネー</a></li>
+                    <li><a href="admin-settings.html"><i class="fas fa-cogs"></i> サイト設定</a></li>
                     <li><a href="menu.html"><i class="fas fa-arrow-alt-circle-left"></i> ユーザーメニューへ</a></li>
                 </ul>
             </nav>
@@ -53,797 +35,102 @@
             <div id="admin-dashboard-section" class="content-section">
                 <h2><i class="fas fa-tools"></i> 管理者ダッシュボード</h2>
                 <div class="dashboard-metrics">
-                    <div class="metric-card">
-                        <div class="value" id="total-members">0</div>
-                        <div class="label">全会員数</div>
-                    </div>
-                    <div class="metric-card secondary">
-                        <div class="value" id="monthly-due">0KAFer</div>
-                        <div class="label">今月の合計会費徴収額</div>
-                    </div>
-                    <div class="metric-card accent">
-                        <div class="value" id="active-money-codes">0</div>
-                        <div class="label">有効なKAFerマネーコード</div>
-                    </div>
+                    <div class="metric-card"><div class="value" id="total-members">0</div><div class="label">全会員数</div></div>
+                    <div class="metric-card secondary"><div class="value" id="monthly-due">0KAFer</div><div class="label">今月の合計会費徴収額</div></div>
+                    <div class="metric-card accent"><div class="value" id="active-money-codes">0</div><div class="label">有効なKAFerマネーコード</div></div>
                 </div>
-
                 <h3>クイックアクション</h3>
                 <div class="action-buttons">
-                    <button class="btn btn-secondary" onclick="showAdminSection('member-management-section', 'admin-register-tab');"><i class="fas fa-user-plus"></i> 新規会員登録</button>
-                    <button class="btn btn-secondary" onclick="showAdminSection('code-management-section', 'issue-code-tab');"><i class="fas fa fa-plus-square"></i> KAFerマネーコード発行</button>
+                    <a href="admin-members.html#register" class="btn btn-secondary"><i class="fas fa-user-plus"></i> 新規会員登録</a>
+                    <a href="admin-money.html#issue" class="btn btn-secondary"><i class="fas fa-plus-square"></i> KAFerマネーコード発行</a>
                     <button class="btn btn-danger" onclick="toggleEmergencyLockdown();"><i class="fas fa-shield-alt"></i> 緊急情報保護切り替え</button>
                 </div>
-
                 <div class="card" style="margin-top: var(--spacing-xl);">
                     <div class="card-header"><i class="fas fa-exclamation-triangle"></i> システムステータス</div>
                     <div class="list-group">
-                        <div class="list-group-item">
-                            <span>緊急情報保護モード:</span>
-                            <span id="emergency-lockdown-status" style="font-weight: bold; color: var(--success-color);">無効</span>
-                        </div>
+                        <div class="list-group-item"><span>緊急情報保護モード:</span><span id="emergency-lockdown-status" style="font-weight: bold; color: var(--success-color);">無効</span></div>
                     </div>
                 </div>
-
                 <h3 style="margin-top: var(--spacing-xxl);"><i class="fas fa-bullhorn"></i> 運営からのお知らせ投稿</h3>
                 <form id="announcement-form">
-                    <div class="form-group">
-                        <label for="announcement-message"><i class="fas fa-comment-alt"></i> お知らせ内容</label>
-                        <textarea id="announcement-message" rows="4" required></textarea>
-                    </div>
+                    <div class="form-group"><label for="announcement-message"><i class="fas fa-comment-alt"></i> お知らせ内容</label><textarea id="announcement-message" rows="4" required></textarea></div>
                     <button type="submit" class="btn btn-secondary"><i class="fas fa-paper-plane"></i> お知らせを投稿</button>
                 </form>
-
                 <h3 style="margin-top: var(--spacing-xxl);"><i class="fas fa-list-alt"></i> 最新のお知らせ履歴</h3>
-                <div class="card">
-                    <div id="latest-announcements">
-                        <div class="log-entry"><i class="fas fa-info-circle"></i> 最新の運営からのお知らせが表示されます。</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="member-management-section" class="content-section" style="display: none;">
-                <h2><i class="fas fa-users"></i> 会員管理</h2>
-                <div class="tab-navigation" id="member-management-tab-nav">
-                    <button class="tab-button active" data-target="member-list-tab"><i class="fas fa-user-friends"></i> 会員リスト</button>
-                    <button class="tab-button" data-target="admin-register-tab"><i class="fas fa-user-plus"></i> 新規登録</button>
-                    <button class="tab-button" data-target="user-modify-tab"><i class="fas fa-user-edit"></i> ユーザー変更</button>
-                    <button class="tab-button" data-target="remove-member-tab"><i class="fas fa-user-minus"></i> 会員削除</button>
-                </div>
-                <div class="tab-content-wrapper">
-                    <div id="member-list-tab" class="tab-content">
-                        <h3>全会員リスト</h3>
-                        <div class="data-table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>KAFer ID</th>
-                                        <th>ユーザー名</th>
-                                        <th>登録日</th>
-                                        <th>KAFerマネー残高</th>
-                                        <th>支払い状況</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="member-list">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div id="admin-register-tab" class="tab-content" style="display: none;">
-                        <h3>新規会員登録</h3>
-                        <form id="admin-register-form">
-                            <div class="form-group">
-                                <label for="admin-register-name"><i class="fas fa-user-circle"></i> ユーザー名 (10文字以下)</label>
-                                <input type="text" id="admin-register-name" required maxlength="10" title="10文字以下のユーザー名を入力してください">
-                            </div>
-                            <div class="form-group">
-                                <label for="admin-register-kaferId"><i class="fas fa-id-card"></i> KAFer ID (4桁の数字)</label>
-                                <input type="text" id="admin-register-kaferId" required pattern="[0-9]{4}" title="4桁の数字を入力してください">
-                            </div>
-                            <div class="form-group">
-                                <label for="admin-register-password"><i class="fas fa-key"></i> パスコード (4桁以上の半角英数字記号)</label>
-                                <input type="password" id="admin-register-password" required pattern="[a-zA-Z0-9!@#$%\^&amp;*()_+\-=\\[\\]{}|;:'&lt;&gt;\\./?]{4,}" title="4文字以上の半角英数字記号を入力してください">
-                            </div>
-                            <button type="submit" class="btn"><i class="fas fa-user-plus"></i> 会員登録</button>
-                        </form>
-                    </div>
-                    <div id="user-modify-tab" class="tab-content" style="display: none;">
-                        <h3>ユーザー名変更</h3>
-                        <form id="user-modify-form">
-                            <div class="form-group">
-                                <label for="modify-kaferId"><i class="fas fa-id-card"></i> 変更対象KAFer ID</label>
-                                <input type="text" id="modify-kaferId" required pattern="[0-9]{4}" title="4桁の数字を入力してください">
-                            </div>
-                            <div class="form-group">
-                                <label for="new-username"><i class="fas fa-user-edit"></i> 新しいユーザー名 (10文字以下)</label>
-                                <input type="text" id="new-username" required maxlength="10" title="10文字以下のユーザー名を入力してください">
-                            </div>
-                            <button type="submit" class="btn btn-secondary"><i class="fas fa-save"></i> ユーザー名変更</button>
-                        </form>
-                    </div>
-                    <div id="remove-member-tab" class="tab-content" style="display: none;">
-                        <h3>会員削除 (強制退会)</h3>
-                        <form id="remove-member-form">
-                            <div class="form-group">
-                                <label for="remove-kaferId"><i class="fas fa-id-card"></i> 削除対象KAFer ID</label>
-                                <input type="text" id="remove-kaferId" required pattern="[0-9]{4}" title="4桁の数字を入力してください">
-                            </div>
-                            <div class="form-group">
-                                <label for="remove-reason"><i class="fas fa-comment-alt"></i> 削除理由 (任意)</label>
-                                <textarea id="remove-reason" rows="3"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-danger"><i class="fas fa-user-times"></i> 会員を強制削除</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div id="code-management-section" class="content-section" style="display: none;">
-                <h2><i class="fas fa-money-check-alt"></i> KAFerマネー</h2>
-                <div class="tab-navigation" id="code-management-tab-nav">
-                    <button class="tab-button active" data-target="issued-codes-tab"><i class="fas fa-clipboard-list"></i> 発行済みコード</button>
-                    <button class="tab-button" data-target="issue-code-tab"><i class="fas fa-hand-holding-usd"></i> コード発行</button>
-                    <button class="tab-button" data-target="void-code-tab"><i class="fas fa-ban"></i> コード無効化</button>
-                    <button class="tab-button" data-target="refund-approval-tab"><i class="fas fa-cash-register"></i> 返金承認</button>
-                </div>
-                <div class="tab-content-wrapper">
-                    <div id="issued-codes-tab" class="tab-content">
-                        <h3>発行済みKAFerマネーコードリスト</h3>
-                        <div class="data-table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>コード</th>
-                                        <th>金額 (KAFer)</th>
-                                        <th>金額 (円)</th>
-                                        <th>発行日</th>
-                                        <th>ステータス</th>
-                                        <th>利用者ID</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="issued-codes-list">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div id="issue-code-tab" class="tab-content" style="display: none;">
-                        <h3>KAFerマネーコード発行</h3>
-                        <form id="issue-code-form">
-                            <div class="form-group">
-                                <label for="new-money-code"><i class="fas fa-qrcode"></i> 新しいKAFerマネーコード (16桁の数字)</label>
-                                <input type="text" id="new-money-code" required pattern="[0-9]{16}" title="16桁の数字を入力してください">
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('new-money-code').value = generateRandomMoneyCode();" style="margin-top: 5px;"><i class="fas fa-random"></i> ランダム生成</button>
-                            </div>
-                            <div class="form-group">
-                                <label for="code-amount-yen"><i class="fas fa-yen-sign"></i> 金額 (円, 10円単位)</label>
-                                <input type="number" id="code-amount-yen" required min="10" step="10" value="100" title="10円以上の10円単位で入力してください">
-                            </div>
-                            <div class="form-group" id="qrcode-container" style="display: none;">
-                                <canvas id="qrcode-canvas"></canvas>
-                                <p>KAFerマネーコード: <span id="qrcode-text" style="font-weight: bold;"></span></p>
-                            </div>
-                            <button type="submit" class="btn"><i class="fas fa-plus-square"></i> コード発行</button>
-                        </form>
-                    </div>
-                    <div id="void-code-tab" class="tab-content" style="display: none;">
-                        <h3>KAFerマネーコード無効化</h3>
-                        <form id="void-code-form">
-                            <div class="form-group">
-                                <label for="void-money-code"><i class="fas fa-barcode"></i> 無効化するKAFerマネーコード (16桁の数字)</label>
-                                <input type="text" id="void-money-code" required pattern="[0-9]{16}" title="16桁の数字を入力してください">
-                            </div>
-                            <button type="submit" class="btn btn-danger"><i class="fas fa-ban"></i> コードを無効化</button>
-                        </form>
-                    </div>
-                    <div id="refund-approval-tab" class="tab-content" style="display: none;">
-                        <h3>返金申請承認</h3>
-                        <div class="data-table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>申請日</th>
-                                        <th>KAFer ID</th>
-                                        <th>ユーザー名</th>
-                                        <th>申請額 (KAFer)</th>
-                                        <th>返金額 (KAFer)</th>
-                                        <th>返還コード</th>
-                                        <th>アクション</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="refund-requests-list">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="site-settings-section" class="content-section" style="display: none;">
-                <h2><i class="fas fa-cogs"></i> サイト設定</h2>
-                <form id="config-form">
-                    <div class="form-group">
-                        <label for="admin-email"><i class="fas fa-at"></i> 管理者Eメール (通知用)</label>
-                        <input type="email" id="admin-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="admin-panel-password"><i class="fas fa-user-secret"></i> 管理者パネルアクセスパスワード (KAFerID '2025' のパスコード)</label>
-                        <input type="password" id="admin-panel-password" required pattern="[a-zA-Z0-9!@#$%\^&amp;*()_+\-=\\[\\]{}|;:'&lt;&gt;\\./?]{4,}" title="4文字以上の半角英数字記号で入力してください">
-                    </div>
-                    <div class="form-group">
-                        <label for="base-monthly-fee-input"><i class="fas fa-yen-sign"></i> 基本月額会費 (円)</label>
-                        <input type="number" id="base-monthly-fee-input" required min="0" step="100" value="1000" title="0円以上の100円単位で入力してください">
-                    </div>
-                    <button type="submit" class="btn btn-secondary"><i class="fas fa-save"></i> 設定を保存</button>
-                </form>
-
-                <h3 style="margin-top: var(--spacing-xxl);">緊急情報保護モード</h3>
-                <div class="card">
-                    <div class="list-group">
-                        <div class="list-group-item">
-                            <span>現在のステータス:</span>
-                            <span id="site-setting-emergency-lockdown-status" style="font-weight: bold; color: var(--success-color);">無効</span>
-                        </div>
-                    </div>
-                    <div class="action-buttons" style="margin-top: var(--spacing-lg);">
-                        <button class="btn btn-danger" onclick="toggleEmergencyLockdown(true);"><i class="fas fa-lock"></i> 保護モードを有効にする</button>
-                        <button class="btn btn-success" onclick="toggleEmergencyLockdown(false);"><i class="fas fa-unlock"></i> 保護モードを無効にする</button>
-                    </div>
-                    <p style="font-size: 0.85em; color: var(--medium-grey); margin-top: var(--spacing-md);"><i class="fas fa-info-circle"></i> 保護モードを有効にすると、管理者以外の全ユーザーはログインできなくなり、データ読み込みも不可能になります。緊急時のみ使用してください。</p>
-                </div>
-            </div>
-
-            <div id="activity-log-section" class="content-section" style="display: none;">
-                <h2><i class="fas fa-history"></i> アクティビティログ</h2>
-                <div id="log-entries">
-                    <div class="log-entry"><i class="fas fa-info-circle"></i> ログデータがここに表示されます。</div>
-                </div>
+                <div class="card"><div id="latest-announcements"><div class="log-entry"><i class="fas fa-info-circle"></i> 最新の運営からのお知らせが表示されます。</div></div></div>
             </div>
         </main>
     </div>
-    <footer class="app-footer">
-        <p>&copy; 2025 KAFer Admin App. All rights reserved.</p>
-    </footer>
-    <script src="crypto.js"></script>
     <script src="global.js"></script>
     <script>
-        let deferredPrompt;
-        let currentAdminSection = 'admin-dashboard-section'; // 現在表示中の管理画面セクション
-        let qrcode = null; // QRiousインスタンス
-
         document.addEventListener('DOMContentLoaded', async () => {
             initializePwaAndDarkMode();
-
-            // 管理者ページへのアクセスチェック
-            if (window.location.pathname.endsWith('admin.html')) {
-                const user = getLoggedInUser();
-                if (!(user && user.isAdmin)) {
-                    // 管理者でなければログインページへリダイレクト
-                    window.location.href = 'index.html';
-                    return;
-                }
-            }
-
-            await checkLoginStatus(true, true, 'admin.html'); // 管理者ログイン必須
+            await checkLoginStatus(true, true, 'admin.html');
+            document.body.classList.add('admin-page');
 
             const user = getLoggedInUser();
-            if (!user) return; // checkLoginStatusでリダイレクトされるはずだが念のため
+            if (!user) return;
 
             document.getElementById('header-user-info').textContent = `${user.name} (${user.kaferId})`;
 
-            // PWAインストールボタンのロジック (admin.htmlには直接表示されないが、念のため残す)
-            const installAppButton = document.getElementById('installAppButton');
-            if (installAppButton) {
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    deferredPrompt = e;
-                    installAppButton.style.display = 'block';
-                });
+            const bottomNavHtml = `
+                <nav>
+                    <ul>
+                        <li><a href="admin.html" data-page="admin.html"><i class="fas fa-tools"></i><span>ダッシュボード</span></a></li>
+                        <li><a href="admin-members.html" data-page="admin-members.html"><i class="fas fa-users"></i><span>会員管理</span></a></li>
+                        <li><a href="admin-money.html" data-page="admin-money.html"><i class="fas fa-money-check-alt"></i><span>KAFerマネー</span></a></li>
+                        <li><a href="admin-settings.html" data-page="admin-settings.html"><i class="fas fa-cogs"></i><span>設定</span></a></li>
+                        <li><a href="menu.html"><i class="fas fa-arrow-alt-circle-left"></i><span>メニューへ</span></a></li>
+                    </ul>
+                </nav>
+            `;
+            const bottomNavElement = document.createElement('footer');
+            bottomNavElement.className = 'bottom-nav';
+            bottomNavElement.innerHTML = bottomNavHtml;
+            document.body.appendChild(bottomNavElement);
 
-                installAppButton.addEventListener('click', () => {
-                    (async () => {
-                        installAppButton.style.display = 'none';
-                        if (deferredPrompt) {
-                            deferredPrompt.prompt();
-                            const choiceResult = await deferredPrompt.userChoice;
-                            if (choiceResult.outcome === 'accepted') {
-                                console.log('User accepted the A2HS prompt');
-                            } else {
-                                console.log('User dismissed the A2HS prompt');
-                            }
-                            deferredPrompt = null;
-                        }
-                    })();
-                });
-            }
-
-            // セクション表示関数
-            window.showAdminSection = async (sectionId, initialTabId = null) => {
-                document.querySelectorAll('.content-section').forEach(section => {
-                    section.style.display = 'none';
-                });
-                document.getElementById(sectionId).style.display = 'block';
-
-                document.querySelectorAll('.sidebar nav ul li a').forEach(link => {
-                    link.classList.remove('active');
-                });
-                const targetLink = document.querySelector(`.sidebar nav ul li a[onclick*="showAdminSection('${sectionId}')"]`);
-                if (targetLink) {
-                    targetLink.classList.add('active');
-                    // 親要素の<a>もアクティブにする（サブメニューの場合）
-                    const parentLi = targetLink.closest('ul').previousElementSibling;
-                    if (parentLi && parentLi.tagName === 'A') {
-                        parentLi.classList.add('active');
-                    }
-                } else if (sectionId === 'admin-dashboard-section') {
-                    // ダッシュボードの場合、サイドバーの「管理者ダッシュボード」を直接アクティブにする
-                    document.querySelector('.sidebar nav ul li a[onclick*="showAdminSection(\'admin-dashboard-section\')"]').classList.add('active');
+            const currentPage = window.location.pathname.split('/').pop();
+            document.querySelectorAll('.bottom-nav a, .sidebar a').forEach(link => {
+                const linkPage = link.getAttribute('href').split('/').pop();
+                if (linkPage === currentPage) {
+                    link.classList.add('active');
                 }
+            });
 
-                currentAdminSection = sectionId;
-
-                // 各セクション表示時にデータをロード
-                if (sectionId === 'admin-dashboard-section') {
-                    await updateAdminDashboard();
-                    await loadLatestAnnouncements();
-                } else if (sectionId === 'member-management-section') {
-                    await loadMembers();
-                    showTabContent('member-management-tab-nav', initialTabId || 'member-list-tab');
-                } else if (sectionId === 'code-management-section') {
-                    await loadIssuedCodes();
-                    await loadRefundRequests();
-                    showTabContent('code-management-tab-nav', initialTabId || 'issued-codes-tab');
-                } else if (sectionId === 'site-settings-section') {
-                    await loadSiteConfig();
-                } else if (sectionId === 'activity-log-section') {
-                    await loadActivityLogs();
-                }
-
-                // QRコード表示をリセット
-                if (qrcode) {
-                    document.getElementById('qrcode-container').style.display = 'none';
-                }
-            };
-
-            // 初期ロード
             await updateAdminDashboard();
-            await loadMembers();
-            await loadIssuedCodes();
-            await loadRefundRequests();
-            await loadActivityLogs();
-            await loadSiteConfig();
             await loadLatestAnnouncements();
-            showAdminSection('admin-dashboard-section'); // 初期表示はダッシュボード
 
-            // 運営からのお知らせ投稿フォーム
             document.getElementById('announcement-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 hideMessage('message-area');
                 const message = document.getElementById('announcement-message').value;
-
                 if (!message) {
                     showMessage('message-area', 'お知らせ内容を入力してください。', 'error');
                     return;
                 }
-
-                const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'announcement', { message: message });
-
+                const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'announcement', { message });
                 if (success) {
                     showMessage('message-area', 'お知らせを投稿しました。', 'success');
                     document.getElementById('announcement-form').reset();
                     await loadLatestAnnouncements();
-                    await loadActivityLogs();
                 } else {
                     showMessage('message-area', 'お知らせの投稿に失敗しました。', 'error');
                 }
             });
-
-            // 新規会員登録フォーム (管理者用)
-            document.getElementById('admin-register-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                hideMessage('message-area');
-                const name = document.getElementById('admin-register-name').value;
-                const kaferId = document.getElementById('admin-register-kaferId').value;
-                const password = document.getElementById('admin-register-password').value;
-
-                if (!name || !kaferId || !password) {
-                    showMessage('message-area', 'すべてのフィールドを入力してください。', 'error');
-                    return;
-                }
-                if (name.length > 10) {
-                    showMessage('message-area', 'ユーザー名は10文字以下で入力してください。', 'error');
-                    return;
-                }
-                if (!/^[0-9]{4}$/.test(kaferId)) {
-                    showMessage('message-area', 'KAFer IDは4桁の数字で入力してください。', 'error');
-                    return;
-                }
-                if (!/^[a-zA-Z0-9!@#$%^&amp;*()_+\-=\\[\\]{}|;:'&lt;&gt;\\./?]{4,}$/.test(password)) {
-                    showMessage('message-area', 'パスコードは4文字以上の半角英数字記号で入力してください。', 'error');
-                    return;
-                }
-
-                const records = await fetchSheetData(true); // 管理者権限でフェッチ
-                const existingUser = records.find(r => r.kaferId === kaferId && r.type === 'register');
-                if (existingUser) {
-                    showMessage('message-area', 'このKAFer IDは既に登録されています。', 'error');
-                    return;
-                }
-
-                const success = await writeToSheet(name, kaferId, 'register', { pass: password });
-
-                if (success) {
-                    showMessage('message-area', `KAFer ID: ${kaferId} を登録しました。`, 'success');
-                    document.getElementById('admin-register-form').reset();
-                    await updateAdminDashboard();
-                    await loadMembers();
-                    await loadActivityLogs();
-                } else {
-                    showMessage('message-area', '会員登録に失敗しました。', 'error');
-                }
-            });
-
-            // ユーザー名変更フォーム (管理者用)
-            document.getElementById('user-modify-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                hideMessage('message-area');
-                const modifyKaferId = document.getElementById('modify-kaferId').value;
-                const newUsername = document.getElementById('new-username').value;
-
-                if (!modifyKaferId || !/^[0-9]{4}$/.test(modifyKaferId)) {
-                    showMessage('message-area', '変更対象のKAFer IDを4桁の数字で入力してください。', 'error');
-                    return;
-                }
-                if (!newUsername || newUsername.length > 10) {
-                    showMessage('message-area', '新しいユーザー名は10文字以下で入力してください。', 'error');
-                    return;
-                }
-
-                const records = await fetchSheetData(true);
-                const targetUser = records.find(r => r.kaferId === modifyKaferId && r.type === 'register');
-
-                if (!targetUser) {
-                    showMessage('message-area', '指定されたKAFer IDの会員は見つかりませんでした。', 'error');
-                    return;
-                }
-                if (targetUser.kaferId === PROJECT_CONFIG.ADMIN_ID) {
-                    showMessage('message-area', '管理者KAFer IDのユーザー名は変更できません。', 'error');
-                    return;
-                }
-
-                if (confirm(`${targetUser.name} (KAFer ID: ${targetUser.kaferId}) のユーザー名を ${newUsername} に変更しますか？`)) {
-                    const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'name_update', {
-                        targetKaferId: modifyKaferId,
-                        newName: newUsername
-                    });
-
-                    if (success) {
-                        showMessage('message-area', `${modifyKaferId} のユーザー名を ${newUsername} に変更しました。`, 'success');
-                        document.getElementById('user-modify-form').reset();
-                        await updateAdminDashboard();
-                        await loadMembers();
-                        await loadActivityLogs();
-                    } else {
-                    showMessage('message-area', 'ユーザー名の変更に失敗しました。', 'error');
-                    }
-                }
-            });
-
-            // 会員削除フォーム (管理者用)
-            document.getElementById('remove-member-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                hideMessage('message-area');
-                const removeKaferId = document.getElementById('remove-kaferId').value;
-                const removeReason = document.getElementById('remove-reason').value;
-
-                if (!removeKaferId || !/^[0-9]{4}$/.test(removeKaferId)) {
-                    showMessage('message-area', '4桁のKAFer IDを入力してください。', 'error');
-                    return;
-                }
-
-                const records = await fetchSheetData(true);
-                const targetUser = records.find(r => r.kaferId === removeKaferId && r.type === 'register');
-
-                if (!targetUser) {
-                    showMessage('message-area', '指定されたKAFer IDの会員は見つかりませんでした。', 'error');
-                    return;
-                }
-                if (targetUser.kaferId === PROJECT_CONFIG.ADMIN_ID) {
-                    showMessage('message-area', '管理者KAFer IDは削除できません。', 'error');
-                    return;
-                }
-
-                if (confirm(`${targetUser.name} (KAFer ID: ${targetUser.kaferId}) を強制削除しますか？\n理由: ${removeReason || 'なし'}`)) {
-                    const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'remove', {
-                        targetKaferId: targetUser.kaferId,
-                        reason: removeReason
-                    });
-
-                    if (success) {
-                        showMessage('message-area', `${targetUser.kaferId} を強制削除しました。`, 'success');
-                        document.getElementById('remove-member-form').reset();
-                        await updateAdminDashboard();
-                        await loadMembers();
-                        await loadActivityLogs();
-                    } else {
-                        showMessage('message-area', '会員強制削除に失敗しました。', 'error');
-                    }
-                }
-            });
-
-            // KAFerマネーコード発行フォーム
-            document.getElementById('issue-code-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                hideMessage('message-area');
-                document.getElementById('qrcode-container').style.display = 'none'; // QRコード表示を隠す
-
-                const newMoneyCode = document.getElementById('new-money-code').value;
-                const codeAmountYen = parseInt(document.getElementById('code-amount-yen').value, 10);
-                const codeAmountKaf = yenToKaf(codeAmountYen);
-
-                if (!newMoneyCode || !/^[0-9]{16}$/.test(newMoneyCode)) {
-                    showMessage('message-area', '16桁のKAFerマネーコードを入力してください。', 'error');
-                    return;
-                }
-                if (isNaN(codeAmountYen) || codeAmountYen < 10 || codeAmountYen % 10 !== 0) {
-                    showMessage('message-area', '金額は10円以上の10円単位で入力してください。', 'error');
-                    return;
-                }
-
-                const records = await fetchSheetData(true);
-                const issuedCodes = records.filter(r => r.type === 'money_code_issue');
-                const existingCode = issuedCodes.find(r => r.moneyCode === newMoneyCode);
-                if (existingCode) {
-                    showMessage('message-area', 'このKAFerマネーコードは既に発行済みです。', 'error');
-                    return;
-                }
-
-                const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'money_code_issue', {
-                    moneyCode: newMoneyCode,
-                    amount: codeAmountKaf,
-                    amountYen: codeAmountYen,
-                    status: 'active'
-                });
-
-                if (success) {
-                    showMessage('message-area', `KAFerマネーコード ${newMoneyCode} (${codeAmountYen}円相当) を発行しました。`, 'success');
-                    document.getElementById('issue-code-form').reset();
-
-                    // QRコード表示
-                    const qrText = `${PROJECT_CONFIG.SITE_URL}/?code=${newMoneyCode}`;
-                    if (!qrcode) {
-                        qrcode = new QRious({
-                            element: document.getElementById('qrcode-canvas'),
-                            size: 200,
-                            value: qrText
-                        });
-                    } else {
-                        qrcode.value = qrText;
-                    }
-                    document.getElementById('qrcode-text').textContent = newMoneyCode;
-                    document.getElementById('qrcode-container').style.display = 'flex';
-
-                    await updateAdminDashboard();
-                    await loadIssuedCodes();
-                    await loadActivityLogs();
-                } else {
-                    showMessage('message-area', 'KAFerマネーコードの発行に失敗しました。', 'error');
-                }
-            });
-            // 新しいKAFerマネーコード入力欄にフォーカスが当たったらQRコードを非表示にする
-            document.getElementById('new-money-code').addEventListener('focus', () => {
-                document.getElementById('qrcode-container').style.display = 'none';
-            });
-
-
-            // KAFerマネーコード無効化フォーム
-            document.getElementById('void-code-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                hideMessage('message-area');
-                const voidMoneyCode = document.getElementById('void-money-code').value;
-
-                if (!voidMoneyCode || !/^[0-9]{16}$/.test(voidMoneyCode)) {
-                    showMessage('message-area', '16桁のKAFerマネーコードを入力してください。', 'error');
-                    return;
-                }
-
-                const records = await fetchSheetData(true);
-                const targetCode = records.find(r => r.type === 'money_code_issue' && r.moneyCode === voidMoneyCode);
-
-                if (!targetCode) {
-                    showMessage('message-area', '指定されたKAFerマネーコードは見つかりませんでした。', 'error');
-                    return;
-                }
-
-                const alreadyUsed = records.some(r => r.type === 'payment' && r.paymentCode === voidMoneyCode);
-                if (alreadyUsed) {
-                    showMessage('message-area', 'このコードは既に使用されているため、無効化できません。', 'error');
-                    return;
-                }
-
-                if (confirm(`KAFerマネーコード ${voidMoneyCode} を無効化しますか？`)) {
-                    const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'money_code_void', {
-                        moneyCode: voidMoneyCode,
-                        status: 'voided'
-                    });
-
-                    if (success) {
-                        showMessage('message-area', `KAFerマネーコード ${voidMoneyCode} を無効化しました。`, 'success');
-                        document.getElementById('void-code-form').reset();
-                        await updateAdminDashboard();
-                        await loadIssuedCodes();
-                        await loadActivityLogs();
-                    } else {
-                        showMessage('message-area', 'コードの無効化に失敗しました。', 'error');
-                    }
-                }
-            });
-
-
-            // 返金申請承認タブクリック時
-            document.getElementById('refund-approval-tab').addEventListener('click', async () => {
-                await loadRefundRequests();
-            });
-
-            // 返金承認ボタンのクリックイベント
-            document.getElementById('refund-requests-list').addEventListener('click', async (e) => {
-                if (e.target.classList.contains('approve-refund-btn')) {
-                    const refundCode = e.target.dataset.refundCode;
-                    const kaferId = e.target.dataset.kaferId;
-                    const requestAmountKaf = parseInt(e.target.dataset.requestAmountKaf, 10);
-                    const refundAmountAfterFeeKaf = parseInt(e.target.dataset.refundAmountAfterFeeKaf, 10);
-                    const requesterName = e.target.dataset.requesterName;
-
-
-                    if (confirm(`${requesterName} (ID: ${kaferId}) の返金申請（${kafToYen(refundAmountAfterFeeKaf)}円相当）を承認しますか？\n返還コード: ${refundCode}\nこの操作は、スプレッドシートに返金承認記録を追記するもので、実際の返金は別途手動で行う必要があります。`)) {
-                        const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'refund_approved', {
-                            targetKaferId: kaferId,
-                            refundCode: refundCode,
-                            requestAmountKaf: requestAmountKaf,
-                            refundAmountAfterFeeKaf: refundAmountAfterFeeKaf,
-                            status: 'approved'
-                        });
-
-                        if (success) {
-                            showMessage('message-area', `KAFer ID: ${kaferId} への返金申請を承認しました (${kafToYen(refundAmountAfterFeeKaf)}円相当)。`, 'success');
-                            await updateAdminDashboard();
-                            await loadRefundRequests();
-                            await loadActivityLogs();
-                        } else {
-                            showMessage('message-area', '返金承認に失敗しました。', 'error');
-                        }
-                    }
-                }
-            });
-
-            // サイト設定フォーム
-            document.getElementById('config-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                hideMessage('message-area');
-                const adminEmail = document.getElementById('admin-email').value;
-                const adminPanelPassword = document.getElementById('admin-panel-password').value;
-                const baseMonthlyFeeYen = parseInt(document.getElementById('base-monthly-fee-input').value, 10);
-
-                if (!adminEmail || !adminPanelPassword) {
-                    showMessage('message-area', '管理者Eメールとパスコードを入力してください。', 'error');
-                    return;
-                }
-                if (!/^[a-zA-Z0-9!@#$%^&amp;*()_+\-=\\[\\]{}|;:'&lt;&gt;\\./?]{4,}$/.test(adminPanelPassword)) {
-                    showMessage('message-area', '管理者パスコードは4文字以上の半角英数字記号で入力してください。', 'error');
-                    return;
-                }
-                if (isNaN(baseMonthlyFeeYen) || baseMonthlyFeeYen < 0 || baseMonthlyFeeYen % 100 !== 0) {
-                    showMessage('message-area', '基本月額会費は0円以上の100円単位で入力してください。', 'error');
-                    return;
-                }
-
-                // 管理者パスコードを更新
-                const records = await fetchSheetData(true);
-                const adminRegisterRecord = records.find(r => r.kaferId === PROJECT_CONFIG.ADMIN_ID && r.type === 'register');
-                let passUpdateSuccess = false;
-
-                if (!adminRegisterRecord) {
-                    // 管理者アカウントが未登録の場合、新規登録
-                    const registerSuccess = await writeToSheet('ADMIN', PROJECT_CONFIG.ADMIN_ID, 'register', { pass: adminPanelPassword });
-                    if (registerSuccess) {
-                        passUpdateSuccess = true;
-                    } else {
-                        showMessage('message-area', '管理者アカウントの初期登録に失敗しました。', 'error');
-                        return;
-                    }
-                } else {
-                    // 既に登録されている場合、パスコード更新
-                    const result = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'pass_update', { kaferId: PROJECT_CONFIG.ADMIN_ID, pass: adminPanelPassword });
-                    if (result) {
-                        passUpdateSuccess = true;
-                    } else {
-                        showMessage('message-area', '管理者パスワードの更新に失敗しました。', 'error');
-                        return;
-                    }
-                }
-                
-                // システム設定を更新
-                const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'config', {
-                    email: adminEmail,
-                    base_monthly_fee_yen: baseMonthlyFeeYen
-                });
-
-                if (success && passUpdateSuccess) {
-                    showMessage('message-area', 'サイト設定が保存されました。管理者パスコードも更新されました。', 'success');
-                    await loadSiteConfig();
-                    await updateAdminDashboard();
-                    await loadActivityLogs();
-                    logoutUser(); // 管理者パスコード変更後はログアウトして再ログインを促す
-                } else {
-                    showMessage('message-area', 'サイト設定の保存に失敗しました。', 'error');
-                }
-            });
-
-            // タブ切り替えのイベントリスナー
-            document.querySelectorAll('#member-management-tab-nav .tab-button').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    showTabContent('member-management-tab-nav', e.target.dataset.target);
-                });
-            });
-            document.querySelectorAll('#code-management-tab-nav .tab-button').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    showTabContent('code-management-tab-nav', e.target.dataset.target);
-                });
-            });
-
-            // 初期表示タブを設定
-            showAdminSection('admin-dashboard-section');
-            showTabContent('member-management-tab-nav', 'member-list-tab'); // 会員管理の初期タブ
-            showTabContent('code-management-tab-nav', 'issued-codes-tab'); // KAFerマネーの初期タブ
         });
 
-        // 緊急情報保護モード切り替え関数
-        async function toggleEmergencyLockdown(activate = null) {
-            const user = getLoggedInUser();
-            if (!user || !user.isAdmin) {
-                showMessage('message-area', '管理者権限がありません。', 'error');
-                return;
-            }
-            hideMessage('message-area');
-
-            const records = await fetchSheetData(true);
-            const currentSystemConfig = await getSystemConfig(records);
-
-            const newLockdownStatus = activate !== null ? activate : !currentSystemConfig.emergency_lockdown;
-
-            let confirmationMessage = newLockdownStatus
-                ? '本当に緊急情報保護モードを「有効」にしますか？（管理者以外の全ユーザーはログイン不可、データ読み込み不可になります）'
-                : '緊急情報保護モードを「無効」にしますか？（全ユーザーが通常通りアクセス可能になります）';
-
-            if (!confirm(confirmationMessage)) {
-                return;
-            }
-
-            const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'system_config', {
-                emergency_lockdown: newLockdownStatus
-            });
-
-            if (success) {
-                showMessage('message-area', `緊急情報保護モードを${newLockdownStatus ? '有効' : '無効'}にしました。`, 'success');
-                await updateAdminDashboard();
-                await loadSiteConfig();
-                await loadActivityLogs();
-            } else {
-                showMessage('message-area', '緊急情報保護モードの切り替えに失敗しました。', 'error');
-            }
-        }
-
         async function updateAdminDashboard() {
-            const records = await fetchSheetData(true); // 管理者権限でフェッチ
-
+            const records = await fetchSheetData();
             const allRegisters = records.filter(r => r.type === 'register');
             const totalMembers = allRegisters.length;
             document.getElementById('total-members').textContent = totalMembers;
 
-            const currentMonthlyTotalDue = await calculateCurrentMonthlyFee(records); // 全員の合計会費
+            const currentMonthlyTotalDue = await calculateCurrentMonthlyFee(records);
             document.getElementById('monthly-due').textContent = `${currentMonthlyTotalDue}KAFer (${kafToYen(currentMonthlyTotalDue)}円)`;
 
             const issuedMoneyCodes = records.filter(r => r.type === 'money_code_issue');
-            const activeMoneyCodes = issuedMoneyCodes.filter(code =>
-                !records.some(p => p.type === 'payment' && p.paymentCode === code.moneyCode) &&
+            const activeMoneyCodes = issuedMoneyCodes.filter(code => 
+                !records.some(p => p.type === 'payment' && p.paymentCode === code.moneyCode) && 
                 !records.some(v => v.type === 'money_code_void' && v.moneyCode === code.moneyCode)
             );
             document.getElementById('active-money-codes').textContent = activeMoneyCodes.length;
@@ -859,173 +146,16 @@
             }
         }
 
-        async function loadMembers() {
-            const records = await fetchSheetData(true); // 管理者権限でフェッチ
-            const memberListBody = document.getElementById('member-list');
-            memberListBody.innerHTML = '';
-
-            const allRegisters = records.filter(r => r.type === 'register');
-            allRegisters.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
-            if (allRegisters.length === 0) {
-                memberListBody.innerHTML = '<tr><td colspan="5">登録されている会員がいません。</td></tr>';
-                return;
-            }
-
-            for (const member of allRegisters) {
-                const isRemoved = records.some(r => r.type === 'remove' && r.targetKaferId === member.kaferId);
-                if (isRemoved) continue; // 削除済み会員は表示しない
-
-                const row = memberListBody.insertRow();
-                row.insertCell().textContent = member.kaferId;
-                row.insertCell().textContent = member.name;
-                row.insertCell().textContent = new Date(member.timestamp).toLocaleDateString('ja-JP');
-
-                const kaferMoneyBalance = calculateKAFerMoneyBalance(member.kaferId, records);
-                row.insertCell().textContent = `${kaferMoneyBalance}KAFer (${kafToYen(kaferMoneyBalance)}円)`;
-
-                const paymentStatus = await calculateUserPaymentStatus(member.kaferId, records);
-                const statusCell = row.insertCell();
-                if (paymentStatus.outstanding <= 0) {
-                    statusCell.textContent = '支払い済み';
-                    statusCell.style.color = 'var(--success-color)';
-                } else {
-                    statusCell.textContent = `未払い (${paymentStatus.outstanding}KAFer不足)`;
-                    statusCell.style.color = 'var(--error-color)';
-                }
-            }
-        }
-
-        async function loadIssuedCodes() {
-            const records = await fetchSheetData(true); // 管理者権限でフェッチ
-            const issuedCodesListBody = document.getElementById('issued-codes-list');
-            issuedCodesListBody.innerHTML = '';
-
-            const issuedMoneyCodes = records.filter(r => r.type === 'money_code_issue');
-            issuedMoneyCodes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // 新しい順
-
-            if (issuedMoneyCodes.length === 0) {
-                issuedCodesListBody.innerHTML = '<tr><td colspan="6">発行済みのKAFerマネーコードがありません。</td></tr>';
-                return;
-            }
-
-            for (const codeRecord of issuedMoneyCodes) {
-                const row = issuedCodesListBody.insertRow();
-                row.insertCell().textContent = codeRecord.moneyCode;
-                row.insertCell().textContent = `${codeRecord.amount || 0}KAFer`;
-                row.insertCell().textContent = `${codeRecord.amountYen || 0}円`;
-                row.insertCell().textContent = new Date(codeRecord.timestamp).toLocaleDateString('ja-JP');
-
-                const usedByPayment = records.find(r => r.type === 'payment' && r.paymentCode === codeRecord.moneyCode);
-                const isVoided = records.some(r => r.type === 'money_code_void' && r.moneyCode === codeRecord.moneyCode);
-
-                const statusCell = row.insertCell();
-                const userCell = row.insertCell();
-
-                if (usedByPayment) {
-                    statusCell.textContent = '使用済み';
-                    statusCell.style.color = 'var(--medium-grey)';
-                    userCell.textContent = usedByPayment.name + ` (${usedByPayment.kaferId})`;
-                } else if (isVoided) {
-                    statusCell.textContent = '無効';
-                    statusCell.style.color = 'var(--error-color)';
-                    userCell.textContent = 'N/A';
-                } else {
-                    statusCell.textContent = '有効';
-                    statusCell.style.color = 'var(--success-color)';
-                    userCell.textContent = '未利用';
-                }
-            }
-        }
-
-        async function loadRefundRequests() {
-            const records = await fetchSheetData(true); // 管理者権限でフェッチ
-            const refundRequestsListBody = document.getElementById('refund-requests-list');
-            refundRequestsListBody.innerHTML = '';
-
-            // 承認されていない、かつ無効化されていない返金申請のみを表示
-            const pendingRefundRequests = records.filter(r =>
-                r.type === 'refund_request' &&
-                r.status === 'pending' &&
-                !records.some(approved => approved.type === 'refund_approved' && approved.refundCode === r.refundCode) // 既に承認済みでない
-            );
-            pendingRefundRequests.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); // 古い順
-
-            if (pendingRefundRequests.length === 0) {
-                refundRequestsListBody.innerHTML = '<tr><td colspan="7">未承認の返金申請はありません。</td></tr>';
-                return;
-            }
-
-            for (const request of pendingRefundRequests) {
-                const row = refundRequestsListBody.insertRow();
-                const requestingUser = records.find(r => r.kaferId === request.kaferId && r.type === 'register');
-                const requesterName = requestingUser ? requestingUser.name : '不明なユーザー';
-
-                row.insertCell().textContent = new Date(request.timestamp).toLocaleDateString('ja-JP');
-                row.insertCell().textContent = request.kaferId;
-                row.insertCell().textContent = requesterName;
-                row.insertCell().textContent = `${request.requestAmountKaf}KAFer (${kafToYen(request.requestAmountKaf)}円相当)`;
-                row.insertCell().textContent = `${request.refundAmountAfterFeeKaf}KAFer (${kafToYen(request.refundAmountAfterFeeKaf)}円相当)`;
-                row.insertCell().textContent = request.refundCode;
-
-                const actionCell = row.insertCell();
-                const approveBtn = document.createElement('button');
-                approveBtn.textContent = '承認';
-                approveBtn.className = 'btn btn-secondary btn-sm approve-refund-btn';
-                approveBtn.dataset.refundCode = request.refundCode;
-                approveBtn.dataset.kaferId = request.kaferId;
-                approveBtn.dataset.requestAmountKaf = request.requestAmountKaf;
-                approveBtn.dataset.refundAmountAfterFeeKaf = request.refundAmountAfterFeeKaf;
-                approveBtn.dataset.requesterName = requesterName;
-                actionCell.appendChild(approveBtn);
-            }
-        }
-
-        async function loadSiteConfig() {
-            const records = await fetchSheetData(true); // 管理者権限でフェッチ
-            const configRecords = records.filter(r => r.type === 'config');
-
-            let currentConfig = {
-                email: '',
-                base_monthly_fee_yen: PROJECT_CONFIG.DEFAULT_SYSTEM_CONFIG.base_monthly_fee_yen
-            };
-
-            if (configRecords.length > 0) {
-                const latestConfig = configRecords.reduce((prev, current) => {
-                    const prevTime = new Date(prev.timestamp);
-                    const currentTime = new Date(current.timestamp);
-                    return (prevTime > currentTime) ? prev : current;
-                }, configRecords[0]);
-                Object.assign(currentConfig, latestConfig);
-            }
-
-            document.getElementById('admin-email').value = currentConfig.email;
-            document.getElementById('base-monthly-fee-input').value = currentConfig.base_monthly_fee_yen;
-
-            const systemConfig = await getSystemConfig(records);
-            const statusElement = document.getElementById('site-setting-emergency-lockdown-status');
-            if (systemConfig.emergency_lockdown) {
-                statusElement.textContent = '有効';
-                statusElement.style.color = 'var(--error-color)';
-            } else {
-                statusElement.textContent = '無効';
-                statusElement.style.color = 'var(--success-color)';
-            }
-        }
-
         async function loadLatestAnnouncements() {
-            const records = await fetchSheetData(true); // 管理者権限でフェッチ
+            const records = await fetchSheetData();
             const latestAnnouncementsDiv = document.getElementById('latest-announcements');
             latestAnnouncementsDiv.innerHTML = '';
-
             const announcements = records.filter(r => r.type === 'announcement');
-            announcements.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // 新しい順
-
+            announcements.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             if (announcements.length === 0) {
                 latestAnnouncementsDiv.innerHTML = '<div class="log-entry"><i class="fas fa-info-circle"></i> 運営からのお知らせはまだありません。</div>';
                 return;
             }
-
             announcements.slice(0, 5).forEach(announcement => {
                 const announcementEntry = document.createElement('div');
                 announcementEntry.className = 'log-entry';
@@ -1034,57 +164,25 @@
             });
         }
 
-        async function loadActivityLogs() {
-            const records = await fetchSheetData(true); // 管理者権限でフェッチ
-            const logEntriesDiv = document.getElementById('log-entries');
-            logEntriesDiv.innerHTML = '';
-
-            // スプレッドシートのTIME列でソート（最も新しいものが上に来るように）
-            records.sort((a, b) => new Date(b.TIME).getTime() - new Date(a.TIME).getTime());
-
-            if (records.length === 0) {
-                logEntriesDiv.innerHTML = '<div class="log-entry"><i class="fas fa-info-circle"></i> まだアクティビティログがありません。</div>';
+        async function toggleEmergencyLockdown(activate = null) {
+            const user = getLoggedInUser();
+            if (!user || !user.isAdmin) {
+                showMessage('message-area', '管理者権限がありません。', 'error');
                 return;
             }
-
-            records.forEach(record => {
-                const logEntry = document.createElement('div');
-                logEntry.className = 'log-entry';
-
-                let logText = `<i class="fas fa-info-circle"></i> [${new Date(record.TIME).toLocaleString('ja-JP')}] `;
-                let performedBy = record.name ? ` by ${record.name} (ID: ${record.kaferId})` : '';
-
-                if (record.type === 'register') {
-                    logText += `新しい会員が登録されました: ${record.name} (ID: ${record.kaferId})`;
-                } else if (record.type === 'payment') {
-                    logText += `KAFerマネーコードが使用されました${performedBy}: コード ${record.paymentCode} (${record.amount || 0}KAFer / ${kafToYen(record.amount || 0)}円相当)`;
-                } else if (record.type === 'remove') {
-                    logText += `会員強制削除が行われました${performedBy}: ターゲットID ${record.targetKaferId} (理由: ${record.reason || '不明'})`;
-                } else if (record.type === 'name_update') {
-                    logText += `ユーザー名変更が行われました${performedBy}: ターゲットID ${record.targetKaferId} を ${record.newName} に変更`;
-                } else if (record.type === 'money_code_issue') {
-                    logText += `KAFerマネーコードが発行されました${performedBy}: コード ${record.moneyCode} (${record.amount}KAFer / ${kafToYen(record.amount || 0)}円相当)`;
-                } else if (record.type === 'money_code_void') {
-                    logText += `KAFerマネーコードが無効化されました${performedBy}: コード ${record.moneyCode}`;
-                } else if (record.type === 'pass_update') {
-                    logText += `パスコードが変更されました${performedBy}: ID ${record.kaferId}`;
-                } else if (record.type === 'config') {
-                    logText += `サイト設定が更新されました${performedBy}: 管理者Eメール ${record.email || 'N/A'}, 基本月額会費 ${record.base_monthly_fee_yen || 'N/A'}円`;
-                } else if (record.type === 'system_config') {
-                    logText += `システム設定が更新されました${performedBy}: 緊急情報保護モード: ${record.emergency_lockdown ? '有効' : '無効'}`;
-                } else if (record.type === 'announcement') {
-                    logText += `運営からのお知らせが投稿されました${performedBy}: 「${record.message.substring(0, 30)}...」`;
-                } else if (record.type === 'refund_request') {
-                    logText += `返金申請が提出されました${performedBy}: 申請額 ${record.requestAmountKaf}KAFer (${kafToYen(record.requestAmountKaf)}円相当), 返還コード: ${record.refundCode}`;
-                } else if (record.type === 'refund_approved') {
-                    logText += `返金が承認されました${performedBy}: 対象ID ${record.targetKaferId}, 返金額 ${record.refundAmountAfterFeeKaf}KAFer (${kafToYen(record.refundAmountAfterFeeKaf)}円相当), 返還コード: ${record.refundCode}`;
-                }
-                else {
-                    logText += `未知のアクティビティ: ${record.type} (詳細: ${JSON.stringify(record)})`;
-                }
-                logEntry.innerHTML = logText;
-                logEntriesDiv.appendChild(logEntry);
-            });
+            hideMessage('message-area');
+            const records = await fetchSheetData();
+            const currentSystemConfig = await getSystemConfig(records);
+            const newLockdownStatus = activate !== null ? activate : !currentSystemConfig.emergency_lockdown;
+            let confirmationMessage = newLockdownStatus ? '本当に緊急情報保護モードを「有効」にしますか？' : '緊急情報保護モードを「無効」にしますか？';
+            if (!confirm(confirmationMessage)) { return; }
+            const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'system_config', { emergency_lockdown: newLockdownStatus });
+            if (success) {
+                showMessage('message-area', `緊急情報保護モードを${newLockdownStatus ? '有効' : '無効'}にしました。`, 'success');
+                await updateAdminDashboard();
+            } else {
+                showMessage('message-area', '緊急情報保護モードの切り替えに失敗しました。', 'error');
+            }
         }
     </script>
 </body>

@@ -1,33 +1,30 @@
 {
-  "name": "KAFer",
-  "short_name": "KAFer App",
-  "start_url": "./index.html",
+  "name": "KAFer App",
+  "short_name": "KAFer",
+  "description": "KAFer - 会費管理・KAFerマネーアプリ",
+  "start_url": "/index.html?utm_source=homescreen",
   "display": "standalone",
-  "background_color": "#E0F2F1",
-  "theme_color": "#00796B",
-  "description": "友人コミュニティにおける会員管理、KAFerマネーによる会費徴収、情報共有を行うためのWebアプリケーション。",
+  "background_color": "#FFEBEE",
+  "theme_color": "#F44336",
   "icons": [
     {
-      "src": "/icon.png",
+      "src": "icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icon.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
-    },
+    }
+  ],
+  "scope": "/",
+  "related_applications": [
     {
-      "src": "/icon-dark.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/icon-dark.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "platform": "web",
+      "url": "https://KAFer-WEB.github.io/manifest.webmanifest",
+      "id": "https://KAFer-WEB.github.io/",
+      "name": "KAFer App"
     }
   ]
 }

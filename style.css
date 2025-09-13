@@ -1,43 +1,39 @@
 :root {
-    /* Teal/Mint color palette (10 colors) for v3.0 refresh */
-    --teal-shade-1: #E0F2F1; /* Lightest Teal (Almost white) */
+    --teal-shade-1: #E0F2F1;
     --teal-shade-2: #B2DFDB;
     --teal-shade-3: #80CBC4;
     --teal-shade-4: #4DB6AC;
-    --teal-shade-5: #00BFA5; /* Accent Teal */
-    --teal-shade-6: #26A69A; /* Muted Teal */
-    --teal-shade-7: #00897B; /* Mid Teal */
-    --teal-shade-8: #00796B; /* Darker Mid Teal */
-    --teal-shade-9: #00695C; /* Deep Teal */
-    --teal-shade-10: #004D40; /* Darkest Teal */
+    --teal-shade-5: #00BFA5;
+    --teal-shade-6: #26A69A;
+    --teal-shade-7: #00897B;
+    --teal-shade-8: #00796B;
+    --teal-shade-9: #00695C;
+    --teal-shade-10: #004D40;
 
-    --primary-color: var(--teal-shade-8); /* Main actions */
+    --primary-color: var(--teal-shade-8);
     --primary-dark: var(--teal-shade-9);
     --primary-light: var(--teal-shade-7);
-    --secondary-color: var(--teal-shade-5); /* Sub actions/emphasis */
+    --secondary-color: var(--teal-shade-5);
     --secondary-dark: var(--teal-shade-9);
-    --accent-color: #FFC107; /* Warning/emphasis (Amber, still good contrast) */
-    --success-color: #4CAF50; /* Success (Green) */
-    --error-color: #F44336; /* Error (Red) */
-    --info-color: #2196F3; /* Info (Blue) */
+    --accent-color: #FFC107;
+    --success-color: #4CAF50;
+    --error-color: #F44336;
+    --info-color: #2196F3;
 
-    /* Grays */
     --text-color: #4A4A4A;
     --light-text-color: #ffffff;
     --dark-grey: #616161;
     --medium-grey: #9E9E9E;
     --light-grey: #E0E0E0;
     --border-color: #e0e0e0;
-    --bg-color: var(--teal-shade-1); /* Light background */
+    --bg-color: var(--teal-shade-1);
     --card-bg-color: #ffffff;
-    --hover-bg-color: var(--teal-shade-2); /* Hover background */
+    --hover-bg-color: var(--teal-shade-2);
 
-    /* Typography */
     --font-family-sans: 'Roboto', 'Noto Sans JP', sans-serif;
     --heading-font-weight: 700;
     --body-font-weight: 400;
 
-    /* Spacing */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
     --spacing-md: 16px;
@@ -45,21 +41,20 @@
     --spacing-xl: 32px;
     --spacing-xxl: 48px;
 
-    /* Shadow */
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
     --shadow-lg: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 
-    /* Border Radius */
     --border-radius-sm: 4px;
     --border-radius-md: 8px;
     --border-radius-lg: 12px;
+
+    --header-height: 60px;
+    --footer-height: 60px;
 }
 
-/* Google Fonts (Roboto, Noto Sans JP) */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Roboto:wght@400;700&display=swap');
 
-/* Reset */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -88,9 +83,6 @@ a:hover {
     color: var(--primary-dark);
 }
 
-/* ============================================================
-   2. レイアウト & グリッド
-   ============================================================ */
 .app-container {
     display: flex;
     flex-direction: column;
@@ -101,11 +93,13 @@ a:hover {
     display: flex;
     flex-grow: 1;
     padding-top: var(--header-height);
+    padding-bottom: var(--footer-height);
+    position: relative;
 }
 
 .container {
     flex-grow: 1;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
@@ -113,10 +107,11 @@ a:hover {
 
 .content-section {
     background-color: var(--card-bg-color);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-lg);
     border-radius: var(--border-radius-md);
     box-shadow: var(--shadow-sm);
     margin-bottom: var(--spacing-xl);
+    border: 1px solid var(--teal-shade-2);
     transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -129,14 +124,10 @@ a:hover {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
-/* ============================================================
-   3. ヘッダー
-   ============================================================ */
 header.app-header {
-    /* ヘッダーはティールのグラデーションに */
     background: linear-gradient(135deg, var(--teal-shade-8) 0%, var(--teal-shade-5) 100%);
     color: var(--light-text-color);
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-md);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -146,22 +137,16 @@ header.app-header {
     top: 0;
     left: 0;
     z-index: 1000;
-    height: 70px;
+    height: var(--header-height);
     transition: background 0.3s ease, box-shadow 0.3s ease;
 }
-header.app-header .logo {
-    font-size: 2.2rem;
-    font-weight: var(--heading-font-weight);
+.app-header .logo h1 {
+    font-size: 1.8rem;
     margin: 0;
     letter-spacing: 1px;
-    display: flex;
-    align-items: center;
 }
-header.app-header .logo img#app-logo {
-    display: none; /* ロゴ画像を非表示 */
-    height: 40px;
-    margin-right: var(--spacing-sm);
-    transition: none;
+.app-header .logo img#app-logo {
+    display: none;
 }
 
 .user-controls {
@@ -169,17 +154,10 @@ header.app-header .logo img#app-logo {
     align-items: center;
 }
 .user-info-header {
-    margin-right: var(--spacing-md);
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.8);
-    transition: color 0.3s ease;
-}
-.user-info-header span {
-    font-weight: var(--heading-font-weight);
-    color: var(--light-text-color);
+    display: none;
 }
 .logout-btn {
-    background-color: var(--secondary-color);
+    background-color: rgba(255, 255, 255, 0.2);
     color: var(--light-text-color);
     border: none;
     padding: var(--spacing-sm) var(--spacing-md);
@@ -189,13 +167,63 @@ header.app-header .logo img#app-logo {
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 .logout-btn:hover {
-    background-color: var(--secondary-dark);
+    background-color: rgba(255, 255, 255, 0.3);
     transform: translateY(-2px);
 }
 
-/* ============================================================
-   4. サイドナビゲーション (多階層対応)
-   ============================================================ */
+.bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--footer-height);
+    background: var(--card-bg-color);
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    border-top: 1px solid var(--teal-shade-3);
+    z-index: 1001;
+    padding: var(--spacing-sm) 0;
+    transition: background-color 0.3s ease, border-top-color 0.3s ease;
+}
+
+.bottom-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+}
+
+.bottom-nav li a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--medium-grey);
+    font-size: 0.75rem;
+    font-weight: var(--heading-font-weight);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    transition: color 0.3s ease;
+    width: 70px;
+}
+
+.bottom-nav li a i {
+    font-size: 1.4rem;
+    margin-bottom: var(--spacing-xs);
+    color: var(--medium-grey);
+    transition: color 0.3s ease;
+}
+
+.bottom-nav li a:hover,
+.bottom-nav li a.active {
+    color: var(--primary-color);
+}
+.bottom-nav li a.active i {
+    color: var(--primary-color);
+}
+
 .sidebar {
     width: 250px;
     background-color: var(--card-bg-color);
@@ -206,16 +234,8 @@ header.app-header .logo img#app-logo {
     overflow-y: auto;
     transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
-
-.sidebar nav ul {
-    list-style: none;
-    padding: 0;
-}
-
-.sidebar nav ul li {
-    position: relative;
-}
-
+.sidebar nav ul { list-style: none; padding: 0; }
+.sidebar nav ul li { position: relative; }
 .sidebar nav ul li a {
     display: flex;
     align-items: center;
@@ -225,69 +245,26 @@ header.app-header .logo img#app-logo {
     transition: background-color 0.3s ease, color 0.3s ease, border-left-color 0.3s ease;
     border-left: 4px solid transparent;
 }
-
-.sidebar nav ul li a i {
-    margin-right: var(--spacing-sm);
-    font-size: 1.1rem;
-    color: var(--medium-grey);
-    transition: color 0.3s ease;
-}
-
-.sidebar nav ul li a:hover {
-    background-color: var(--hover-bg-color);
-    color: var(--primary-color);
-    border-left-color: var(--primary-color);
-}
-.sidebar nav ul li a:hover i {
-    color: var(--primary-color);
-}
-
-.sidebar nav ul li a.active {
-    background-color: var(--primary-color);
-    color: var(--light-text-color);
-    border-left-color: var(--secondary-color);
-}
-.sidebar nav ul li a.active i {
-    color: var(--light-text-color);
-}
-
-/* サブメニューのスタイリング */
+.sidebar nav ul li a i { margin-right: var(--spacing-sm); }
+.sidebar nav ul li a:hover { background-color: var(--hover-bg-color); color: var(--primary-color); border-left-color: var(--primary-color); }
+.sidebar nav ul li a.active { background-color: var(--primary-color); color: var(--light-text-color); border-left-color: var(--secondary-color); }
 .sidebar nav ul ul {
-    list-style: none;
     padding-left: var(--spacing-xxl);
     border-left: 1px dashed var(--light-grey);
     margin-left: calc(var(--spacing-lg) + 2px);
-    transition: border-left-color 0.3s ease;
 }
+.sidebar nav ul ul li a { padding: var(--spacing-sm) var(--spacing-lg); font-size: 0.95rem; border-left: none; }
+.sidebar nav ul ul li a:hover { background-color: var(--hover-bg-color); color: var(--primary-color); }
+.sidebar nav ul ul li a.active { background-color: var(--teal-shade-4); color: var(--light-text-color); }
 
-.sidebar nav ul ul li a {
-    padding: var(--spacing-sm) var(--spacing-lg);
-    font-size: 0.95rem;
-    border-left: none;
-}
-.sidebar nav ul ul li a:hover {
-    background-color: var(--hover-bg-color);
-    color: var(--primary-color);
-}
-.sidebar nav ul ul li a.active {
-    background-color: var(--teal-shade-4); /* サブメニューのアクティブは少し濃いティールに */
-    color: var(--light-text-color);
-}
-
-
-/* ============================================================
-   5. メインコンテンツのスタイリング
-   ============================================================ */
 h2 {
-    font-size: 2rem;
-    font-weight: var(--heading-font-weight);
+    font-size: 1.8rem;
     color: var(--primary-color);
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
     padding-bottom: var(--spacing-sm);
     border-bottom: 2px solid var(--border-color);
     text-align: center;
     position: relative;
-    padding-top: var(--spacing-md);
     transition: color 0.3s ease, border-bottom-color 0.3s ease;
 }
 h2::after {
@@ -304,8 +281,7 @@ h2::after {
 }
 
 h3 {
-    font-size: 1.5rem;
-    font-weight: var(--heading-font-weight);
+    font-size: 1.4rem;
     color: var(--dark-grey);
     margin-bottom: var(--spacing-lg);
     border-bottom: 1px solid var(--border-color);
@@ -313,15 +289,13 @@ h3 {
     transition: color 0.3s ease, border-bottom-color 0.3s ease;
 }
 
-/* ============================================================
-   6. フォームコンポーネント
-   ============================================================ */
 form {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
-    max-width: 500px;
+    max-width: none;
     margin: var(--spacing-lg) auto;
+    width: 100%;
 }
 
 .form-group {
@@ -361,7 +335,7 @@ textarea:focus,
 select:focus {
     outline: none;
     border-color: var(--primary-light);
-    box-shadow: 0 0 0 3px var(--teal-shade-3); /* フォーカス時は少し明るいティールのシャドウ */
+    box-shadow: 0 0 0 3px var(--teal-shade-3);
 }
 
 .btn {
@@ -371,52 +345,38 @@ select:focus {
     border: none;
     border-radius: var(--border-radius-sm);
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: var(--heading-font-weight);
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--spacing-sm);
+    width: 100%;
+    height: 50px;
 }
-.btn i {
-    font-size: 1.2rem;
-}
+.btn i { font-size: 1.2rem; }
 
 .btn:hover {
     background-color: var(--primary-dark);
     transform: translateY(-2px);
     box-shadow: var(--shadow-sm);
 }
+.btn:active { transform: translateY(0); box-shadow: none; }
 
-.btn:active {
-    transform: translateY(0);
-    box-shadow: none;
-}
-
-.btn-secondary {
-    background-color: var(--secondary-color);
-}
-.btn-secondary:hover {
-    background-color: var(--secondary-dark);
-}
-
-.btn-danger {
-    background-color: var(--error-color);
-}
-.btn-danger:hover {
-    background-color: #d32f2f;
-}
+.btn-secondary { background-color: var(--secondary-color); }
+.btn-secondary:hover { background-color: var(--secondary-dark); }
+.btn-danger { background-color: var(--error-color); }
+.btn-danger:hover { background-color: #d32f2f; }
 
 .btn-sm {
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: 0.85rem;
     font-weight: var(--body-font-weight);
+    height: auto;
+    width: auto;
 }
 
-/* ============================================================
-   7. メッセージ & アラート
-   ============================================================ */
 .message {
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
@@ -428,63 +388,37 @@ select:focus {
     border: 1px solid transparent;
 }
 
-.message.error {
-    background-color: #fce4e4; /* エラー背景も赤系に調整 */
-    color: var(--error-color);
-    border-color: var(--error-color);
-}
+.message.error { background-color: #fce4e4; color: var(--error-color); border-color: var(--error-color); }
+.message.success { background-color: var(--teal-shade-2); color: var(--success-color); border-color: var(--success-color); }
+.message.info { background-color: var(--teal-shade-1); color: var(--info-color); border-color: var(--info-color); }
 
-.message.success {
-    background-color: var(--teal-shade-2); /* 成功背景はライトティール系 */
-    color: var(--success-color);
-    border-color: var(--success-color);
-}
-
-.message.info {
-    background-color: var(--teal-shade-1); /* 情報背景は最も明るいティール系 */
-    color: var(--info-color);
-    border-color: var(--info-color);
-}
-
-/* ============================================================
-   8. カード & リスト
-   ============================================================ */
 .card {
     background-color: var(--card-bg-color);
     padding: var(--spacing-lg);
     border-radius: var(--border-radius-md);
     box-shadow: var(--shadow-sm);
     margin-bottom: var(--spacing-lg);
-    border: 1px solid var(--teal-shade-2); /* カードにライトティールのボーダー */
+    border: 1px solid var(--teal-shade-2);
     transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
-
 .card-header {
     font-size: 1.2rem;
     font-weight: var(--heading-font-weight);
-    color: var(--teal-shade-7); /* カードヘッダーはミッドティール */
+    color: var(--teal-shade-7);
     margin-bottom: var(--spacing-md);
-    border-bottom: 1px solid var(--teal-shade-3); /* ボーダーもティール系 */
+    border-bottom: 1px solid var(--teal-shade-3);
     padding-bottom: var(--spacing-sm);
     transition: color 0.3s ease, background-color 0.3s ease, border-bottom-color 0.3s ease;
 }
-
-.list-group {
-    list-style: none;
-    padding: 0;
-}
-
 .list-group-item {
     padding: var(--spacing-sm) 0;
-    border-bottom: 1px solid var(--teal-shade-2); /* リストのボーダーもティール系 */
+    border-bottom: 1px solid var(--teal-shade-2);
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: border-bottom-color 0.3s ease;
 }
-.list-group-item:last-child {
-    border-bottom: none;
-}
+.list-group-item:last-child { border-bottom: none; }
 
 .log-entry {
     padding: var(--spacing-sm) 0;
@@ -492,17 +426,9 @@ select:focus {
     font-size: 0.95em;
     color: var(--dark-grey);
 }
-.log-entry:last-child {
-    border-bottom: none;
-}
-.log-entry i {
-    margin-right: var(--spacing-xs);
-    color: var(--medium-grey);
-}
+.log-entry:last-child { border-bottom: none; }
+.log-entry i { margin-right: var(--spacing-xs); color: var(--medium-grey); }
 
-/* ============================================================
-   9. テーブル
-   ============================================================ */
 .data-table-container {
     overflow-x: auto;
 }
@@ -531,32 +457,13 @@ select:focus {
     z-index: 1;
 }
 
-.data-table tbody tr:nth-child(even) {
-    background-color: var(--teal-shade-1); /* テーブル偶数行もライトティール */
-}
+.data-table tbody tr:nth-child(even) { background-color: var(--teal-shade-1); }
+.data-table tbody tr:hover { background-color: var(--teal-shade-2); }
 
-.data-table tbody tr:hover {
-    background-color: var(--teal-shade-2); /* テーブルホバーもライトティール */
-}
-
-/* ============================================================
-   10. フッター
-   ============================================================ */
 footer.app-footer {
-    text-align: center;
-    padding: var(--spacing-lg);
-    margin-top: auto;
-    color: var(--medium-grey);
-    font-size: 0.9rem;
-    background-color: var(--card-bg-color);
-    border-top: 1px solid var(--teal-shade-3); /* フッターのボーダーもティール系 */
-    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
-    transition: background-color 0.3s ease, border-top-color 0.3s ease, color 0.3s ease;
+    display: none;
 }
 
-/* ============================================================
-   11. 特殊コンポーネント
-   ============================================================ */
 .dashboard-metrics {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -565,36 +472,24 @@ footer.app-footer {
 }
 
 .metric-card {
-    background: linear-gradient(45deg, var(--teal-shade-7), var(--teal-shade-4)); /* メトリックカードもグラデーションティール */
+    background: linear-gradient(45deg, var(--teal-shade-7), var(--teal-shade-4));
     color: var(--light-text-color);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-lg);
     border-radius: var(--border-radius-md);
     box-shadow: var(--shadow-md);
     text-align: center;
     transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
-.metric-card.secondary {
-    background: linear-gradient(45deg, var(--teal-shade-5), var(--teal-shade-3));
-}
-.metric-card.accent {
-    background: linear-gradient(45deg, var(--accent-color), #FFEB3B); /* アクセント色はそのまま */
-    color: var(--dark-grey);
-}
-
-.metric-card:hover {
-    transform: translateY(-5px);
-}
+.metric-card.secondary { background: linear-gradient(45deg, var(--teal-shade-5), var(--teal-shade-3)); }
+.metric-card.accent { background: linear-gradient(45deg, var(--accent-color), #FFEB3B); color: var(--dark-grey); }
+.metric-card:hover { transform: translateY(-5px); }
 
 .metric-card .value {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: var(--heading-font-weight);
     margin-bottom: var(--spacing-sm);
 }
-
-.metric-card .label {
-    font-size: 1.1rem;
-    opacity: 0.9;
-}
+.metric-card .label { font-size: 1rem; opacity: 0.9; }
 
 .action-buttons {
     display: flex;
@@ -604,7 +499,6 @@ footer.app-footer {
     flex-wrap: wrap;
 }
 
-/* ローディングスピナー */
 .spinner {
     border: 4px solid rgba(0, 0, 0, 0.1);
     width: 36px;
@@ -615,17 +509,12 @@ footer.app-footer {
     margin: 20px auto;
     display: none;
 }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* タブコンポーネント */
 .tab-navigation {
     display: flex;
     margin-bottom: var(--spacing-lg);
-    border-bottom: 2px solid var(--teal-shade-4); /* タブナビのボーダーもティール系 */
+    border-bottom: 2px solid var(--teal-shade-4);
     width: 100%;
     transition: border-bottom-color 0.3s ease;
     flex-wrap: wrap;
@@ -646,26 +535,16 @@ footer.app-footer {
     white-space: nowrap;
 }
 
-.tab-button:hover {
-    color: var(--primary-dark);
-    background-color: var(--teal-shade-2); /* ホバーもライトティール */
-}
-
+.tab-button:hover { color: var(--primary-dark); background-color: var(--teal-shade-2); }
 .tab-button.active {
     color: var(--primary-color);
     border-bottom-color: var(--primary-color);
     background-color: var(--card-bg-color);
 }
 
-.tab-content-wrapper {
-    margin-top: var(--spacing-lg);
-}
+.tab-content-wrapper { margin-top: var(--spacing-lg); }
+.tab-content { padding: var(--spacing-md) 0; }
 
-.tab-content {
-    padding: var(--spacing-md) 0;
-}
-
-/* QRコード表示エリア */
 #qrcode-container {
     display: flex;
     flex-direction: column;
@@ -689,7 +568,6 @@ footer.app-footer {
     margin-top: var(--spacing-md);
 }
 
-/* QRコードスキャナー */
 #reader {
     width: 100%;
     max-width: 400px;
@@ -698,14 +576,8 @@ footer.app-footer {
     border-radius: var(--border-radius-md);
     overflow: hidden;
 }
-#reader video {
-    width: 100% !important;
-    height: auto !important;
-}
-#reader div {
-    text-align: center;
-    color: var(--text-color);
-}
+#reader video { width: 100% !important; height: auto !important; }
+#reader div { text-align: center; color: var(--text-color); }
 .qr-scanner-controls {
     display: flex;
     gap: var(--spacing-md);
@@ -714,141 +586,161 @@ footer.app-footer {
     flex-wrap: wrap;
 }
 
+/* PWAインストールボタンのスタイル */
+#installAppButton {
+    background-color: var(--secondary-color);
+    color: var(--light-text-color);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    font-size: 1.1rem;
+    font-weight: var(--heading-font-weight);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, bottom 0.3s ease, right 0.3s ease, transform 0.3s ease;
+    box-shadow: var(--shadow-md);
+    animation: pulse 1.5s infinite ease-in-out;
+    display: none;
+    z-index: 1005;
+    border: none;
+}
 
-/* ============================================================
-   12. レスポンシブデザイン
-   ============================================================ */
-/* Small devices (phones, 600px and down) */
-@media (max-width: 768px) {
-    .app-header {
-        height: 60px;
-        padding: var(--spacing-sm) var(--spacing-md);
-    }
-    .app-header .logo {
-        font-size: 1.8rem;
-    }
-    header.app-header .logo img#app-logo {
-        height: 30px;
-    }
-    .user-info-header {
-        display: none;
-    }
-
-    .main-content-wrapper {
-        flex-direction: column;
-        padding-bottom: 60px;
-        padding-top: 60px;
-    }
-
-    .sidebar {
-        width: 100%;
+@media (min-width: 769px) {
+    #installAppButton {
         position: fixed;
-        bottom: 0;
-        left: 0;
-        height: 60px;
-        padding-top: 0;
-        border-right: none;
-        border-top: 1px solid var(--border-color);
-        box-shadow: var(--shadow-lg);
-        background-color: var(--card-bg-color);
-        z-index: 999;
+        bottom: calc(var(--spacing-lg) + 70px);
+        right: var(--spacing-lg);
+        transform: scale(1.1);
+        animation: pulse 1.5s infinite ease-in-out;
     }
-    .sidebar nav ul {
-        display: flex;
-        justify-content: space-around;
-        height: 100%;
-    }
-    .sidebar nav ul ul {
-        display: none;
-    }
-    .sidebar nav ul li {
-        flex: 1;
-        text-align: center;
-    }
-    .sidebar nav ul li a {
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: var(--spacing-xs) 0;
-        font-size: 0.8rem;
-        border-left: none;
-        border-top: 4px solid transparent;
-        height: 100%;
-    }
-    .sidebar nav ul li a:hover, .sidebar nav ul li a.active {
-        border-left-color: transparent;
-        border-top-color: var(--primary-color);
-        background-color: var(--hover-bg-color);
-    }
-    .sidebar nav ul li a.active {
-        border-top-color: var(--secondary-color);
-        background-color: var(--hover-bg-color);
-        color: var(--secondary-color);
-    }
-    .sidebar nav ul li a.active i {
-        color: var(--secondary-color);
-    }
-
-
-    .container {
-        padding: var(--spacing-md);
-    }
-
-    .content-section {
-        padding: var(--spacing-lg);
-    }
-
-    h2 {
-        font-size: 1.8rem;
-    }
-
-    .dashboard-metrics {
-        grid-template-columns: 1fr;
-    }
-
-    .data-table-container {
-    }
-
-    .action-buttons {
-        flex-direction: column;
-        gap: var(--spacing-sm);
-    }
-    .btn {
-        width: 100%;
-    }
-
-    .tab-navigation {
-        flex-direction: column;
-    }
-    .tab-button {
-        border-bottom: 1px solid var(--border-color);
-        border-right: none;
-    }
-    .tab-button.active {
-        border-right: none;
-        border-bottom-color: var(--primary-color);
+    #installAppButton.hidden {
+        opacity: 0;
+        transform: scale(0.9);
+        pointer-events: none;
+        animation: none;
     }
 }
 
-/* Medium devices (tablets, 768px and up) */
+@media (max-width: 768px) {
+    #installAppButton {
+        position: fixed;
+        bottom: calc(var(--footer-height) + var(--spacing-md));
+        right: var(--spacing-md);
+        width: auto;
+        max-width: none;
+        font-size: 1rem;
+        padding: var(--spacing-md) var(--spacing-lg);
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+    #installAppButton.hidden {
+        opacity: 0;
+        transform: scale(0.9);
+        pointer-events: none;
+        animation: none;
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
 @media (min-width: 769px) {
     .main-content-wrapper {
         padding-top: var(--header-height);
+        padding-bottom: 0;
     }
     .sidebar {
+        display: block;
         padding-top: calc(var(--header-height) + var(--spacing-lg));
         position: sticky;
         top: 0;
         height: 100vh;
     }
+    .bottom-nav {
+        display: none;
+    }
+    body.admin-page .sidebar,
+    body.menu-page .sidebar,
+    body.index-page .sidebar {
+        display: none;
+    }
+    body.menu-page .main-content-wrapper,
+    body.index-page .main-content-wrapper {
+        padding-bottom: 0;
+    }
+
+    .container {
+        padding: var(--spacing-lg);
+    }
+    .content-section {
+        padding: var(--spacing-xl);
+    }
+    h2 { font-size: 2rem; }
+    h3 { font-size: 1.5rem; }
+    .btn { width: auto; }
 }
 
-/* Header Height Variables */
-:root {
-    --header-height: 70px;
-}
 @media (max-width: 768px) {
-    :root {
-        --header-height: 60px;
+    .app-header {
+        height: var(--header-height);
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    .app-header .logo h1 { font-size: 1.6rem; }
+    .user-info-header { display: none; }
+
+    .main-content-wrapper {
+        flex-direction: column;
+        padding-bottom: var(--footer-height);
+    }
+
+    .sidebar {
+        display: none;
+    }
+    .bottom-nav {
+        display: flex;
+    }
+
+    body.admin-page .bottom-nav {
+        display: flex;
+    }
+
+    body.index-page .bottom-nav {
+        display: none;
+    }
+    body.index-page .main-content-wrapper {
+        padding-bottom: 0;
+    }
+
+    .container {
+        padding: var(--spacing-md);
+    }
+    .content-section {
+        padding: var(--spacing-lg);
+    }
+    h2 { font-size: 1.8rem; }
+    h3 { font-size: 1.3rem; }
+
+    .dashboard-metrics { grid-template-columns: 1fr; }
+    .metric-card .value { font-size: 2rem; }
+    .metric-card .label { font-size: 1rem; }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    .btn { width: 100%; height: 48px; }
+
+    .tab-navigation {
+        flex-direction: column;
+        border-bottom: none;
+    }
+    .tab-button {
+        border-bottom: 1px solid var(--border-color);
+        border-right: none;
+        padding: var(--spacing-md) var(--spacing-sm);
+    }
+    .tab-button.active {
+        border-bottom-color: var(--primary-color);
+        border-right: none;
     }
 }

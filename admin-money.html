@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>KAFer - KAFerマネー管理</title>
+    <link id="favicon" rel="icon" href="icon.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="manifest" href="manifest.webmanifest">
+    <script src="https://unpkg.com/qrious@4.0.2/dist/qrious.js"></script>
+</head>
+<body class="app-container admin-page">
+    <header class="app-header">
+        <div class="logo"><h1>KAFer Admin</h1></div>
+        <div class="user-controls">
+            <span class="user-info-header" id="header-user-info"></span>
+            <button class="logout-btn" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> ログアウト</button>
+        </div>
+    </header>
+    <div class="main-content-wrapper">
+        <aside class="sidebar">
+            <nav>
+                <ul>
+                    <li><a href="admin.html"><i class="fas fa-tools"></i> 管理者ダッシュボード</a></li>
+                    <li><a href="admin-members.html"><i class="fas fa-users"></i> 会員管理</a></li>
+                    <li><a href="admin-money.html" class="active"><i class="fas fa-money-check-alt"></i> KAFerマネー</a></li>
+                    <li><a href="admin-settings.html"><i class="fas fa-cogs"></i> サイト設定</a></li>
+                    <li><a href="menu.html"><i class="fas fa-arrow-alt-circle-left"></i> ユーザーメニューへ</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="container">
+            <div id="message-area" class="message"></div>
+
+            <div id="code-management-section" class="content-section">
+                <h2><i class="fas fa-money-check-alt"></i> KAFerマネー管理</h2>
+                <div class="tab-navigation" id="code-management-tab-nav">
+                    <button class="tab-button active" data-target="issued-codes-tab"><i class="fas fa-clipboard-list"></i> 発行済みコード</button>
+                    <button class="tab-button" data-target="issue-code-tab"><i class="fas fa-hand-holding-usd"></i> コード発行</button>
+                    <button class="tab-button" data-target="void-code-tab"><i class="fas fa-ban"></i> コード無効化</button>
+                    <button class="tab-button" data-target="refund-approval-tab"><i class="fas fa-cash-register"></i> 返金承認</button>
+                </div>
+                <div class="tab-content-wrapper">
+                    <div id="issued-codes-tab" class="tab-content">
+                        <h3>発行済みKAFerマネーコードリスト</h3>
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>コード</th><th>金額 (KAFer)</th><th>金額 (円)</th><th>発行日</th><th>ステータス</th><th>利用者ID</th></tr>
+                                </thead>
+                                <tbody id="issued-codes-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="issue-code-tab" class="tab-content" style="display: none;">
+                        <h3>KAFerマネーコード発行</h3>
+                        <form id="issue-code-form">
+                            <div class="form-group"><label for="new-money-code"><i class="fas fa-qrcode"></i> 新しいKAFerマネーコード (16桁の数字)</label><input type="text" id="new-money-code" required pattern="[0-9]{16}" title="16桁の数字を入力してください"><button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('new-money-code').value = generateRandomMoneyCode();" style="margin-top: 5px;"><i class="fas fa-random"></i> ランダム生成</button></div>
+                            <div class="form-group"><label for="code-amount-yen"><i class="fas fa-yen-sign"></i> 金額 (円, 10円単位)</label><input type="number" id="code-amount-yen" required min="10" step="10" value="100" title="10円以上の10円単位で入力してください"></div>
+                            <div class="form-group" id="qrcode-container" style="display: none;"><canvas id="qrcode-canvas"></canvas><p>KAFerマネーコード: <span id="qrcode-text" style="font-weight: bold;"></span></p></div>
+                            <button type="submit" class="btn"><i class="fas fa-plus-square"></i> コード発行</button>
+                        </form>
+                    </div>
+                    <div id="void-code-tab" class="tab-content" style="display: none;">
+                        <h3>KAFerマネーコード無効化</h3>
+                        <form id="void-code-form">
+                            <div class="form-group"><label for="void-money-code"><i class="fas fa-barcode"></i> 無効化するKAFerマネーコード (16桁の数字)</label><input type="text" id="void-money-code" required pattern="[0-9]{16}" title="16桁の数字を入力してください"></div>
+                            <button type="submit" class="btn btn-danger"><i class="fas fa-ban"></i> コードを無効化</button>
+                        </form>
+                    </div>
+                    <div id="refund-approval-tab" class="tab-content" style="display: none;">
+                        <h3>返金申請承認</h3>
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>申請日</th><th>KAFer ID</th><th>ユーザー名</th><th>申請額 (KAFer)</th><th>返金額 (KAFer)</th><th>返還コード</th><th>アクション</th></tr>
+                                </thead>
+                                <tbody id="refund-requests-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="global.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            initializePwaAndDarkMode();
+            await checkLoginStatus(true, true, 'admin-money.html');
+            document.body.classList.add('admin-page');
+
+            const user = getLoggedInUser();
+            if (!user) return;
+
+            document.getElementById('header-user-info').textContent = `${user.name} (${user.kaferId})`;
+
+            const bottomNavHtml = `
+                <nav>
+                    <ul>
+                        <li><a href="admin.html" data-page="admin.html"><i class="fas fa-tools"></i><span>ダッシュボード</span></a></li>
+                        <li><a href="admin-members.html" data-page="admin-members.html"><i class="fas fa-users"></i><span>会員管理</span></a></li>
+                        <li><a href="admin-money.html" data-page="admin-money.html"><i class="fas fa-money-check-alt"></i><span>KAFerマネー</span></a></li>
+                        <li><a href="admin-settings.html" data-page="admin-settings.html"><i class="fas fa-cogs"></i><span>設定</span></a></li>
+                        <li><a href="menu.html"><i class="fas fa-arrow-alt-circle-left"></i><span>メニューへ</span></a></li>
+                    </ul>
+                </nav>
+            `;
+            const bottomNavElement = document.createElement('footer');
+            bottomNavElement.className = 'bottom-nav';
+            bottomNavElement.innerHTML = bottomNavHtml;
+            document.body.appendChild(bottomNavElement);
+
+            const currentPage = window.location.pathname.split('/').pop();
+            document.querySelectorAll('.bottom-nav a, .sidebar a').forEach(link => {
+                const linkPage = link.getAttribute('href').split('/').pop();
+                if (linkPage === currentPage) {
+                    link.classList.add('active');
+                }
+            });
+
+            await loadIssuedCodes();
+            await loadRefundRequests();
+
+            if (window.location.hash === '#issue') {
+                showTabContent('code-management-tab-nav', 'issue-code-tab');
+            }
+
+            document.querySelectorAll('#code-management-tab-nav .tab-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const targetTab = e.currentTarget.dataset.target;
+                    showTabContent('code-management-tab-nav', targetTab);
+                });
+            });
+
+            document.getElementById('issue-code-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                hideMessage('message-area');
+                document.getElementById('qrcode-container').style.display = 'none';
+                const newMoneyCode = document.getElementById('new-money-code').value;
+                const codeAmountYen = parseInt(document.getElementById('code-amount-yen').value, 10);
+                if (!newMoneyCode || !/^[0-9]{16}$/.test(newMoneyCode)) { showMessage('message-area', '16桁のKAFerマネーコードを入力してください。', 'error'); return; }
+                const records = await fetchSheetData(true);
+                const existingCode = records.find(r => r.type === 'money_code_issue' && r.moneyCode === newMoneyCode);
+                if (existingCode) { showMessage('message-area', 'このKAFerマネーコードは既に発行済みです。', 'error'); return; }
+                const codeAmountKaf = yenToKaf(codeAmountYen);
+                const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'money_code_issue', { moneyCode: newMoneyCode, amount: codeAmountKaf, amountYen: codeAmountYen, status: 'active' });
+                if (success) {
+                    showMessage('message-area', `KAFerマネーコード ${newMoneyCode} (${codeAmountYen}円相当) を発行しました。`, 'success');
+                    document.getElementById('issue-code-form').reset();
+                    const qrText = `${PROJECT_CONFIG.SITE_URL}/?code=${newMoneyCode}`;
+                    new QRious({ element: document.getElementById('qrcode-canvas'), size: 200, value: qrText });
+                    document.getElementById('qrcode-text').textContent = newMoneyCode;
+                    document.getElementById('qrcode-container').style.display = 'flex';
+                    await loadIssuedCodes();
+                } else {
+                    showMessage('message-area', 'KAFerマネーコードの発行に失敗しました。', 'error');
+                }
+            });
+
+            document.getElementById('void-code-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                hideMessage('message-area');
+                const voidMoneyCode = document.getElementById('void-money-code').value;
+                if (!voidMoneyCode || !/^[0-9]{16}$/.test(voidMoneyCode)) { showMessage('message-area', '16桁のKAFerマネーコードを入力してください。', 'error'); return; }
+                const records = await fetchSheetData(true);
+                const targetCode = records.find(r => r.type === 'money_code_issue' && r.moneyCode === voidMoneyCode);
+                if (!targetCode) { showMessage('message-area', '指定されたKAFerマネーコードは見つかりませんでした。', 'error'); return; }
+                const alreadyUsed = records.some(r => r.type === 'payment' && r.paymentCode === voidMoneyCode);
+                if (alreadyUsed) { showMessage('message-area', 'このコードは既に使用されているため、無効化できません。', 'error'); return; }
+                if (confirm(`KAFerマネーコード ${voidMoneyCode} を無効化しますか？`)) {
+                    const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'money_code_void', { moneyCode: voidMoneyCode });
+                    if (success) {
+                        showMessage('message-area', `KAFerマネーコード ${voidMoneyCode} を無効化しました。`, 'success');
+                        document.getElementById('void-code-form').reset();
+                        await loadIssuedCodes();
+                    } else {
+                        showMessage('message-area', 'コードの無効化に失敗しました。', 'error');
+                    }
+                }
+            });
+
+            document.getElementById('refund-requests-list').addEventListener('click', async (e) => {
+                if (e.target.classList.contains('approve-refund-btn')) {
+                    const refundCode = e.target.dataset.refundCode;
+                    const kaferId = e.target.dataset.kaferId;
+                    const requestAmountKaf = parseInt(e.target.dataset.requestAmountKaf, 10);
+                    const refundAmountAfterFeeKaf = parseInt(e.target.dataset.refundAmountAfterFeeKaf, 10);
+                    const requesterName = e.target.dataset.requesterName;
+                    if (confirm(`${requesterName} (ID: ${kaferId}) の返金申請（${kafToYen(refundAmountAfterFeeKaf)}円相当）を承認しますか？`)) {
+                        const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'refund_approved', { targetKaferId: kaferId, refundCode: refundCode, requestAmountKaf: requestAmountKaf, refundAmountAfterFeeKaf: refundAmountAfterFeeKaf });
+                        if (success) {
+                            showMessage('message-area', `KAFer ID: ${kaferId} への返金申請を承認しました。`, 'success');
+                            await loadRefundRequests();
+                        } else {
+                            showMessage('message-area', '返金承認に失敗しました。', 'error');
+                        }
+                    }
+                }
+            });
+        });
+
+        async function loadIssuedCodes() {
+            const records = await fetchSheetData(true);
+            const issuedCodesListBody = document.getElementById('issued-codes-list');
+            issuedCodesListBody.innerHTML = '';
+            const issuedMoneyCodes = records.filter(r => r.type === 'money_code_issue');
+            issuedMoneyCodes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            if (issuedMoneyCodes.length === 0) {
+                issuedCodesListBody.innerHTML = '<tr><td colspan="6">発行済みのKAFerマネーコードがありません。</td></tr>';
+                return;
+            }
+            for (const codeRecord of issuedMoneyCodes) {
+                const row = issuedCodesListBody.insertRow();
+                row.insertCell().textContent = codeRecord.moneyCode;
+                row.insertCell().textContent = `${codeRecord.amount || 0}KAFer`;
+                row.insertCell().textContent = `${codeRecord.amountYen || 0}円`;
+                row.insertCell().textContent = new Date(codeRecord.timestamp).toLocaleDateString('ja-JP');
+                const usedByPayment = records.find(r => r.type === 'payment' && r.paymentCode === codeRecord.moneyCode);
+                const isVoided = records.some(r => r.type === 'money_code_void' && r.moneyCode === codeRecord.moneyCode);
+                const statusCell = row.insertCell();
+                const userCell = row.insertCell();
+                if (usedByPayment) {
+                    statusCell.textContent = '使用済み';
+                    statusCell.style.color = 'var(--medium-grey)';
+                    userCell.textContent = `${usedByPayment.name} (${usedByPayment.kaferId})`;
+                } else if (isVoided) {
+                    statusCell.textContent = '無効';
+                    statusCell.style.color = 'var(--error-color)';
+                    userCell.textContent = 'N/A';
+                } else {
+                    statusCell.textContent = '有効';
+                    statusCell.style.color = 'var(--success-color)';
+                    userCell.textContent = '未利用';
+                }
+            }
+        }
+
+        async function loadRefundRequests() {
+            const records = await fetchSheetData(true);
+            const refundRequestsListBody = document.getElementById('refund-requests-list');
+            refundRequestsListBody.innerHTML = '';
+            const pendingRefundRequests = records.filter(r => 
+                r.type === 'refund_request' && 
+                !records.some(approved => approved.type === 'refund_approved' && approved.refundCode === r.refundCode)
+            );
+            pendingRefundRequests.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            if (pendingRefundRequests.length === 0) {
+                refundRequestsListBody.innerHTML = '<tr><td colspan="7">未承認の返金申請はありません。</td></tr>';
+                return;
+            }
+            for (const request of pendingRefundRequests) {
+                const row = refundRequestsListBody.insertRow();
+                const requestingUser = records.find(r => r.kaferId === request.kaferId && r.type === 'register');
+                const requesterName = requestingUser ? requestingUser.name : '不明なユーザー';
+                row.insertCell().textContent = new Date(request.timestamp).toLocaleDateString('ja-JP');
+                row.insertCell().textContent = request.kaferId;
+                row.insertCell().textContent = requesterName;
+                row.insertCell().textContent = `${request.requestAmountKaf}KAFer (${kafToYen(request.requestAmountKaf)}円相当)`;
+                row.insertCell().textContent = `${request.refundAmountAfterFeeKaf}KAFer (${kafToYen(request.refundAmountAfterFeeKaf)}円相当)`;
+                row.insertCell().textContent = request.refundCode;
+                const actionCell = row.insertCell();
+                const approveBtn = document.createElement('button');
+                approveBtn.textContent = '承認';
+                approveBtn.className = 'btn btn-secondary btn-sm approve-refund-btn';
+                approveBtn.dataset.refundCode = request.refundCode;
+                approveBtn.dataset.kaferId = request.kaferId;
+                approveBtn.dataset.requestAmountKaf = request.requestAmountKaf;
+                approveBtn.dataset.refundAmountAfterFeeKaf = request.refundAmountAfterFeeKaf;
+                approveBtn.dataset.requesterName = requesterName;
+                actionCell.appendChild(approveBtn);
+            }
+        }
+    </script>
+</body>
+</html>
