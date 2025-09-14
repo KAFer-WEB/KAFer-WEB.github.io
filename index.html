@@ -12,7 +12,6 @@
 <body class="app-container index-page">
     <header class="app-header">
         <div class="logo"><h1>KAFer</h1></div>
-        <div class="user-controls"></div>
     </header>
     <div class="main-content-wrapper">
         <main class="container">
@@ -27,37 +26,40 @@
                             <input type="text" id="login-kaferId" required pattern="[0-9]{4}" title="4桁の数字を入力してください">
                         </div>
                         <div class="form-group">
-                            <label for="login-password"><i class="fas fa-key"></i> パスコード</label>
+                            <label for="login-password"><i class="fas fa-key"></i> パスワード</label>
                             <input type="password" id="login-password" required>
                         </div>
                         <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> ログイン</button>
                     </form>
                 </div>
                 <div class="card register-card" style="margin-top: var(--spacing-xl);">
-                    <div class="card-header">新規アカウント登録<button id="toggle-register-form-btn" class="btn btn-secondary" style="float: right; padding: 5px 10px; font-size: 0.9rem;"><i class="fas fa-plus"></i> 開く</button></div>
+                    <div class="card-header">新規アカウント登録<button id="toggle-register-form-btn" class="btn btn-sm" style="float: right;"><i class="fas fa-plus"></i> 開く</button></div>
                     <div id="register-form-wrapper" style="display: none;">
                         <form id="register-form">
                             <div class="form-group">
                                 <label for="register-name"><i class="fas fa-user-circle"></i> ユーザー名 (10文字以下)</label>
-                                <input type="text" id="register-name" required maxlength="10" title="10文字以下のユーザー名を入力してください">
+                                <input type="text" id="register-name" required maxlength="10">
                             </div>
                             <div class="form-group">
                                 <label for="register-kaferId"><i class="fas fa-id-card"></i> KAFer ID (4桁の数字)</label>
-                                <input type="text" id="register-kaferId" required pattern="[0-9]{4}" title="4桁の数字を入力してください">
+                                <input type="text" id="register-kaferId" required pattern="[0-9]{4}">
                             </div>
                             <div class="form-group">
-                                <label for="register-password"><i class="fas fa-key"></i> パスコード</label>
+                                <label for="register-password"><i class="fas fa-key"></i> パスワード</label>
                                 <input type="password" id="register-password" required>
                             </div>
                             <button type="submit" class="btn btn-secondary"><i class="fas fa-user-plus"></i> アカウント作成</button>
                         </form>
                     </div>
                 </div>
-                <div style="text-align: center; margin-top: var(--spacing-xxl);">
-                    <button id="installAppButton" class="btn btn-secondary" style="display: none;"><i class="fas fa-download"></i> アプリをインストール</button>
-                </div>
-            </main>
-        </div>
+            </div>
+        </main>
+    </div>
+    <button id="installAppButton"><i class="fas fa-download"></i></button>
+    <div id="ios-install-prompt">
+        <button id="close-ios-prompt">&times;</button>
+        ホーム画面に追加してアプリのように使えます。<br>
+        共有 <i class="fas fa-share-square"></i> ボタンから「ホーム画面に追加」を選択してください。
     </div>
     <script src="global.js"></script>
     <script>
@@ -66,9 +68,21 @@
         document.addEventListener('DOMContentLoaded', async () => {
             initializePwaAndDarkMode();
             await checkLoginStatus(false, false, 'index.html');
-            document.body.classList.add('index-page');
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectMessage = urlParams.get('redirect_message');
+            if (redirectMessage === 'login_required') {
+                showMessage('message-area', 'ログインが必要です。', 'info');
+            } else if (redirectMessage === 'admin_required') {
+                showMessage('message-area', '管理者権限が必要です。', 'error');
+            }
 
             const installAppButton = document.getElementById('installAppButton');
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS && !navigator.standalone) {
+                document.getElementById('ios-install-prompt').style.display = 'block';
+            }
+
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
@@ -80,20 +94,16 @@
                 hideInstallPromptButton();
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the A2HS prompt');
-                    } else {
-                        console.log('User dismissed the A2HS prompt');
-                    }
                     deferredPrompt = null;
                 });
             });
 
-            const urlParams = new URLSearchParams(window.location.search);
+            document.getElementById('close-ios-prompt').addEventListener('click', () => {
+                document.getElementById('ios-install-prompt').style.display = 'none';
+            });
+
             const initialCode = urlParams.get('code');
-            if (initialCode) {
-                document.getElementById('login-kaferId').value = initialCode;
-            }
+            if (initialCode) document.getElementById('login-kaferId').value = initialCode;
 
             const registerFormWrapper = document.getElementById('register-form-wrapper');
             const toggleRegisterFormBtn = document.getElementById('toggle-register-form-btn');
@@ -108,13 +118,14 @@
                 hideMessage('message-area');
                 const kaferId = document.getElementById('login-kaferId').value;
                 const password = document.getElementById('login-password').value;
-                if (!kaferId || !password) { showMessage('message-area', 'KAFer IDとパスコードを入力してください。', 'error'); return; }
+                if (!kaferId || !password) { showMessage('message-area', 'KAFer IDとパスワードを入力してください。', 'error'); return; }
+                
                 const loggedInUser = await authenticateUser(kaferId, password);
                 if (loggedInUser) {
                     showMessage('message-area', 'ログイン成功！', 'success');
                     window.location.href = loggedInUser.isAdmin ? 'admin.html' : 'menu.html';
                 } else {
-                    showMessage('message-area', 'KAFer IDまたはパスコードが間違っています。', 'error');
+                    showMessage('message-area', 'KAFer IDまたはパスワードが間違っています。', 'error');
                 }
             });
 
@@ -128,6 +139,7 @@
                 const records = await fetchSheetData();
                 const existingUser = records.find(r => r.kaferId === kaferId && r.type === 'register');
                 if (existingUser) { showMessage('message-area', 'このKAFer IDは既に登録されています。', 'error'); return; }
+                
                 const success = await writeToSheet(name, kaferId, 'register', { pass: password });
                 if (success) {
                     showMessage('message-area', '新規登録が完了しました！ログインしてください。', 'success');

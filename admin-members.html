@@ -55,24 +55,24 @@
                     <div id="admin-register-tab" class="tab-content" style="display: none;">
                         <h3>新規会員登録</h3>
                         <form id="admin-register-form">
-                            <div class="form-group"><label for="admin-register-name"><i class="fas fa-user-circle"></i> ユーザー名 (10文字以下)</label><input type="text" id="admin-register-name" required maxlength="10" title="10文字以下のユーザー名を入力してください"></div>
-                            <div class="form-group"><label for="admin-register-kaferId"><i class="fas fa-id-card"></i> KAFer ID (4桁の数字)</label><input type="text" id="admin-register-kaferId" required pattern="[0-9]{4}" title="4桁の数字を入力してください"></div>
-                            <div class="form-group"><label for="admin-register-password"><i class="fas fa-key"></i> パスコード (4桁以上の半角英数字記号)</label><input type="password" id="admin-register-password" required pattern="[a-zA-Z0-9!@#$%^&amp;*()_+\-=\\[\\]{}|;:'&lt;&gt;\\./?]{4,}" title="4文字以上の半角英数字記号を入力してください"></div>
+                            <div class="form-group"><label for="admin-register-name"><i class="fas fa-user-circle"></i> ユーザー名 (10文字以下)</label><input type="text" id="admin-register-name" required maxlength="10"></div>
+                            <div class="form-group"><label for="admin-register-kaferId"><i class="fas fa-id-card"></i> KAFer ID (4桁の数字)</label><input type="text" id="admin-register-kaferId" required pattern="[0-9]{4}"></div>
+                            <div class="form-group"><label for="admin-register-password"><i class="fas fa-key"></i> パスワード</label><input type="password" id="admin-register-password" required></div>
                             <button type="submit" class="btn"><i class="fas fa-user-plus"></i> 会員登録</button>
                         </form>
                     </div>
                     <div id="user-modify-tab" class="tab-content" style="display: none;">
                         <h3>ユーザー名変更</h3>
                         <form id="user-modify-form">
-                            <div class="form-group"><label for="modify-kaferId"><i class="fas fa-id-card"></i> 変更対象KAFer ID</label><input type="text" id="modify-kaferId" required pattern="[0-9]{4}" title="4桁の数字を入力してください"></div>
-                            <div class="form-group"><label for="new-username"><i class="fas fa-user-edit"></i> 新しいユーザー名 (10文字以下)</label><input type="text" id="new-username" required maxlength="10" title="10文字以下のユーザー名を入力してください"></div>
+                            <div class="form-group"><label for="modify-kaferId"><i class="fas fa-id-card"></i> 変更対象KAFer ID</label><input type="text" id="modify-kaferId" required pattern="[0-9]{4}"></div>
+                            <div class="form-group"><label for="new-username"><i class="fas fa-user-edit"></i> 新しいユーザー名 (10文字以下)</label><input type="text" id="new-username" required maxlength="10"></div>
                             <button type="submit" class="btn btn-secondary"><i class="fas fa-save"></i> ユーザー名変更</button>
                         </form>
                     </div>
                     <div id="remove-member-tab" class="tab-content" style="display: none;">
                         <h3>会員削除 (強制退会)</h3>
                         <form id="remove-member-form">
-                            <div class="form-group"><label for="remove-kaferId"><i class="fas fa-id-card"></i> 削除対象KAFer ID</label><input type="text" id="remove-kaferId" required pattern="[0-9]{4}" title="4桁の数字を入力してください"></div>
+                            <div class="form-group"><label for="remove-kaferId"><i class="fas fa-id-card"></i> 削除対象KAFer ID</label><input type="text" id="remove-kaferId" required pattern="[0-9]{4}"></div>
                             <div class="form-group"><label for="remove-reason"><i class="fas fa-comment-alt"></i> 削除理由 (任意)</label><textarea id="remove-reason" rows="3"></textarea></div>
                             <button type="submit" class="btn btn-danger"><i class="fas fa-user-times"></i> 会員を強制削除</button>
                         </form>
@@ -111,7 +111,7 @@
 
             const currentPage = window.location.pathname.split('/').pop();
             document.querySelectorAll('.bottom-nav a, .sidebar a').forEach(link => {
-                const linkPage = link.getAttribute('href').split('/').pop();
+                const linkPage = link.getAttribute('href').split('/').pop().split('#')[0];
                 if (linkPage === currentPage) {
                     link.classList.add('active');
                 }
@@ -124,8 +124,7 @@
 
             document.querySelectorAll('#member-management-tab-nav .tab-button').forEach(button => {
                 button.addEventListener('click', (e) => {
-                    const targetTab = e.currentTarget.dataset.target;
-                    showTabContent('member-management-tab-nav', targetTab);
+                    showTabContent('member-management-tab-nav', e.currentTarget.dataset.target);
                 });
             });
 
@@ -136,9 +135,13 @@
                 const kaferId = document.getElementById('admin-register-kaferId').value;
                 const password = document.getElementById('admin-register-password').value;
                 if (!name || !kaferId || !password) { showMessage('message-area', 'すべてのフィールドを入力してください。', 'error'); return; }
+                
                 const records = await fetchSheetData(true);
-                const existingUser = records.find(r => r.kaferId === kaferId && r.type === 'register');
-                if (existingUser) { showMessage('message-area', 'このKAFer IDは既に登録されています。', 'error'); return; }
+                if (records.find(r => r.kaferId === kaferId && r.type === 'register')) {
+                    showMessage('message-area', 'このKAFer IDは既に登録されています。', 'error');
+                    return;
+                }
+                
                 const success = await writeToSheet(name, kaferId, 'register', { pass: password });
                 if (success) {
                     showMessage('message-area', `KAFer ID: ${kaferId} を登録しました。`, 'success');
@@ -161,7 +164,7 @@
                 if (confirm(`${targetUser.name} のユーザー名を ${newUsername} に変更しますか？`)) {
                     const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'name_update', { targetKaferId: modifyKaferId, newName: newUsername });
                     if (success) {
-                        showMessage('message-area', `${modifyKaferId} のユーザー名を ${newUsername} に変更しました。`, 'success');
+                        showMessage('message-area', `${modifyKaferId} のユーザー名を変更しました。`, 'success');
                         document.getElementById('user-modify-form').reset();
                         await loadMembers();
                     } else {
@@ -179,7 +182,7 @@
                 const records = await fetchSheetData(true);
                 const targetUser = records.find(r => r.kaferId === removeKaferId && r.type === 'register');
                 if (!targetUser) { showMessage('message-area', '指定されたKAFer IDの会員は見つかりませんでした。', 'error'); return; }
-                if (confirm(`${targetUser.name} (KAFer ID: ${removeKaferId}) を強制削除しますか？`)) {
+                if (confirm(`${targetUser.name} (ID: ${removeKaferId}) を強制削除しますか？`)) {
                     const success = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'remove', { targetKaferId: removeKaferId, reason: removeReason });
                     if (success) {
                         showMessage('message-area', `${removeKaferId} を強制削除しました。`, 'success');

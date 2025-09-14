@@ -114,7 +114,7 @@
 
             const currentPage = window.location.pathname.split('/').pop();
             document.querySelectorAll('.bottom-nav a, .sidebar a').forEach(link => {
-                const linkPage = link.getAttribute('href').split('/').pop();
+                const linkPage = link.getAttribute('href').split('/').pop().split('#')[0];
                 if (linkPage === currentPage) {
                     link.classList.add('active');
                 }
@@ -129,8 +129,7 @@
 
             document.querySelectorAll('#code-management-tab-nav .tab-button').forEach(button => {
                 button.addEventListener('click', (e) => {
-                    const targetTab = e.currentTarget.dataset.target;
-                    showTabContent('code-management-tab-nav', targetTab);
+                    showTabContent('code-management-tab-nav', e.currentTarget.dataset.target);
                 });
             });
 

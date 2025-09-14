@@ -43,8 +43,8 @@
                         <h3>一般設定</h3>
                         <form id="config-form">
                             <div class="form-group"><label for="admin-email"><i class="fas fa-at"></i> 管理者Eメール (通知用)</label><input type="email" id="admin-email" required></div>
-                            <div class="form-group"><label for="admin-panel-password"><i class="fas fa-user-secret"></i> 管理者パスコード (KAFerID '2025')</label><input type="password" id="admin-panel-password" required pattern="[a-zA-Z0-9!@#$%^&amp;*()_+\-=\\[\\]{}|;:'&lt;&gt;\\./?]{4,}" title="4文字以上の半角英数字記号を入力してください"></div>
-                            <div class="form-group"><label for="base-monthly-fee-input"><i class="fas fa-yen-sign"></i> 基本月額会費 (円)</label><input type="number" id="base-monthly-fee-input" required min="0" step="100" value="1000" title="0円以上の100円単位で入力してください"></div>
+                            <div class="form-group"><label for="admin-panel-password"><i class="fas fa-user-secret"></i> 管理者パスワード (KAFerID '2025')</label><input type="password" id="admin-panel-password" required></div>
+                            <div class="form-group"><label for="base-monthly-fee-input"><i class="fas fa-yen-sign"></i> 基本月額会費 (円)</label><input type="number" id="base-monthly-fee-input" required min="0" step="100" value="1000"></div>
                             <button type="submit" class="btn btn-secondary"><i class="fas fa-save"></i> 設定を保存</button>
                         </form>
                         <h3 style="margin-top: var(--spacing-xxl);">緊急情報保護モード</h3>
@@ -108,8 +108,7 @@
 
             document.querySelectorAll('#settings-tab-nav .tab-button').forEach(button => {
                 button.addEventListener('click', (e) => {
-                    const targetTab = e.currentTarget.dataset.target;
-                    showTabContent('settings-tab-nav', targetTab);
+                    showTabContent('settings-tab-nav', e.currentTarget.dataset.target);
                 });
             });
 
@@ -119,12 +118,13 @@
                 const adminEmail = document.getElementById('admin-email').value;
                 const adminPanelPassword = document.getElementById('admin-panel-password').value;
                 const baseMonthlyFeeYen = parseInt(document.getElementById('base-monthly-fee-input').value, 10);
-                if (!adminEmail || !adminPanelPassword) { showMessage('message-area', 'Eメールとパスコードを入力してください。', 'error'); return; }
-                const hashedNewAdminPassword = CryptoJS.SHA256(adminPanelPassword).toString();
+                if (!adminEmail || !adminPanelPassword) { showMessage('message-area', 'Eメールとパスワードを入力してください。', 'error'); return; }
+                
                 const configSuccess = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'config', { email: adminEmail, base_monthly_fee_yen: baseMonthlyFeeYen });
-                const passUpdateSuccess = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'pass_update', { kaferId: PROJECT_CONFIG.ADMIN_ID, pass: hashedNewAdminPassword });
+                const passUpdateSuccess = await writeToSheet(user.name, PROJECT_CONFIG.ADMIN_ID, 'pass_update', { kaferId: PROJECT_CONFIG.ADMIN_ID, pass: adminPanelPassword });
+
                 if (configSuccess && passUpdateSuccess) {
-                    showMessage('message-area', 'サイト設定が保存され、管理者パスコードも更新されました。再ログインしてください。', 'success');
+                    showMessage('message-area', 'サイト設定が保存され、管理者パスワードも更新されました。再ログインしてください。', 'success');
                     setTimeout(logoutUser, 2000);
                 } else {
                     showMessage('message-area', 'サイト設定の保存に失敗しました。', 'error');
@@ -137,11 +137,12 @@
             const configRecords = records.filter(r => r.type === 'config');
             let currentConfig = { email: '', base_monthly_fee_yen: PROJECT_CONFIG.DEFAULT_SYSTEM_CONFIG.base_monthly_fee_yen };
             if (configRecords.length > 0) {
-                const latestConfig = configRecords.reduce((prev, current) => new Date(prev.timestamp) > new Date(current.timestamp) ? prev : current, configRecords[0]);
+                const latestConfig = configRecords.reduce((prev, current) => new Date(prev.timestamp) > new Date(current.timestamp) ? prev : current);
                 Object.assign(currentConfig, latestConfig);
             }
             document.getElementById('admin-email').value = currentConfig.email;
             document.getElementById('base-monthly-fee-input').value = currentConfig.base_monthly_fee_yen;
+            
             const systemConfig = await getSystemConfig(records);
             const statusElement = document.getElementById('site-setting-emergency-lockdown-status');
             if (systemConfig.emergency_lockdown) {
@@ -165,22 +166,25 @@
             records.forEach(record => {
                 const logEntry = document.createElement('div');
                 logEntry.className = 'log-entry';
-                let logText = `<i class="fas fa-info-circle"></i> [${new Date(record.TIME).toLocaleString('ja-JP')}] `;
-                let performedBy = record.name ? ` by ${record.name} (ID: ${record.kaferId})` : '';
-                if (record.type === 'register') { logText += `新しい会員が登録されました: ${record.name} (ID: ${record.kaferId})`; }
-                else if (record.type === 'payment') { logText += `KAFerマネーコードが使用されました${performedBy}: コード ${record.paymentCode} (${record.amount}KAFer / ${kafToYen(record.amount)}円相当)`; }
-                else if (record.type === 'remove') { logText += `会員強制削除が行われました${performedBy}: ターゲットID ${record.targetKaferId} (理由: ${record.reason || '不明'})`; }
-                else if (record.type === 'name_update') { logText += `ユーザー名変更が行われました${performedBy}: ターゲットID ${record.targetKaferId} を ${record.newName} に変更`; }
-                else if (record.type === 'money_code_issue') { logText += `KAFerマネーコードが発行されました${performedBy}: コード ${record.moneyCode} (${record.amount}KAFer / ${kafToYen(record.amount)}円相当)`; }
-                else if (record.type === 'money_code_void') { logText += `KAFerマネーコードが無効化されました${performedBy}: コード ${record.moneyCode}`; }
-                else if (record.type === 'pass_update') { logText += `パスコードが変更されました${performedBy}: ID ${record.kaferId}`; }
-                else if (record.type === 'config') { logText += `サイト設定が更新されました${performedBy}: 管理者Eメール ${record.email || 'N/A'}, 基本月額会費 ${record.base_monthly_fee_yen || 'N/A'}円`; }
-                else if (record.type === 'system_config') { logText += `システム設定が更新されました${performedBy}: 緊急情報保護モード: ${record.emergency_lockdown ? '有効' : '無効'}`; }
-                else if (record.type === 'announcement') { logText += `運営からのお知らせが投稿されました${performedBy}: 「${record.message.substring(0, 30)}...」`; }
-                else if (record.type === 'refund_request') { logText += `返金申請が提出されました${performedBy}: 申請額 ${record.requestAmountKaf}KAFer (${kafToYen(record.requestAmountKaf)}円相当), 返還コード: ${record.refundCode}`; }
-                else if (record.type === 'refund_approved') { logText += `返金が承認されました${performedBy}: 対象ID ${record.targetKaferId}, 返金額 ${record.refundAmountAfterFeeKaf}KAFer (${kafToYen(record.refundAmountAfterFeeKaf)}円相当), 返還コード: ${record.refundCode}`; }
-                else { logText += `未知のアクティビティ: ${record.type} (詳細: ${JSON.stringify(record)})`; }
-                logEntry.innerHTML = logText;
+                let logText = `[${new Date(record.TIME).toLocaleString('ja-JP')}] `;
+                let performedBy = record.name ? ` by ${record.name} (${record.kaferId})` : '';
+                
+                switch(record.type) {
+                    case 'register': logText += `新会員登録: ${record.name} (${record.kaferId})`; break;
+                    case 'payment': logText += `入金${performedBy}: ${record.amount}KAFer`; break;
+                    case 'remove': logText += `会員削除${performedBy}: 対象ID ${record.targetKaferId}`; break;
+                    case 'name_update': logText += `ユーザー名変更${performedBy}: 対象ID ${record.targetKaferId} -> ${record.newName}`; break;
+                    case 'money_code_issue': logText += `コード発行${performedBy}: ${record.moneyCode}`; break;
+                    case 'money_code_void': logText += `コード無効化${performedBy}: ${record.moneyCode}`; break;
+                    case 'pass_update': logText += `パスワード変更${performedBy}`; break;
+                    case 'config': logText += `サイト設定更新${performedBy}`; break;
+                    case 'system_config': logText += `システム設定更新${performedBy}: 緊急モード -> ${record.emergency_lockdown}`; break;
+                    case 'announcement': logText += `お知らせ投稿${performedBy}`; break;
+                    case 'refund_request': logText += `返金申請${performedBy}: ${record.requestAmountKaf}KAFer`; break;
+                    case 'refund_approved': logText += `返金承認${performedBy}: 対象ID ${record.targetKaferId}`; break;
+                    default: logText += `未知のアクティビティ: ${record.type}`;
+                }
+                logEntry.textContent = logText;
                 logEntriesDiv.appendChild(logEntry);
             });
         }
