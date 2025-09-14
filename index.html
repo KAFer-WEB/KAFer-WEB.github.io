@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>KAFer - ログイン / 新規登録</title>
-    <link id="favicon" rel="icon" href="icon.png" type="image/png">
-    <link rel="stylesheet" href="style.css">
+    
+    <!-- Asset paths updated for the new file structure -->
+    <link id="favicon" rel="icon" href="assets/icons/icon.png" type="image/png">
+    <link rel="stylesheet" href="assets/css/global.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="manifest" href="manifest.webmanifest">
+    
+    <!-- Manifest path should be absolute from the root directory -->
+    <link rel="manifest" href="/manifest.webmanifest">
 </head>
 <body class="app-container index-page">
     <header class="app-header">
@@ -18,144 +23,71 @@
             <div class="content-section">
                 <h2><i class="fas fa-lock"></i> ログイン / 新規登録</h2>
                 <div id="message-area" class="message"></div>
-                <div class="card login-card">
-                    <div class="card-header">既存アカウントでログイン</div>
-                    <form id="login-form">
-                        <div class="form-group">
-                            <label for="login-kaferId"><i class="fas fa-id-card"></i> KAFer ID</label>
-                            <input type="text" id="login-kaferId" required pattern="[0-9]{4}" title="4桁の数字を入力してください">
-                        </div>
-                        <div class="form-group">
-                            <label for="login-password"><i class="fas fa-key"></i> パスワード</label>
-                            <input type="password" id="login-password" required>
-                        </div>
-                        <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> ログイン</button>
-                    </form>
+
+                <!-- PWA mode check message area -->
+                <div id="pwa-message-area" class="message info" style="display: none;">
+                    <p style="font-weight: bold;">このサイトはアプリとして開く必要があります。</p>
+                    <p style="font-size: 0.9em; margin-top: 8px;">
+                        <strong>Android:</strong> 右上のメニューから「アプリをインストール」または「ホーム画面に追加」を選択してください。<br>
+                        <strong>iOS:</strong> 共有ボタン <i class="fas fa-share-square"></i> から「ホーム画面に追加」を選択してください。
+                    </p>
                 </div>
-                <div class="card register-card" style="margin-top: var(--spacing-xl);">
-                    <div class="card-header">新規アカウント登録<button id="toggle-register-form-btn" class="btn btn-sm" style="float: right;"><i class="fas fa-plus"></i> 開く</button></div>
-                    <div id="register-form-wrapper" style="display: none;">
-                        <form id="register-form">
+
+                <div id="auth-forms-wrapper">
+                    <div class="card login-card">
+                        <div class="card-header">既存アカウントでログイン</div>
+                        <form id="login-form">
                             <div class="form-group">
-                                <label for="register-name"><i class="fas fa-user-circle"></i> ユーザー名 (10文字以下)</label>
-                                <input type="text" id="register-name" required maxlength="10">
+                                <label for="login-kaferId"><i class="fas fa-id-card"></i> KAFer ID</label>
+                                <input type="text" id="login-kaferId" required pattern="[0-9]{4}" title="4桁の数字を入力してください">
                             </div>
                             <div class="form-group">
-                                <label for="register-kaferId"><i class="fas fa-id-card"></i> KAFer ID (4桁の数字)</label>
-                                <input type="text" id="register-kaferId" required pattern="[0-9]{4}">
+                                <label for="login-password"><i class="fas fa-key"></i> パスワード</label>
+                                <input type="password" id="login-password" required>
                             </div>
-                            <div class="form-group">
-                                <label for="register-password"><i class="fas fa-key"></i> パスワード</label>
-                                <input type="password" id="register-password" required>
-                            </div>
-                            <button type="submit" class="btn btn-secondary"><i class="fas fa-user-plus"></i> アカウント作成</button>
+                            <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> ログイン</button>
                         </form>
+                    </div>
+                    <div class="card register-card">
+                        <div class="card-header">
+                            新規アカウント登録
+                            <button id="toggle-register-form-btn" class="btn btn-sm" style="float: right;">
+                                <i class="fas fa-plus"></i> 開く
+                            </button>
+                        </div>
+                        <div id="register-form-wrapper" style="display: none;">
+                            <form id="register-form">
+                                <div class="form-group">
+                                    <label for="register-name"><i class="fas fa-user-circle"></i> ユーザー名 (10文字以下)</label>
+                                    <input type="text" id="register-name" required maxlength="10">
+                                </div>
+                                <div class="form-group">
+                                    <label for="register-kaferId"><i class="fas fa-id-card"></i> KAFer ID (4桁の数字)</label>
+                                    <input type="text" id="register-kaferId" required pattern="[0-9]{4}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="register-password"><i class="fas fa-key"></i> パスワード</label>
+                                    <input type="password" id="register-password" required>
+                                </div>
+                                <button type="submit" class="btn btn-secondary"><i class="fas fa-user-plus"></i> アカウント作成</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
+
+    <!-- PWA install buttons/prompts -->
     <button id="installAppButton"><i class="fas fa-download"></i></button>
     <div id="ios-install-prompt">
         <button id="close-ios-prompt">&times;</button>
         ホーム画面に追加してアプリのように使えます。<br>
         共有 <i class="fas fa-share-square"></i> ボタンから「ホーム画面に追加」を選択してください。
     </div>
-    <script src="global.js"></script>
-    <script>
-        let deferredPrompt = null;
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            initializePwaAndDarkMode();
-            await checkLoginStatus(false, false, 'index.html');
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            const redirectMessage = urlParams.get('redirect_message');
-            if (redirectMessage === 'login_required') {
-                showMessage('message-area', 'ログインが必要です。', 'info');
-            } else if (redirectMessage === 'admin_required') {
-                showMessage('message-area', '管理者権限が必要です。', 'error');
-            } else if (redirectMessage === 'pwa_required') {
-                showMessage('message-area', 'アプリとして開いてください。', 'info');
-            }
-
-            const installAppButton = document.getElementById('installAppButton');
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            if (isIOS && !navigator.standalone) {
-                document.getElementById('ios-install-prompt').style.display = 'block';
-            }
-
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                showInstallPromptButton();
-            });
-
-            installAppButton.addEventListener('click', () => {
-                if (!deferredPrompt) return;
-                hideInstallPromptButton();
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    deferredPrompt = null;
-                });
-            });
-
-            document.getElementById('close-ios-prompt').addEventListener('click', () => {
-                document.getElementById('ios-install-prompt').style.display = 'none';
-            });
-
-            const initialCode = urlParams.get('code');
-            if (initialCode) document.getElementById('login-kaferId').value = initialCode;
-
-            const registerFormWrapper = document.getElementById('register-form-wrapper');
-            const toggleRegisterFormBtn = document.getElementById('toggle-register-form-btn');
-            toggleRegisterFormBtn.addEventListener('click', () => {
-                const isHidden = registerFormWrapper.style.display === 'none' || registerFormWrapper.style.display === '';
-                registerFormWrapper.style.display = isHidden ? 'block' : 'none';
-                toggleRegisterFormBtn.innerHTML = isHidden ? '<i class="fas fa-minus"></i> 閉じる' : '<i class="fas fa-plus"></i> 開く';
-            });
-
-            document.getElementById('login-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                hideMessage('message-area');
-                const kaferId = document.getElementById('login-kaferId').value;
-                const password = document.getElementById('login-password').value;
-                if (!kaferId || !password) { showMessage('message-area', 'KAFer IDとパスワードを入力してください。', 'error'); return; }
-                
-                const loggedInUser = await authenticateUser(kaferId, password);
-                if (loggedInUser) {
-                    showMessage('message-area', 'ログイン成功！', 'success');
-                    window.location.href = loggedInUser.isAdmin ? 'admin.html' : 'menu.html';
-                } else {
-                    showMessage('message-area', 'KAFer IDまたはパスワードが間違っています。', 'error');
-                }
-            });
-
-            document.getElementById('register-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                hideMessage('message-area');
-                const name = document.getElementById('register-name').value;
-                const kaferId = document.getElementById('register-kaferId').value;
-                const password = document.getElementById('register-password').value;
-                if (!name || !kaferId || !password) { showMessage('message-area', 'すべてのフィールドを入力してください。', 'error'); return; }
-                
-                const records = await fetchSheetData();
-                if (records.find(r => r.kaferId === kaferId && r.type === 'register')) {
-                    showMessage('message-area', 'このKAFer IDは既に登録されています。', 'error');
-                    return;
-                }
-                
-                const success = await writeToSheet(name, kaferId, 'register', { pass: password });
-                if (success) {
-                    showMessage('message-area', '新規登録が完了しました！ログインしてください。', 'success');
-                    document.getElementById('register-form').reset();
-                    registerFormWrapper.style.display = 'none';
-                    toggleRegisterFormBtn.innerHTML = '<i class="fas fa-plus"></i> 開く';
-                } else {
-                    showMessage('message-area', '登録に失敗しました。', 'error');
-                }
-            });
-        });
-    </script>
+    <!-- Script paths updated for the new file structure -->
+    <script src="assets/js/global.js"></script>
+    <script src="assets/js/index.js"></script>
 </body>
 </html>
