@@ -66,8 +66,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             initializePwaAndDarkMode();
             await checkLoginStatus(true, true, 'admin.html');
-            document.body.classList.add('admin-page');
-
+            
             const user = getLoggedInUser();
             if (!user) return;
 

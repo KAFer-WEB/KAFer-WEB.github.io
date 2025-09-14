@@ -75,6 +75,8 @@
                 showMessage('message-area', 'ログインが必要です。', 'info');
             } else if (redirectMessage === 'admin_required') {
                 showMessage('message-area', '管理者権限が必要です。', 'error');
+            } else if (redirectMessage === 'pwa_required') {
+                showMessage('message-area', 'アプリとして開いてください。', 'info');
             }
 
             const installAppButton = document.getElementById('installAppButton');
@@ -136,9 +138,12 @@
                 const kaferId = document.getElementById('register-kaferId').value;
                 const password = document.getElementById('register-password').value;
                 if (!name || !kaferId || !password) { showMessage('message-area', 'すべてのフィールドを入力してください。', 'error'); return; }
+                
                 const records = await fetchSheetData();
-                const existingUser = records.find(r => r.kaferId === kaferId && r.type === 'register');
-                if (existingUser) { showMessage('message-area', 'このKAFer IDは既に登録されています。', 'error'); return; }
+                if (records.find(r => r.kaferId === kaferId && r.type === 'register')) {
+                    showMessage('message-area', 'このKAFer IDは既に登録されています。', 'error');
+                    return;
+                }
                 
                 const success = await writeToSheet(name, kaferId, 'register', { pass: password });
                 if (success) {

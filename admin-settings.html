@@ -180,7 +180,7 @@
                     case 'config': logText += `サイト設定更新${performedBy}`; break;
                     case 'system_config': logText += `システム設定更新${performedBy}: 緊急モード -> ${record.emergency_lockdown}`; break;
                     case 'announcement': logText += `お知らせ投稿${performedBy}`; break;
-                    case 'refund_request': logText += `返金申請${performedBy}: ${record.requestAmountKaf}KAFer`; break;
+                    case 'refund_request': logText += `返金申請${performedBy}: ${record.requestAmountKAFer}KAFer`; break;
                     case 'refund_approved': logText += `返金承認${performedBy}: 対象ID ${record.targetKaferId}`; break;
                     default: logText += `未知のアクティビティ: ${record.type}`;
                 }

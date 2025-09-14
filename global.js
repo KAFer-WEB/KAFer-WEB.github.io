@@ -45,11 +45,10 @@ function decryptData(encryptedData) {
 async function fetchSheetData(isAdminFetch = false) {
     const user = getLoggedInUser();
     const recordsForConfig = await fetchRawSheetData();
-
     const systemConfigRecordsRaw = recordsForConfig.map(r => {
         try {
             if (r.DATA) return JSON.parse(decryptData(r.DATA));
-        } catch (e) { }
+        } catch (e) {}
         return null;
     }).filter(r => r && r.type === 'system_config');
 
@@ -111,12 +110,16 @@ async function writeToSheet(name, kaferId, type, additionalData) {
     }
     formData.append(`entry.${ENTRY_MAP.data}`, encryptedResult);
 
+    console.log('Submitting to Google Form...');
+    console.log(`Decrypted Data (for verification):`, JSON.parse(dataToEncrypt));
+
     try {
         await fetch(PROJECT_CONFIG.FORM_BASE_URL, {
             method: 'POST',
             body: formData,
             mode: 'no-cors'
         });
+        console.log('Form submission request sent.');
         return true;
     } catch (error) {
         console.error('Error submitting form:', error);
@@ -151,6 +154,11 @@ function getLoggedInUser() {
 }
 
 async function checkLoginStatus(requireLogin = true, requireAdmin = false, currentPath = '') {
+    if (currentPath !== 'index.html' && !window.matchMedia('(display-mode: standalone)').matches && navigator.userAgent.indexOf("Chrome-Lighthouse") === -1) {
+        window.location.href = `index.html?redirect_message=pwa_required`;
+        return;
+    }
+
     const user = getLoggedInUser();
     if (user && currentPath === 'index.html') {
         window.location.href = user.isAdmin ? 'admin.html' : 'menu.html';
@@ -162,7 +170,6 @@ async function checkLoginStatus(requireLogin = true, requireAdmin = false, curre
     }
     if (user && requireAdmin && !user.isAdmin) {
         window.location.href = `index.html?redirect_message=admin_required`;
-        return;
     }
 }
 

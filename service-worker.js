@@ -4,6 +4,9 @@ const urlsToCache = [
   '/index.html',
   '/menu.html',
   '/admin.html',
+  '/admin-members.html',
+  '/admin-money.html',
+  '/admin-settings.html',
   '/style.css',
   '/global.js',
   '/icon.png',
@@ -26,6 +29,10 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
+
+  if (!requestUrl.protocol.startsWith('http')) {
+    return;
+  }
 
   if (requestUrl.origin.includes('opensheet.elk.sh') || requestUrl.origin.includes('docs.google.com')) {
     event.respondWith(fetch(event.request));

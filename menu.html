@@ -133,7 +133,7 @@
                 const moneyCode = document.getElementById('payment-code').value;
                 if (!moneyCode || !/^[0-9]{16}$/.test(moneyCode)) { showMessage('message-area', '16桁のKAFerマネーコードを入力してください。', 'error'); return; }
                 const records = await fetchSheetData();
-                const validMoneyCodeRecord = records.find(r => r.type === 'money_code_issue' && r.moneyCode === moneyCode && !records.some(p => p.type === 'payment' && p.paymentCode === moneyCode) && !records.some(v => v.type === 'money_code_void' && v.moneyCode === moneyCode));
+                const validMoneyCodeRecord = records.find(r => r.type === 'money_code_issue' && r.moneyCode === moneyCode && !records.some(p => p.type === 'payment' && p.paymentCode === moneyCode) && !records.some(v => v.type === 'money_code_void' && v.moneyCode === code));
                 if (!validMoneyCodeRecord) { showMessage('message-area', '無効な、または使用済みのKAFerマネーコードです。', 'error'); return; }
                 const success = await writeToSheet(user.name, user.kaferId, 'payment', { paymentCode: moneyCode, amount: validMoneyCodeRecord.amount });
                 if (success) {
