@@ -1,0 +1,163 @@
+/**
+ * =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+ * USER APPLICATION STYLES (`/app/*` pages)
+ * =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+ */
+
+/*
+ * Bottom Navigation Bar
+ * Fixed at the bottom of the screen for mobile-first navigation.
+ */
+.bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--footer-height);
+    background: var(--card-bg-color);
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    z-index: 1001;
+}
+
+.bottom-nav nav { 
+    width: 100%; 
+}
+
+.bottom-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+}
+
+.bottom-nav li a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--medium-grey);
+    text-decoration: none;
+    font-size: 0.7rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    width: 70px; /* Fixed width for consistent spacing */
+    transition: color 0.2s ease;
+    border-top: 3px solid transparent;
+}
+
+.bottom-nav li a i {
+    font-size: 1.4rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+.bottom-nav li a.active {
+    color: var(--primary-color);
+    border-top-color: var(--primary-color); /* Active section indicator */
+}
+
+/* Style for the link that points to the current page (e.g., 'Home' vs 'Meet') */
+.bottom-nav li a.active-page {
+    color: var(--primary-color);
+}
+
+/* Hide bottom nav on larger screens where a sidebar might be used */
+@media (min-width: 769px) {
+    .bottom-nav {
+        display: none;
+    }
+    .main-content-wrapper {
+        padding-bottom: 0; /* Remove padding when bottom nav is hidden */
+    }
+}
+
+
+/*
+ * Dashboard Metrics
+ * Styles for the main statistic cards on the user dashboard.
+ */
+.dashboard-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.metric-card {
+    background: var(--card-bg-color);
+    color: var(--text-color);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    border-top: 4px solid var(--primary-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.metric-card.secondary { border-top-color: var(--secondary-color); }
+.metric-card.accent { border-top-color: var(--accent-color); }
+.metric-card .value { font-size: 2rem; font-weight: var(--heading-font-weight); }
+.metric-card .label { font-size: 0.9rem; color: var(--dark-grey); }
+
+
+/*
+ * Action Buttons
+ * Container for primary actions on a page.
+ */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xxl);
+}
+
+
+/*
+ * QR Code Scanner
+ * Defines the size and appearance of the QR code reader view.
+ */
+#reader { 
+    width: 100%; 
+    max-width: 400px; 
+    margin: var(--spacing-lg) auto; 
+    border-radius: var(--border-radius-md); 
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.qr-scanner-controls {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+
+
+/*
+ * Miscellaneous Component Styles
+ */
+.highlight {
+    font-weight: bold;
+    color: var(--primary-dark);
+}
+
+.form-note {
+    font-size: 0.9em;
+    color: var(--medium-grey);
+    text-align: center;
+    margin-top: calc(-1 * var(--spacing-sm)); /* Reduce space after input */
+    margin-bottom: var(--spacing-md);
+}
+
+#refund-code-display {
+    text-align: center;
+    background-color: var(--hover-bg-color);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+}

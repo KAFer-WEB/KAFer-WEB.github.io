@@ -1,0 +1,384 @@
+/**
+ * ==============================================================================
+ * CSS CUSTOM PROPERTIES (VARIABLES)
+ * Defines the core design tokens for the application.
+ * ==============================================================================
+ */
+:root {
+    /* Color Palette */
+    --pink-lighten-5: #FCE4EC;
+    --pink-lighten-4: #F8BBD0;
+    --pink-lighten-3: #F48FB1;
+    --pink-lighten-2: #F06292;
+    --pink-lighten-1: #EC407A;
+    --pink-base: #E91E63;
+    --pink-darken-1: #D81B60;
+    --pink-darken-2: #C2185B;
+    --pink-darken-3: #AD1457;
+    --pink-darken-4: #880E4F;
+
+    /* Semantic Colors */
+    --primary-color: var(--pink-darken-1);
+    --primary-dark: var(--pink-darken-2);
+    --primary-light: var(--pink-base);
+    --secondary-color: var(--pink-lighten-1);
+    --secondary-dark: var(--pink-base);
+    --accent-color: #FFC107;
+    --success-color: #4CAF50;
+    --error-color: #F44336;
+    --info-color: #2196F3;
+
+    /* Text and UI Colors */
+    --text-color: #333;
+    --light-text-color: #ffffff;
+    --dark-grey: #616161;
+    --medium-grey: #9E9E9E;
+    --light-grey: #E0E0E0;
+    --border-color: #f0f0f0;
+    --bg-color: #FFF8F9;
+    --card-bg-color: #ffffff;
+    --hover-bg-color: var(--pink-lighten-5);
+
+    /* Typography */
+    --font-family-sans: 'Roboto', 'Noto Sans JP', sans-serif;
+    --heading-font-weight: 700;
+    --body-font-weight: 400;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
+
+    /* UI Metrics */
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 20px rgba(0,0,0,0.1);
+    --border-radius-sm: 6px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 18px;
+    --header-height: 60px;
+    --footer-height: 60px;
+}
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Roboto:wght@400;700&display=swap');
+
+
+/**
+ * ==============================================================================
+ * GLOBAL RESETS & BASE STYLES
+ * Ensures consistent styling across all browsers.
+ * ==============================================================================
+ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family-sans);
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 16px;
+}
+
+
+/**
+ * ==============================================================================
+ * CORE LAYOUT STRUCTURE
+ * Defines the main application container, header, sidebar, etc.
+ * ==============================================================================
+ */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-content-wrapper {
+    flex-grow: 1;
+    padding-top: var(--header-height);
+    padding-bottom: var(--footer-height); /* For mobile view with bottom nav */
+}
+
+.container {
+    padding: var(--spacing-md);
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+header.app-header {
+    background: linear-gradient(135deg, var(--pink-base) 0%, var(--pink-lighten-1) 100%);
+    color: var(--light-text-color);
+    padding: 0 var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-md);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    height: var(--header-height);
+}
+
+.app-header .logo h1 {
+    font-size: 1.6rem;
+    margin: 0;
+    font-weight: var(--heading-font-weight);
+}
+
+.user-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+
+/**
+ * ==============================================================================
+ * COMMON UI COMPONENTS
+ * Styles for buttons, forms, cards, messages, etc.
+ * ==============================================================================
+ */
+
+/* --- Headings --- */
+h2 {
+    font-size: 1.8rem;
+    color: var(--primary-dark);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--pink-lighten-4);
+    text-align: center;
+    font-weight: var(--heading-font-weight);
+}
+
+h3 {
+    font-size: 1.2rem;
+    color: var(--dark-grey);
+    margin-bottom: var(--spacing-md);
+    margin-top: var(--spacing-xl);
+}
+
+/* --- Buttons --- */
+.btn {
+    background-color: var(--primary-color);
+    color: var(--light-text-color);
+    padding: var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: var(--heading-font-weight);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    text-decoration: none; /* For <a> tags styled as buttons */
+    width: 100%;
+}
+.btn:hover { background-color: var(--primary-dark); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.btn:active { transform: translateY(0); box-shadow: var(--shadow-sm); }
+.btn-secondary { background-color: var(--secondary-color); }
+.btn-secondary:hover { background-color: var(--secondary-dark); }
+.btn-danger { background-color: var(--error-color); }
+.btn-danger:hover { background-color: #d32f2f; }
+.btn-success { background-color: var(--success-color); }
+.btn-success:hover { background-color: #388E3C; }
+.btn-sm { padding: var(--spacing-sm) var(--spacing-md); font-size: 0.85rem; width: auto; }
+
+.logout-btn {
+    background-color: transparent;
+    color: var(--light-text-color);
+    border: 1px solid rgba(255,255,255,0.5);
+    padding: var(--spacing-sm) var(--spacing-md);
+}
+.logout-btn:hover { background-color: rgba(255,255,255,0.2); }
+
+/* --- Forms --- */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+.form-group { margin-bottom: 0; }
+label {
+    font-weight: var(--body-font-weight);
+    margin-bottom: var(--spacing-xs);
+    display: block;
+    color: var(--dark-grey);
+    font-size: 0.9rem;
+}
+input[type="text"], input[type="password"], input[type="email"], input[type="number"], textarea {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 1px solid var(--light-grey);
+    border-radius: var(--border-radius-sm);
+    font-size: 1rem;
+    font-family: inherit;
+}
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px var(--pink-lighten-5);
+}
+textarea { resize: vertical; min-height: 80px; }
+.input-with-button { display: flex; gap: var(--spacing-sm); }
+.input-with-button input { flex-grow: 1; }
+
+/* --- Cards and Content Sections --- */
+.content-section {
+    background-color: var(--card-bg-color);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-xl);
+}
+.card {
+    background-color: var(--card-bg-color);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-lg);
+}
+.card-header {
+    font-size: 1.1rem;
+    font-weight: var(--heading-font-weight);
+    color: var(--primary-dark);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--pink-lighten-5);
+}
+
+/* --- Message/Alert Boxes --- */
+.message {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--border-radius-sm);
+    display: none;
+    border: 1px solid;
+    text-align: center;
+}
+.message.error { background-color: #ffebee; color: var(--error-color); border-color: var(--error-color); }
+.message.success { background-color: #e8f5e9; color: var(--success-color); border-color: var(--success-color); }
+.message.info { background-color: #e3f2fd; color: var(--info-color); border-color: var(--info-color); }
+
+/* --- Data Tables --- */
+.data-table-container { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; margin-top: var(--spacing-lg); }
+.data-table th, .data-table td { border: 1px solid var(--border-color); padding: var(--spacing-md); text-align: left; }
+.data-table th { background-color: var(--pink-lighten-5); font-weight: var(--heading-font-weight); }
+.data-table tbody tr:nth-child(even) { background-color: var(--bg-color); }
+
+/* --- Lists --- */
+.list-group-item {
+    padding: var(--spacing-md) 0;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.list-group-item:last-child { border-bottom: none; }
+
+/* --- Log/History Display --- */
+.log-container { max-height: 400px; overflow-y: auto; }
+.log-entry {
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px dashed var(--light-grey);
+    font-size: 0.9em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+.log-entry:last-child { border-bottom: none; }
+.log-date { color: var(--medium-grey); white-space: nowrap; }
+.log-message { flex-grow: 1; }
+
+/* --- Tab Navigation --- */
+.tab-navigation {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+}
+.tab-button {
+    background: transparent;
+    border: none;
+    padding: var(--spacing-md);
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--dark-grey);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+.tab-button:hover {
+    background-color: var(--hover-bg-color);
+}
+.tab-button.active {
+    color: var(--primary-dark);
+    border-bottom-color: var(--primary-dark);
+    font-weight: bold;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; } /* Initial state in HTML can use this class */
+
+
+/**
+ * ==============================================================================
+ * PWA & INSTALL PROMPTS
+ * ==============================================================================
+ */
+#installAppButton {
+    background-color: var(--primary-color);
+    color: var(--light-text-color);
+    padding: var(--spacing-md);
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    display: none;
+    position: fixed;
+    bottom: calc(var(--footer-height) + var(--spacing-md));
+    right: var(--spacing-md);
+    z-index: 1005;
+    border: none;
+    width: 60px;
+    height: 60px;
+}
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+.pulse-animation { animation: pulse 1.5s infinite ease-in-out; }
+
+#ios-install-prompt {
+    display: none;
+    position: fixed;
+    bottom: var(--spacing-md);
+    left: var(--spacing-md);
+    right: var(--spacing-md);
+    background-color: var(--dark-grey);
+    color: var(--light-text-color);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    z-index: 1010;
+    text-align: center;
+    font-size: 0.9rem;
+}
+#ios-install-prompt button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+}

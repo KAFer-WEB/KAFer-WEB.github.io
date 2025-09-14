@@ -1,0 +1,146 @@
+/**
+ * =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+ * ADMINISTRATOR PAGES STYLES (`/admin/*` pages)
+ * =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+ */
+
+/*
+ * Sidebar Navigation (Hidden on mobile by default)
+ */
+.sidebar {
+    display: none;
+}
+
+
+/*
+ * Desktop Layout (Sidebar becomes visible)
+ * Activates on screens wider than 768px.
+ */
+@media (min-width: 769px) {
+    .main-content-wrapper {
+        display: flex;
+        flex-direction: row;
+        padding-bottom: 0; /* No bottom nav in admin view */
+    }
+
+    .sidebar {
+        display: block;
+        width: 250px;
+        background-color: #fff;
+        border-right: 1px solid var(--border-color);
+        flex-shrink: 0;
+        padding-top: var(--header-height); /* Align content below fixed header */
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 999; /* Below the header */
+    }
+
+    /* Adjust main content container to not be obscured by the fixed sidebar */
+    .admin-page .container {
+        margin-left: 250px;
+    }
+
+    .sidebar nav ul {
+        list-style: none;
+        padding: var(--spacing-md) 0;
+    }
+
+    .sidebar nav ul li a {
+        display: flex;
+        align-items: center;
+        padding: var(--spacing-md) var(--spacing-lg);
+        color: var(--dark-grey);
+        text-decoration: none;
+        border-left: 4px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar nav ul li a i {
+        margin-right: var(--spacing-md);
+        width: 20px; /* Align text by giving icons a fixed width */
+        text-align: center;
+    }
+
+    .sidebar nav ul li a:hover {
+        background-color: var(--hover-bg-color);
+    }
+
+    .sidebar nav ul li a.active {
+        color: var(--primary-dark);
+        border-left-color: var(--primary-dark);
+        font-weight: var(--heading-font-weight);
+    }
+}
+
+
+/*
+ * Admin Dashboard Metrics & Actions
+ */
+.dashboard-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.metric-card {
+    background: var(--card-bg-color);
+    color: var(--text-color);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    border-top: 4px solid var(--primary-color);
+}
+.metric-card.secondary { border-top-color: var(--secondary-color); }
+.metric-card.accent { border-top-color: var(--accent-color); }
+.metric-card .value { font-size: 2rem; font-weight: var(--heading-font-weight); }
+.metric-card .label { font-size: 0.9rem; color: var(--dark-grey); }
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.action-buttons .btn {
+    flex: 1 1 200px; /* Allow buttons to grow and shrink */
+}
+
+
+/*
+ * KAFer Money Management Specific Styles
+ */
+#qrcode-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    background-color: var(--bg-color);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-sm);
+    border: 1px dashed var(--light-grey);
+}
+#qrcode-canvas {
+    max-width: 100%;
+}
+#qrcode-text {
+    font-weight: bold;
+    font-size: 1.1em;
+    letter-spacing: 1px;
+    color: var(--primary-dark);
+}
+
+/*
+ * Settings Page Specific Styles
+ */
+.emergency-info p {
+    font-size: 0.85em;
+    color: var(--medium-grey);
+    margin-top: var(--spacing-md);
+}
+.emergency-info i {
+    margin-right: var(--spacing-xs);
+}
