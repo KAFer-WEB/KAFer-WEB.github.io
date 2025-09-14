@@ -45,13 +45,10 @@ function decryptData(encryptedData) {
 async function fetchSheetData(isAdminFetch = false) {
     const user = getLoggedInUser();
     const recordsForConfig = await fetchRawSheetData();
-
     const systemConfigRecordsRaw = recordsForConfig.map(r => {
         try {
-            if (r.DATA) {
-                return JSON.parse(decryptData(r.DATA));
-            }
-        } catch (e) { /* ignore parse error */ }
+            if (r.DATA) return JSON.parse(decryptData(r.DATA));
+        } catch (e) {}
         return null;
     }).filter(r => r && r.type === 'system_config');
 
@@ -71,7 +68,6 @@ async function fetchSheetData(isAdminFetch = false) {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-
         return data.map(record => {
             if (record.DATA) {
                 try {
@@ -166,8 +162,24 @@ async function checkLoginStatus(requireLogin = true, requireAdmin = false, curre
     if (user && requireAdmin && !user.isAdmin) {
         alert('管理者権限が必要です。');
         window.location.href = 'index.html';
-        return;
     }
+}
+
+function yenToKaf(yenAmount) {
+    return Math.ceil(yenAmount * PROJECT_CONFIG.KAF_MONEY_PER_YEN);
+}
+
+function kafToYen(kafAmount) {
+    const yen = kafAmount / PROJECT_CONFIG.KAF_MONEY_PER_YEN;
+    return Math.ceil(yen * 100) / 100;
+}
+
+function generateRandomMoneyCode() {
+    let result = '';
+    for (let i = 0; i < 16; i++) {
+        result += Math.floor(Math.random() * 10);
+    }
+    return result;
 }
 
 function showMessage(elementId, message, type = 'info') {
@@ -189,29 +201,21 @@ function hideMessage(elementId) {
 }
 
 function showTabContent(tabContainerId, contentId) {
-    document.querySelectorAll(`#${tabContainerId} .tab-button`).forEach(button => {
-        button.classList.remove('active');
-    });
+    document.querySelectorAll(`#${tabContainerId} .tab-button`).forEach(button => button.classList.remove('active'));
     const targetButton = document.querySelector(`#${tabContainerId} button[data-target="${contentId}"]`);
-    if (targetButton) {
-        targetButton.classList.add('active');
-    }
+    if (targetButton) targetButton.classList.add('active');
 
     const contentWrapperId = tabContainerId.replace('-nav', '-content-wrapper');
-    document.querySelectorAll(`#${contentWrapperId} .tab-content`).forEach(content => {
-        content.style.display = 'none';
-    });
+    document.querySelectorAll(`#${contentWrapperId} .tab-content`).forEach(content => content.style.display = 'none');
     const targetContent = document.getElementById(contentId);
-    if (targetContent) {
-        targetContent.style.display = 'block';
-    }
+    if (targetContent) targetContent.style.display = 'block';
 }
 
 function initializePwaAndDarkMode() {
     if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
-                .then(registration => console.log('Service Worker registered:', registration))
+                .then(registration => console.log('Service Worker registered:', registration.scope))
                 .catch(error => console.error('Service Worker registration failed:', error));
         });
     }

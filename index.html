@@ -28,7 +28,7 @@
                         </div>
                         <div class="form-group">
                             <label for="login-password"><i class="fas fa-key"></i> パスコード</label>
-                            <input type="password" id="login-password" required pattern="[a-zA-Z0-9!@#$%^&amp;*()_+\-=\\[\\]{}|;:'&lt;&gt;\\./?]{4,}" title="4文字以上の半角英数字記号を入力してください">
+                            <input type="password" id="login-password" required>
                         </div>
                         <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> ログイン</button>
                     </form>
@@ -47,7 +47,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="register-password"><i class="fas fa-key"></i> パスコード</label>
-                                <input type="password" id="register-password" required pattern="[a-zA-Z0-9!@#$%^&amp;*()_+\-=\\[\\]{}|;:'&lt;&gt;\\./?]{4,}" title="4文字以上の半角英数字記号を入力してください">
+                                <input type="password" id="register-password" required>
                             </div>
                             <button type="submit" class="btn btn-secondary"><i class="fas fa-user-plus"></i> アカウント作成</button>
                         </form>
@@ -128,7 +128,7 @@
                 const records = await fetchSheetData();
                 const existingUser = records.find(r => r.kaferId === kaferId && r.type === 'register');
                 if (existingUser) { showMessage('message-area', 'このKAFer IDは既に登録されています。', 'error'); return; }
-                const success = await writeToSheet(name, kaferId, 'register', { pass: CryptoJS.SHA256(password).toString() });
+                const success = await writeToSheet(name, kaferId, 'register', { pass: password });
                 if (success) {
                     showMessage('message-area', '新規登録が完了しました！ログインしてください。', 'success');
                     document.getElementById('register-form').reset();
