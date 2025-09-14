@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>KAFer - メニュー</title>
+    
+    <!-- Asset paths updated for the new file structure -->
+    <link id="favicon" rel="icon" href="/assets/icons/icon.png" type="image/png">
+    <link rel="stylesheet" href="/assets/css/global.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Manifest path should be absolute from the root directory -->
+    <link rel="manifest" href="/manifest.webmanifest">
+</head>
+<body class="app-container menu-page">
+    <header class="app-header">
+        <div class="logo"><h1>KAFer</h1></div>
+        <div class="user-controls">
+            <span class="user-info-header" id="header-user-info"></span>
+            <button class="logout-btn" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> ログアウト</button>
+        </div>
+    </header>
+
+    <div class="main-content-wrapper">
+        <main class="container">
+            <div id="message-area" class="message"></div>
+
+            <!-- ======== Dashboard Section (Default View) ======== -->
+            <div id="dashboard-section" class="content-section">
+                <h2><i class="fas fa-user-circle"></i> <span id="dashboard-name"></span>さん</h2>
+                <div class="dashboard-metrics">
+                    <div class="metric-card"><div class="value" id="dashboard-kafer-money">0 KAFer</div><div class="label">KAFerマネー残高</div></div>
+                    <div class="metric-card secondary"><div class="value" id="outstanding-amount-display">0 KAFer</div><div class="label">未払い額</div></div>
+                </div>
+                <div class="action-buttons">
+                    <a href="meet.html" class="btn btn-success"><i class="fas fa-video"></i> 限定配信に参加する</a>
+                    <button class="btn" onclick="showSection('payment-section')"><i class="fas fa-wallet"></i> KAFerマネーを入金する</button>
+                    <button class="btn btn-secondary" onclick="showSection('history-section')"><i class="fas fa-history"></i> 利用履歴を確認する</button>
+                </div>
+            </div>
+
+            <!-- ======== Announcements Section (New) ======== -->
+            <div id="announcements-section" class="content-section" style="display: none;">
+                <h2><i class="fas fa-bullhorn"></i> 運営からのお知らせ</h2>
+                <div id="announcements-list" class="log-container">
+                    <!-- Announcements will be loaded here by JavaScript -->
+                </div>
+            </div>
+            
+            <!-- ======== Payment Section ======== -->
+            <div id="payment-section" class="content-section" style="display: none;">
+                <h2><i class="fas fa-wallet"></i> KAFerマネーを入金</h2>
+                <div id="reader"></div>
+                <div class="qr-scanner-controls">
+                    <button id="start-scanner-btn" class="btn btn-secondary"><i class="fas fa-camera"></i> QRコードをスキャン</button>
+                    <button id="stop-scanner-btn" class="btn btn-danger" style="display: none;"><i class="fas fa-stop-circle"></i> スキャン停止</button>
+                </div>
+                <form id="payment-form">
+                    <div class="form-group">
+                        <label for="payment-code"><i class="fas fa-barcode"></i> KAFerマネーコード (16桁)</label>
+                        <input type="text" id="payment-code" required pattern="[0-9]{16}">
+                    </div>
+                    <button type="submit" class="btn"><i class="fas fa-check-circle"></i> このコードを使用する</button>
+                </form>
+            </div>
+            
+            <!-- ======== History Section ======== -->
+            <div id="history-section" class="content-section" style="display: none;">
+                <h2><i class="fas fa-history"></i> 利用履歴</h2>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>日付</th><th>種別</th><th>金額 (KAFer)</th><th>詳細</th></tr>
+                        </thead>
+                        <tbody id="history-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ======== Settings Section ======== -->
+            <div id="settings-section" class="content-section" style="display: none;">
+                <h2><i class="fas fa-cog"></i> 設定</h2>
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <span>パスワード変更</span>
+                        <button class="btn btn-sm" onclick="showSection('pass-update-section')"><i class="fas fa-key"></i> 変更する</button>
+                    </div>
+                    <div class="list-group-item">
+                        <span>KAFerマネー返金申請</span>
+                        <button class="btn btn-sm" onclick="showSection('refund-request-section')"><i class="fas fa-undo-alt"></i> 申請する</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ======== Password Update Sub-section ======== -->
+            <div id="pass-update-section" class="content-section" style="display: none;">
+                <h2><i class="fas fa-user-lock"></i> パスワード変更</h2>
+                <form id="pass-update-form">
+                    <div class="form-group"><label for="current-password"><i class="fas fa-key"></i> 現在のパスワード</label><input type="password" id="current-password" required></div>
+                    <div class="form-group"><label for="new-password"><i class="fas fa-unlock-alt"></i> 新しいパスワード</label><input type="password" id="new-password" required></div>
+                    <div class="form-group"><label for="confirm-new-password"><i class="fas fa-check-double"></i> 新しいパスワード (確認)</label><input type="password" id="confirm-new-password" required></div>
+                    <button type="submit" class="btn btn-secondary"><i class="fas fa-exchange-alt"></i> パスワードを変更</button>
+                </form>
+            </div>
+
+            <!-- ======== Refund Request Sub-section ======== -->
+            <div id="refund-request-section" class="content-section" style="display: none;">
+                <h2><i class="fas fa-undo-alt"></i> KAFerマネー返金申請</h2>
+                <p>現在の残高: <span id="current-money-balance-refund" class="highlight">0 KAFer</span></p>
+                <form id="refund-request-form">
+                    <div class="form-group"><label for="refund-amount-input"><i class="fas fa-yen-sign"></i> 返金を希望する金額 (100円単位)</label><input type="number" id="refund-amount-input" required min="100" step="100"></div>
+                    <p class="form-note">返金には手数料として100円がかかります。</p>
+                    <p id="refund-code-display" style="display: none;">返還コード: <span id="generated-refund-code" class="highlight"></span> (このコードを管理者に提示してください)</p>
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-paper-plane"></i> 返金申請を提出</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bottom Navigation Bar: Content will be generated by JavaScript -->
+    <footer class="bottom-nav" id="bottom-nav-bar"></footer>
+    
+    <!-- External library for QR code scanning -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <!-- App scripts -->
+    <script src="/assets/js/global.js"></script>
+    <script src="/assets/js/app/menu.js"></script>
+</body>
+</html>
